@@ -4,7 +4,7 @@ const envSchema = z.object({
   DATABASE_URL: z
     .string()
     .min(1)
-    .default("postgresql://postgres:postgres@localhost:5433/kaos?schema=public"),
+    .default("postgresql://postgres:postgres@localhost:5433/sentinela?schema=public"),
   APP_BASE_URL: z.string().url().optional(),
   GOV_CONTACT_EMAIL: z.string().email().optional(),
   MAX_UPLOAD_IMAGES: z.coerce.number().int().min(1).max(10).default(3),

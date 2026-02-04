@@ -18,11 +18,35 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Kaos",
-    template: "%s | Kaos",
+    default: "Sentinela",
+    template: "%s | Sentinela",
   },
   description:
-    "OpenStreetMap-based incident reporting: upload a photo, pin location, and generate a message for your local government.",
+    "Crowdsourced emergency reporting — report disasters, fires, floods, and emergencies on a map. Community-validated alerts sent to local government.",
+  keywords: [
+    "emergency reporting",
+    "disaster reporting",
+    "crowdsourced alerts",
+    "flood report",
+    "fire report",
+    "community safety",
+    "incident map",
+  ],
+  openGraph: {
+    title: "Sentinela",
+    description:
+      "Crowdsourced emergency reporting — report disasters on a map, validated by the community, sent to local government.",
+    url: "https://sentinela.help",
+    siteName: "Sentinela",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sentinela",
+    description:
+      "Crowdsourced emergency reporting — report disasters on a map, validated by the community.",
+  },
+  metadataBase: new URL("https://sentinela.help"),
 };
 
 export default function RootLayout({

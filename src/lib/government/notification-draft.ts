@@ -38,7 +38,7 @@ export function composeNotificationDraft(report: {
       ? new URL(`/reports/${report.id}`, env.APP_BASE_URL).toString()
       : null;
 
-  const subject = `[Kaos] ${incidentTypeLabel[report.type]} report`;
+  const subject = `[Sentinela] ${incidentTypeLabel[report.type]} report`;
 
   const lines: string[] = [
     `Incident: ${incidentTypeLabel[report.type]}`,

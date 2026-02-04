@@ -2,14 +2,14 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_DB: kaos
+      POSTGRES_DB: sentinela
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       # Use a non-default port to avoid clashing with a local Postgres on 5432.
       - "5433:5432"
     volumes:
-      - kaos_pgdata:/var/lib/postgresql/data
+      - sentinela_pgdata:/var/lib/postgresql/data
 
 volumes:
-  kaos_pgdata:
+  sentinela_pgdata:

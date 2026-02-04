@@ -144,7 +144,7 @@
 /* ── Custom map markers ── */
 
 /* Yellow pin (reports without images) */
-.kaos-pin--yellow {
+.sentinela-pin--yellow {
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -153,12 +153,12 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
-.dark .kaos-pin--yellow {
+.dark .sentinela-pin--yellow {
   border-color: #1e1e2e;
 }
 
 /* Green pin with checkmark (solved reports) */
-.kaos-pin--solved {
+.sentinela-pin--solved {
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -170,7 +170,7 @@
   justify-content: center;
 }
 
-.kaos-pin--solved::after {
+.sentinela-pin--solved::after {
   content: "✓";
   color: white;
   font-size: 14px;
@@ -178,12 +178,12 @@
   line-height: 1;
 }
 
-.dark .kaos-pin--solved {
+.dark .sentinela-pin--solved {
   border-color: #1e1e2e;
 }
 
 /* Solved image marker (green border with checkmark overlay) */
-.kaos-pin--image-solved {
+.sentinela-pin--image-solved {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -195,7 +195,7 @@
   position: relative;
 }
 
-.kaos-pin--image-solved::after {
+.sentinela-pin--image-solved::after {
   content: "✓";
   position: absolute;
   bottom: -4px;
@@ -213,16 +213,16 @@
   border: 2px solid #fff;
 }
 
-.dark .kaos-pin--image-solved {
+.dark .sentinela-pin--image-solved {
   border-color: #22c55e;
 }
 
-.dark .kaos-pin--image-solved::after {
+.dark .sentinela-pin--image-solved::after {
   border-color: #1e1e2e;
 }
 
 /* Red pin with exclamation (escalated reports) */
-.kaos-pin--escalated {
+.sentinela-pin--escalated {
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -234,7 +234,7 @@
   justify-content: center;
 }
 
-.kaos-pin--escalated::after {
+.sentinela-pin--escalated::after {
   content: "!";
   color: white;
   font-size: 14px;
@@ -242,12 +242,12 @@
   line-height: 1;
 }
 
-.dark .kaos-pin--escalated {
+.dark .sentinela-pin--escalated {
   border-color: #1e1e2e;
 }
 
 /* Escalated image marker (red border with exclamation overlay) */
-.kaos-pin--image-escalated {
+.sentinela-pin--image-escalated {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -259,7 +259,7 @@
   position: relative;
 }
 
-.kaos-pin--image-escalated::after {
+.sentinela-pin--image-escalated::after {
   content: "!";
   position: absolute;
   bottom: -4px;
@@ -277,16 +277,16 @@
   border: 2px solid #fff;
 }
 
-.dark .kaos-pin--image-escalated {
+.dark .sentinela-pin--image-escalated {
   border-color: #ef4444;
 }
 
-.dark .kaos-pin--image-escalated::after {
+.dark .sentinela-pin--image-escalated::after {
   border-color: #1e1e2e;
 }
 
 /* Circular image thumbnail */
-.kaos-pin--image {
+.sentinela-pin--image {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -297,25 +297,25 @@
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
 }
 
-.dark .kaos-pin--image {
+.dark .sentinela-pin--image {
   border-color: #1e1e2e;
 }
 
 /* Override default leaflet-div-icon styles */
-.kaos-marker-yellow,
-.kaos-marker-image,
-.kaos-marker-solved,
-.kaos-marker-image-solved,
-.kaos-marker-escalated,
-.kaos-marker-image-escalated,
-.kaos-cluster {
+.sentinela-marker-yellow,
+.sentinela-marker-image,
+.sentinela-marker-solved,
+.sentinela-marker-image-solved,
+.sentinela-marker-escalated,
+.sentinela-marker-image-escalated,
+.sentinela-cluster {
   background: transparent !important;
   border: none !important;
 }
 
 /* ── Cluster icons ── */
 
-.kaos-cluster__inner {
+.sentinela-cluster__inner {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -330,21 +330,21 @@
   color: #ffffff;
 }
 
-.dark .kaos-cluster__inner {
+.dark .sentinela-cluster__inner {
   /* Dark mode: white circle, black text */
   background-color: #ffffff;
   color: #18181b;
 }
 
-.kaos-cluster--sm .kaos-cluster__inner {
+.sentinela-cluster--sm .sentinela-cluster__inner {
   font-size: 12px;
 }
 
-.kaos-cluster--md .kaos-cluster__inner {
+.sentinela-cluster--md .sentinela-cluster__inner {
   font-size: 14px;
 }
 
-.kaos-cluster--lg .kaos-cluster__inner {
+.sentinela-cluster--lg .sentinela-cluster__inner {
   font-size: 16px;
   font-weight: 700;
 }

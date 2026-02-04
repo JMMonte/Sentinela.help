@@ -41,7 +41,7 @@ export async function reverseGeocode({
     lon: String(longitude),
   }).toString();
 
-  const userAgent = env.NOMINATIM_USER_AGENT ?? "Kaos/0.1";
+  const userAgent = env.NOMINATIM_USER_AGENT ?? "Sentinela/0.1";
 
   const response = await fetch(url, {
     headers: {

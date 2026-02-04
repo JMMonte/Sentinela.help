@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db/prisma";
 import { env } from "@/lib/env";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { createContributionFieldsSchema } from "@/lib/reports/validation";
-import { isAllowedImageMimeType, saveImageToPublicUploads } from "@/lib/uploads/local-public-storage";
+import { isAllowedImageMimeType, saveImage } from "@/lib/uploads";
 
 export const runtime = "nodejs";
 
@@ -102,7 +102,7 @@ export async function POST(
     }
 
     // Store images
-    const storedImages = await Promise.all(files.map((file) => saveImageToPublicUploads(file)));
+    const storedImages = await Promise.all(files.map((file) => saveImage(file)));
 
     // Determine new report status and score updates based on contribution type
     let newReportStatus: "NEW" | "NOTIFIED" | "CLOSED" | null = null;

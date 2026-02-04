@@ -10,7 +10,7 @@ export function SiteHeader() {
           href="/"
           className="px-3 text-sm font-semibold tracking-tight"
         >
-          Kaos
+          Sentinela
         </Link>
 
         <ThemeToggle />

@@ -1,6 +1,6 @@
-# Kaos
+# Sentinela
 
-OpenStreetMap-based incident reporting: users can upload images, pin a location, and generate a ready-to-send message for local government (floods, fires, explosions, etc).
+Crowdsourced emergency reporting platform — citizens report disasters on a map, the community validates and discusses, and notifications are sent to local government. Visit [sentinela.help](https://sentinela.help).
 
 ## Stack
 
