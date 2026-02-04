@@ -244,12 +244,18 @@ function ReportListItems({
               <div className="flex items-center gap-2">
                 <IncidentTypeBadge type={report.type} />
                 <ScoreBadge score={report.score} />
-                <span
-                  className="text-xs text-muted-foreground"
-                  title={new Date(report.createdAt).toLocaleString()}
-                >
-                  {formatRelativeTime(new Date(report.createdAt))}
-                </span>
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="cursor-help text-xs text-muted-foreground">
+                        {formatRelativeTime(new Date(report.createdAt))}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{new Date(report.createdAt).toLocaleString()}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               {report.description && (
                 <p className="text-sm text-muted-foreground truncate">
@@ -641,7 +647,7 @@ function ReportDetailContent({
             )}
 
             {/* Action toggles */}
-            <TooltipProvider delayDuration={300}>
+            <TooltipProvider delayDuration={0}>
               <div className="flex gap-2">
                 <Tooltip>
                   <TooltipTrigger asChild>
