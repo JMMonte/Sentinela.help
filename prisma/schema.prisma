@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum IncidentType {
+  FLOOD
+  FIRE
+  EXPLOSION
+  EARTHQUAKE
+  LANDSLIDE
+  STORM
+  ROAD_CLOSURE
+  OTHER
+}
+
+enum ReportStatus {
+  NEW
+  NOTIFIED
+  CLOSED
+}
+
+enum ContributionType {
+  COMMENT
+  ESCALATE
+  DEESCALATE
+  SOLVED
+  REOPEN
+}
+
+model Jurisdiction {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  name             String
+  countryCode      String?
+  admin1           String?
+  admin2           String?
+  admin3           String?
+
+  contactEmail     String?
+  contactWebhookUrl String?
+}
+
+model Report {
+  id            String       @id @default(cuid())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  type          IncidentType
+  status        ReportStatus @default(NEW)
+
+  description   String?
+  reporterEmail String?
+
+  latitude      Float
+  longitude     Float
+  address       String?
+
+  // Scoring: net score = escalateCount - deescalateCount
+  escalateCount   Int @default(0)
+  deescalateCount Int @default(0)
+
+  images        ReportImage[]
+  contributions Contribution[]
+}
+
+model ReportImage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  reportId  String
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  url       String
+  mimeType  String
+  bytes     Int
+
+  width     Int?
+  height    Int?
+}
+
+model Contribution {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  reportId  String
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  type             ContributionType @default(COMMENT)
+  contributorEmail String?
+  comment          String?
+
+  images    ContributionImage[]
+}
+
+model ContributionImage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  contributionId String
+  contribution   Contribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+
+  url       String
+  mimeType  String
+  bytes     Int
+
+  width     Int?
+  height    Int?
+}
