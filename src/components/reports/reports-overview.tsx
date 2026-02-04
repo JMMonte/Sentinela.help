@@ -53,13 +53,6 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-} from "@/components/ui/drawer";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -804,9 +797,7 @@ export function ReportsOverview({
   const [view, setView] = useState<SidebarView>("reports");
   const [panelOpen, setPanelOpen] = useState(true);
   const [headerPortal, setHeaderPortal] = useState<HTMLElement | null>(null);
-  const [activeSnap, setActiveSnap] = useState<string | number | null>(
-    "148px",
-  );
+  const [activeSnap, setActiveSnap] = useState<"collapsed" | "expanded">("collapsed");
 
   // ── Detail view state ──
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
@@ -849,6 +840,7 @@ export function ReportsOverview({
         ];
         setCenter(loc);
         setUserLocation(loc);
+        setFlyToLocation(loc);
       },
       () => {},
       { enableHighAccuracy: true, timeout: 10_000 },
@@ -969,6 +961,7 @@ export function ReportsOverview({
         ];
         setCenter(loc);
         setUserLocation(loc);
+        setFlyToLocation(loc);
       },
       () =>
         toast.error(
@@ -1326,44 +1319,254 @@ export function ReportsOverview({
       ) : null}
 
       {/* ── Mobile bottom sheet ── */}
-      <Drawer
-        open
-        modal={false}
-        dismissible={false}
-        shouldScaleBackground={false}
-        snapPoints={["148px", 0.5, 0.92]}
-        activeSnapPoint={activeSnap}
-        setActiveSnapPoint={setActiveSnap}
+      <div
+        className={cn(
+          "fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-xl border-t bg-background/95 shadow-[0_-4px_30px_rgba(0,0,0,0.15)] backdrop-blur-xl transition-[height] duration-300 ease-out sm:hidden",
+          activeSnap === "expanded" ? "h-[calc(100dvh-60px)]" : "h-[180px]"
+        )}
       >
-        <DrawerContent className="bg-background/95 backdrop-blur-md supports-backdrop-filter:bg-background/80 sm:hidden">
-          <DrawerHeader className="space-y-3 text-left">
-            <div>
-              <DrawerTitle>Kaos</DrawerTitle>
-              <DrawerDescription>
-                {view === "reports" && (isLoading ? "Loading…" : `${filtered.length} report(s)`)}
-                {view === "detail" && (selectedReport ? "Report details" : "Loading…")}
-                {view === "form" && "Tap the map to pin, then fill details"}
-              </DrawerDescription>
-            </div>
-          </DrawerHeader>
-          <div
-            className={cn(
-              "flex-1 pb-[env(safe-area-inset-bottom)]",
-              activeSnap === "148px" ? "overflow-hidden" : "overflow-y-auto",
-            )}
-          >
-            {view === "reports" && (
-              <ReportListItems
-                reports={filtered}
-                isLoading={isLoading}
-                onSelect={handleSelectReport}
+        {/* Handle */}
+        <button
+          type="button"
+          className="flex w-full shrink-0 items-center justify-center py-3"
+          onClick={() => setActiveSnap(activeSnap === "collapsed" ? "expanded" : "collapsed")}
+        >
+          <div className="h-1.5 w-12 rounded-full bg-muted-foreground/50" />
+        </button>
+
+        {/* Reports view header */}
+          {view === "reports" && (
+            <>
+              <div className="px-4 pt-1 pb-3">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h2 className="text-lg font-semibold">Reports</h2>
+                    <p className="text-sm text-muted-foreground">
+                      {isLoading ? "Loading…" : `${filtered.length} nearby`}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="rounded-full h-8 px-3 text-xs"
+                    onClick={() => {
+                      setView("form");
+                      setActiveSnap("expanded");
+                    }}
+                  >
+                    Report
+                  </Button>
+                </div>
+                <Tabs value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
+                  <TabsList className="w-full h-9">
+                    {TIME_FILTER_OPTIONS.map((option) => (
+                      <TabsTrigger key={option.value} value={option.value} className="flex-1 text-xs">
+                        {option.label}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
+              </div>
+              <Separator />
+              <div
+                className={cn(
+                  "flex-1 pb-[env(safe-area-inset-bottom)]",
+                  activeSnap === "collapsed" ? "overflow-hidden" : "overflow-y-auto",
+                )}
+              >
+                <ReportListItems
+                  reports={filtered}
+                  isLoading={isLoading}
+                  onSelect={(id) => {
+                    handleSelectReport(id);
+                    setActiveSnap("expanded");
+                  }}
+                />
+              </div>
+            </>
+          )}
+
+          {/* Detail view */}
+          {view === "detail" && (
+            <div
+              className={cn(
+                "flex-1 flex flex-col pb-[env(safe-area-inset-bottom)]",
+                activeSnap === "collapsed" ? "overflow-hidden" : "overflow-y-auto",
+              )}
+            >
+              <ReportDetailContent
+                report={selectedReport}
+                isLoading={detailLoading}
+                error={detailError}
+                onBack={handleBackToList}
+                onRefresh={refreshSelectedReport}
+                onReportsRefresh={fetchReports}
+                onGoTo={selectedReport ? () => {
+                  setFlyToLocation([selectedReport.latitude, selectedReport.longitude]);
+                  setActiveSnap("collapsed");
+                } : undefined}
               />
-            )}
-            {view === "detail" && detailContent}
-            {view === "form" && <div className="px-4 pb-6">{formContent}</div>}
-          </div>
-        </DrawerContent>
-      </Drawer>
+            </div>
+          )}
+
+          {/* Form view */}
+          {view === "form" && (
+            <div
+              className={cn(
+                "flex-1 pb-[env(safe-area-inset-bottom)]",
+                activeSnap === "collapsed" ? "overflow-hidden" : "overflow-y-auto",
+              )}
+            >
+              <div className="px-4 pt-1 pb-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold">New Report</h2>
+                    <p className="text-sm text-muted-foreground">
+                      {pinLocation
+                        ? `${pinLocation.latitude.toFixed(4)}, ${pinLocation.longitude.toFixed(4)}`
+                        : "Tap the map to pin location"}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => {
+                      cancelForm();
+                      setActiveSnap("collapsed");
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <Separator />
+              <div className="px-4 py-4">
+                <div className="grid gap-2 pb-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      if (!navigator.geolocation) {
+                        toast.error("Geolocation is not available in this browser.");
+                        return;
+                      }
+                      navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                          setPinLocation({
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                          });
+                        },
+                        () =>
+                          toast.error(
+                            "Unable to read your location. Check browser permissions.",
+                          ),
+                        { enableHighAccuracy: true, timeout: 10_000 },
+                      );
+                    }}
+                  >
+                    <Locate className="mr-2 h-4 w-4" />
+                    Use my location
+                  </Button>
+                </div>
+
+                <Form {...form}>
+                  <form
+                    className="grid gap-4"
+                    onSubmit={(event) => void form.handleSubmit(onSubmit)(event)}
+                  >
+                    <FormField
+                      control={form.control}
+                      name="type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Incident type</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select an incident type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {incidentTypes.map((type) => {
+                                const Icon = incidentTypeIcon[type];
+                                return (
+                                  <SelectItem key={type} value={type}>
+                                    <Icon className="mr-2 inline-block size-4" />
+                                    {incidentTypeLabel[type]}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="What is happening?"
+                              className="min-h-20"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="reporterEmail"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Your email (optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="you@example.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid gap-2">
+                      <div className="text-sm font-medium">Images</div>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(event) => {
+                          const list = event.currentTarget.files;
+                          if (!list) return setFiles([]);
+                          setFiles(Array.from(list));
+                        }}
+                      />
+                      <div className="text-sm text-muted-foreground">
+                        {selectedCountText} (up to {maxImages})
+                      </div>
+                    </div>
+
+                    <Button type="submit" disabled={isSubmitting} className="w-full">
+                      {isSubmitting ? "Submitting…" : "Submit report"}
+                    </Button>
+                  </form>
+                </Form>
+              </div>
+            </div>
+          )}
+      </div>
 
       {/* ── Post-submission dialog ── */}
       <Dialog
