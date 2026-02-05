@@ -80,7 +80,9 @@
     "alreadyVotedDeescalate": "Já votou como menos urgente",
     "solvedTooltip": "Marcar incidente como resolvido",
     "reopenTooltip": "O incidente não está realmente resolvido",
-    "osmLink": "OSM"
+    "osmLink": "OSM",
+    "navigate": "Navegar",
+    "clearRoute": "Limpar rota"
   },
   "status": {
     "active": "Ativo",
@@ -135,7 +137,8 @@
     "attachImage": "Por favor, anexe pelo menos uma imagem.",
     "attachMaxImages": "Por favor, anexe até {max} imagens.",
     "geolocationUnavailable": "A geolocalização não está disponível neste navegador.",
-    "locationPermissionDenied": "Não foi possível ler a sua localização. Verifique as permissões do navegador."
+    "locationPermissionDenied": "Não foi possível ler a sua localização. Verifique as permissões do navegador.",
+    "routeFailed": "Não foi possível calcular a rota. Tente novamente."
   },
   "submitDialog": {
     "title": "Incidente submetido",
@@ -163,6 +166,10 @@
     "freeHighlight": "completamente gratuito",
     "freeParagraph1": "O Sentinela é disponibilizado de forma completamente gratuita para comunidades em Portugal e em toda a Europa. Acreditamos que a infraestrutura de reporte de emergências deve ser acessível a todos, em todo o lado - sem subscrições, sem custos ocultos, sem barreiras.",
     "freeParagraph2": "Quer esteja em Lisboa, no Porto ou em qualquer outro lugar do mundo, o Sentinela está aqui para ajudar a sua comunidade a manter-se segura e informada.",
+    "openSourceTitle": "Código aberto",
+    "openSourceParagraph1": "O Sentinela é totalmente open source sob a licença MIT. Pode inspecionar o código, sugerir melhorias, reportar problemas ou adaptá-lo para a sua comunidade.",
+    "openSourceParagraph2": "Contribuições são bem-vindas — seja código, traduções ou ideias.",
+    "viewOnGitHub": "Ver no GitHub",
     "builtByTitle": "Desenvolvido por Darkmatter AI Labs",
     "builtByParagraph1": "O Sentinela é desenvolvido e mantido pela Darkmatter AI Labs, uma equipa focada em construir ferramentas baseadas em IA que fazem uma verdadeira diferença na vida das pessoas.",
     "builtByParagraph2": "Estamos comprometidos em manter o Sentinela aberto, fiável e em constante melhoria. Se tiver feedback ou quiser entrar em contacto, visite-nos em darkmatter.is.",

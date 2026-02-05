@@ -33,6 +33,7 @@ import { WeatherOverlay } from "./overlays/weather-overlay";
 import { SeismicOverlay } from "./overlays/seismic-overlay";
 import { ProCivOverlay } from "./overlays/prociv-overlay";
 import { RainfallOverlay } from "./overlays/rainfall-overlay";
+import { RouteOverlay } from "./overlays/route-overlay";
 import { OverlayControls } from "./overlays/overlay-controls";
 import { useWeatherOverlay, type WeatherOverlayConfig } from "./hooks/use-weather-overlay";
 import { useSeismicOverlay, type SeismicOverlayConfig } from "./hooks/use-seismic-overlay";
@@ -87,6 +88,8 @@ export type ReportsMapProps = {
   overlayConfig?: OverlayConfig;
   /** Time filter in hours – controls how far back overlays fetch data. */
   timeFilterHours?: number;
+  /** Route geometry to display as a polyline. Array of [lat, lng] pairs. */
+  routeGeometry?: [number, number][];
 };
 
 function FlyToCenter({ center }: { center?: LatLngExpression }) {
@@ -195,6 +198,7 @@ export function ReportsMapClient({
   className,
   overlayConfig = DEFAULT_OVERLAY_CONFIG,
   timeFilterHours = 8,
+  routeGeometry,
 }: ReportsMapProps) {
   const { resolvedTheme } = useTheme();
   const tileUrl = resolvedTheme === "dark" ? TILE_DARK : TILE_LIGHT;
@@ -310,6 +314,11 @@ export function ReportsMapClient({
         {/* Rainfall overlay (IPMA station observations) */}
         {rainfall.enabled && rainfall.stations.length > 0 && (
           <RainfallOverlay stations={rainfall.stations} />
+        )}
+
+        {/* Route polyline (navigation route) */}
+        {routeGeometry && routeGeometry.length >= 2 && (
+          <RouteOverlay geometry={routeGeometry} />
         )}
 
         {/* User location (blue dot + ambient weather) */}

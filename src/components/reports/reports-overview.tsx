@@ -15,8 +15,11 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  ExternalLink,
+  Loader2,
   Locate,
   MapPin,
+  Navigation,
   PanelRightClose,
   PanelRightOpen,
   X,
@@ -73,6 +76,8 @@ import {
   msToKmh,
   windDegToDirection,
 } from "@/lib/overlays/weather-api";
+import { fetchRoute, formatDistance, formatDuration, type RouteResult } from "@/lib/routing/osrm";
+import { getNavigationLinks } from "@/lib/routing/navigation-links";
 import { cn } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
@@ -156,6 +161,13 @@ type ReportDetailData = {
 
 type GetReportResponse = {
   report: ReportDetailData | null;
+};
+
+type RouteData = {
+  geometry: [number, number][];
+  distance: number;
+  duration: number;
+  reportId: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -404,6 +416,11 @@ function ReportDetailContent({
   onRefresh,
   onReportsRefresh,
   onGoTo,
+  onNavigate,
+  routeData,
+  routeLoading,
+  onClearRoute,
+  userLocation,
 }: {
   report: ReportDetailData | null;
   isLoading: boolean;
@@ -412,6 +429,11 @@ function ReportDetailContent({
   onRefresh: () => void;
   onReportsRefresh: () => void;
   onGoTo?: () => void;
+  onNavigate?: () => void;
+  routeData: RouteData | null;
+  routeLoading: boolean;
+  onClearRoute?: () => void;
+  userLocation?: [number, number];
 }) {
   const t = useTranslations();
   const [inputComment, setInputComment] = useState("");
@@ -557,7 +579,23 @@ function ReportDetailContent({
           <IncidentTypeBadge type={report.type} />
           <StatusBadge status={report.status} />
           <ScoreBadge score={report.score} />
-          {onGoTo && (
+          {onNavigate && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2"
+              onClick={onNavigate}
+              disabled={routeLoading || !userLocation}
+            >
+              {routeLoading ? (
+                <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+              ) : (
+                <Navigation className="mr-1 h-3 w-3" />
+              )}
+              {t("reportDetail.navigate")}
+            </Button>
+          )}
+          {onGoTo && !routeData && (
             <Button variant="ghost" size="sm" className="h-6 px-2" onClick={onGoTo}>
               <MapPin className="mr-1 h-3 w-3" />
               {t("reportDetail.goTo")}
@@ -565,6 +603,51 @@ function ReportDetailContent({
           )}
         </div>
       </div>
+
+      {/* Route info panel */}
+      {routeData && report && (
+        <div className="shrink-0 border-b bg-blue-50 px-4 py-3 dark:bg-blue-950/30">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3 text-sm">
+              <span className="font-medium">
+                {formatDistance(routeData.distance)}
+              </span>
+              <span className="text-muted-foreground">
+                ~{formatDuration(routeData.duration)}
+              </span>
+            </div>
+            {onClearRoute && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={onClearRoute}
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            )}
+          </div>
+          {userLocation && (
+            <div className="flex flex-wrap gap-2">
+              {getNavigationLinks(
+                userLocation,
+                [report.latitude, report.longitude]
+              ).map((app) => (
+                <a
+                  key={app.id}
+                  href={app.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 rounded-md border bg-background px-2 py-1 text-xs font-medium transition-colors hover:bg-muted"
+                >
+                  {app.name}
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Scrollable content area - Timeline */}
       <div className="flex-1 overflow-y-auto">
@@ -967,6 +1050,10 @@ export function ReportsOverview({
   const [headerPortal, setHeaderPortal] = useState<HTMLElement | null>(null);
   const [activeSnap, setActiveSnap] = useState<"collapsed" | "expanded">("collapsed");
 
+  // ── Route / navigation state ──
+  const [routeData, setRouteData] = useState<RouteData | null>(null);
+  const [routeLoading, setRouteLoading] = useState(false);
+
   // ── Mobile bottom sheet drag state ──
   const COLLAPSED_HEIGHT = 180;
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -1234,6 +1321,39 @@ export function ReportsOverview({
     );
   }
 
+  async function handleNavigate() {
+    if (!userLocation || !selectedReport) {
+      toast.error(t("toast.locationRequired"));
+      return;
+    }
+    // Skip if we already have a route for this report
+    if (routeData && routeData.reportId === selectedReport.id) return;
+
+    setRouteLoading(true);
+    try {
+      const result = await fetchRoute(
+        userLocation,
+        [selectedReport.latitude, selectedReport.longitude]
+      );
+      setRouteData({
+        geometry: result.geometry,
+        distance: result.distance,
+        duration: result.duration,
+        reportId: selectedReport.id,
+      });
+    } catch {
+      toast.error(t("toast.routeFailed"));
+      // Fallback: just fly to the location
+      setFlyToLocation([selectedReport.latitude, selectedReport.longitude]);
+    } finally {
+      setRouteLoading(false);
+    }
+  }
+
+  function clearRoute() {
+    setRouteData(null);
+  }
+
   function handleMapClick(lat: number, lng: number) {
     setPinLocation({ latitude: lat, longitude: lng });
     setView("form");
@@ -1303,6 +1423,9 @@ export function ReportsOverview({
   // ── Sidebar content builders ──
 
   function handleSelectReport(reportId: string) {
+    if (routeData && routeData.reportId !== reportId) {
+      setRouteData(null);
+    }
     setSelectedReportId(reportId);
     setView("detail");
     // Update URL for shareable links
@@ -1312,6 +1435,7 @@ export function ReportsOverview({
   }
 
   function handleBackToList() {
+    setRouteData(null);
     setSelectedReportId(null);
     setView("reports");
     // Remove report param from URL (use replace to avoid adding history entry)
@@ -1359,6 +1483,11 @@ export function ReportsOverview({
       onRefresh={refreshSelectedReport}
       onReportsRefresh={fetchReports}
       onGoTo={selectedReport ? () => setFlyToLocation([selectedReport.latitude, selectedReport.longitude]) : undefined}
+      onNavigate={selectedReport ? handleNavigate : undefined}
+      routeData={routeData}
+      routeLoading={routeLoading}
+      onClearRoute={clearRoute}
+      userLocation={userLocation}
     />
   );
 
@@ -1543,6 +1672,7 @@ export function ReportsOverview({
           className="h-full w-full rounded-none"
           overlayConfig={overlayConfig}
           timeFilterHours={timeFilterHours}
+          routeGeometry={routeData?.geometry}
         />
       </div>
 
@@ -1741,6 +1871,11 @@ export function ReportsOverview({
                     setFlyToLocation([selectedReport.latitude, selectedReport.longitude]);
                     setActiveSnap("collapsed");
                   } : undefined}
+                  onNavigate={selectedReport ? handleNavigate : undefined}
+                  routeData={routeData}
+                  routeLoading={routeLoading}
+                  onClearRoute={clearRoute}
+                  userLocation={userLocation}
                 />
               </div>
             </>

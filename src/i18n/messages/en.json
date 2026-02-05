@@ -80,7 +80,9 @@
     "alreadyVotedDeescalate": "You already voted to de-escalate",
     "solvedTooltip": "Mark incident as resolved",
     "reopenTooltip": "Report is not actually solved",
-    "osmLink": "OSM"
+    "osmLink": "OSM",
+    "navigate": "Navigate",
+    "clearRoute": "Clear route"
   },
   "status": {
     "active": "Active",
@@ -135,7 +137,8 @@
     "attachImage": "Please attach at least one image.",
     "attachMaxImages": "Please attach up to {max} images.",
     "geolocationUnavailable": "Geolocation is not available in this browser.",
-    "locationPermissionDenied": "Unable to read your location. Check browser permissions."
+    "locationPermissionDenied": "Unable to read your location. Check browser permissions.",
+    "routeFailed": "Could not calculate route. Try again."
   },
   "submitDialog": {
     "title": "Report submitted",
@@ -163,6 +166,10 @@
     "freeHighlight": "completely free",
     "freeParagraph1": "Sentinela is provided completely free to communities in Portugal and across Europe. We believe emergency reporting infrastructure should be accessible to everyone, everywhere - no subscriptions, no hidden fees, no barriers.",
     "freeParagraph2": "Whether you're in Lisbon, Porto, or anywhere else in the world, Sentinela is here to help your community stay safe and informed.",
+    "openSourceTitle": "Open source",
+    "openSourceParagraph1": "Sentinela is fully open source under the MIT license. You can inspect the code, suggest improvements, report bugs, or adapt it for your own community.",
+    "openSourceParagraph2": "Contributions are welcome — whether it's code, translations, or ideas.",
+    "viewOnGitHub": "View on GitHub",
     "builtByTitle": "Built by Darkmatter AI Labs",
     "builtByParagraph1": "Sentinela is developed and maintained by Darkmatter AI Labs, a team focused on building AI-powered tools that make a real difference in people's lives.",
     "builtByParagraph2": "We're committed to keeping Sentinela open, reliable, and always improving. If you have feedback or want to get in touch, visit us at darkmatter.is.",
