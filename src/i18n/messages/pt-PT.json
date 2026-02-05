@@ -1,0 +1,207 @@
+{
+  "common": {
+    "loading": "A carregar...",
+    "back": "Voltar",
+    "cancel": "Cancelar",
+    "submit": "Submeter",
+    "close": "Fechar"
+  },
+  "header": {
+    "brandName": "Sentinela",
+    "toggleTheme": "Alternar tema",
+    "aboutSentinela": "Sobre o Sentinela",
+    "language": "Idioma"
+  },
+  "reports": {
+    "title": "Incidentes",
+    "nearby": "{count} próximos",
+    "noMatching": "Nenhum incidente encontrado.",
+    "filterPlaceholder": "Filtrar {count} incidentes...",
+    "reportIncident": "Reportar incidente",
+    "report": "Reportar",
+    "newReport": "Novo Incidente",
+    "viewReport": "Ver incidente"
+  },
+  "reportForm": {
+    "title": "Novo incidente",
+    "tapMapInstruction": "Toque no mapa para marcar uma localização e preencha os detalhes.",
+    "locationNotSelected": "Localização: ainda não selecionada",
+    "locationSelected": "Localização: {lat}, {lng}",
+    "tapMapToPin": "Toque no mapa para marcar",
+    "useMyLocation": "Usar a minha localização",
+    "incidentType": "Tipo de incidente",
+    "selectIncidentType": "Selecione um tipo de incidente",
+    "description": "Descrição",
+    "descriptionPlaceholder": "O que está a acontecer? Existem perigos imediatos?",
+    "descriptionPlaceholderShort": "O que está a acontecer?",
+    "descriptionMax": "Máximo 2000 caracteres.",
+    "yourEmail": "O seu email (opcional)",
+    "emailPlaceholder": "voce@exemplo.pt",
+    "emailDescription": "Se fornecido, as autoridades locais podem contactá-lo para mais detalhes.",
+    "images": "Imagens",
+    "noImagesSelected": "Nenhuma imagem selecionada",
+    "oneImageSelected": "1 imagem selecionada",
+    "imagesSelected": "{count} imagens selecionadas",
+    "imagesLimit": "(até {max})",
+    "submitting": "A submeter...",
+    "submitReport": "Submeter incidente"
+  },
+  "reportDetail": {
+    "goTo": "Ir para",
+    "addUpdate": "Adicionar Atualização",
+    "addComment": "Adicionar comentário... (opcional)",
+    "addImages": "+ Adicionar imagens",
+    "imagesCount": "{count} imagem(ns)",
+    "addYourEmail": "+ Adicionar o seu email",
+    "yourEmailOptional": "O seu email (opcional)",
+    "submitUpdate": "Submeter Atualização",
+    "updateDialogTitle": "Adicionar Atualização",
+    "updateDialogDescription": "Adicione um comentário, altere o estado ou anexe imagens a este incidente.",
+    "escalate": "Urgente",
+    "deescalate": "Menos urgente",
+    "markSolved": "Resolvido",
+    "reopen": "Reabrir",
+    "escalateTooltip": "Marcar como mais urgente",
+    "deescalateTooltip": "Reduzir urgência",
+    "alreadyVotedEscalate": "Já votou como urgente",
+    "alreadyVotedDeescalate": "Já votou como menos urgente",
+    "solvedTooltip": "Marcar incidente como resolvido",
+    "reopenTooltip": "O incidente não está realmente resolvido",
+    "osmLink": "OSM"
+  },
+  "status": {
+    "active": "Ativo",
+    "escalated": "Urgente",
+    "solved": "Resolvido",
+    "deescalated": "Menos urgente",
+    "reopened": "Reaberto",
+    "markedSolved": "Marcado Resolvido"
+  },
+  "incidentTypes": {
+    "FLOOD": "Cheia",
+    "FIRE": "Incêndio",
+    "EXPLOSION": "Explosão",
+    "EARTHQUAKE": "Sismo",
+    "LANDSLIDE": "Deslizamento",
+    "STORM": "Tempestade",
+    "ROAD_CLOSURE": "Estrada cortada",
+    "OTHER": "Outro"
+  },
+  "relativeTime": {
+    "justNow": "agora mesmo",
+    "minutesAgo": "há {count} min",
+    "hoursAgo": "há {count}h",
+    "daysAgo": "há {count}d"
+  },
+  "tooltips": {
+    "centerLocation": "Centrar na minha localização",
+    "openPanel": "Abrir painel",
+    "closePanel": "Fechar painel",
+    "escalationsMore": "{count} voto de urgência",
+    "escalationsMorePlural": "{count} votos de urgência",
+    "deescalationsMore": "{count} voto para reduzir urgência",
+    "deescalationsMorePlural": "{count} votos para reduzir urgência"
+  },
+  "toast": {
+    "reportSubmitted": "Incidente submetido.",
+    "commentAdded": "Comentário adicionado",
+    "escalatedWithComment": "Marcado urgente com comentário",
+    "escalated": "Marcado urgente",
+    "deescalatedWithComment": "Urgência reduzida com comentário",
+    "deescalated": "Urgência reduzida",
+    "markedSolvedWithComment": "Marcado como resolvido com comentário",
+    "markedSolved": "Marcado como resolvido",
+    "reopenedWithComment": "Reaberto com comentário",
+    "reopened": "Reaberto",
+    "copiedToClipboard": "Copiado para a área de transferência.",
+    "failedToSubmit": "Falha ao submeter",
+    "failedToLoad": "Falha ao carregar incidentes",
+    "addCommentFirst": "Adicione primeiro um comentário ou imagem.",
+    "tapMapFirst": "Toque no mapa para colocar um marcador primeiro.",
+    "attachImage": "Por favor, anexe pelo menos uma imagem.",
+    "attachMaxImages": "Por favor, anexe até {max} imagens.",
+    "geolocationUnavailable": "A geolocalização não está disponível neste navegador.",
+    "locationPermissionDenied": "Não foi possível ler a sua localização. Verifique as permissões do navegador."
+  },
+  "submitDialog": {
+    "title": "Incidente submetido",
+    "description": "Notifique as autoridades locais usando as ações abaixo.",
+    "to": "Para:",
+    "notConfigured": "não configurado",
+    "copyMessage": "Copiar mensagem",
+    "sendEmail": "Enviar email",
+    "sendEmailDisabled": "Configure GOV_CONTACT_EMAIL para ativar o mailto."
+  },
+  "about": {
+    "backToMap": "Voltar ao mapa",
+    "title": "Sobre o Sentinela",
+    "intro": "O Sentinela é uma plataforma colaborativa de reporte de emergências que permite às comunidades reportar desastres, incêndios, cheias e outras emergências em tempo real.",
+    "emergencyContactsTitle": "Contactos de Emergência - Portugal",
+    "emergencyContactsDescription": "Se está a enfrentar uma emergência relacionada com tempestades ou cheias, contacte imediatamente os serviços de emergência.",
+    "visitSite": "Visitar site",
+    "usefulLinks": "Links Úteis",
+    "howItWorksTitle": "Como funciona",
+    "howItWorks1": "Os cidadãos reportam incidentes marcando localizações no mapa",
+    "howItWorks2": "A comunidade valida os reportes através de votos e comentários",
+    "howItWorks3": "Incidentes urgentes podem ser enviados diretamente às autoridades locais",
+    "howItWorks4": "Todos ficam informados com atualizações em tempo real",
+    "freeTitle": "Gratuito para todos",
+    "freeHighlight": "completamente gratuito",
+    "freeParagraph1": "O Sentinela é disponibilizado de forma completamente gratuita para comunidades em Portugal e em toda a Europa. Acreditamos que a infraestrutura de reporte de emergências deve ser acessível a todos, em todo o lado - sem subscrições, sem custos ocultos, sem barreiras.",
+    "freeParagraph2": "Quer esteja em Lisboa, no Porto ou em qualquer outro lugar do mundo, o Sentinela está aqui para ajudar a sua comunidade a manter-se segura e informada.",
+    "builtByTitle": "Desenvolvido por Darkmatter AI Labs",
+    "builtByParagraph1": "O Sentinela é desenvolvido e mantido pela Darkmatter AI Labs, uma equipa focada em construir ferramentas baseadas em IA que fazem uma verdadeira diferença na vida das pessoas.",
+    "builtByParagraph2": "Estamos comprometidos em manter o Sentinela aberto, fiável e em constante melhoria. Se tiver feedback ou quiser entrar em contacto, visite-nos em darkmatter.is.",
+    "technicalNote": "O Sentinela utiliza OpenStreetMap para mapeamento e integra com fornecedores de dados meteorológicos e sísmicos para lhe dar a imagem mais completa do que está a acontecer na sua área.",
+    "madeWith": "Feito com carinho por",
+    "backToSentinela": "Voltar ao Sentinela"
+  },
+  "emergencyContacts": {
+    "112": {
+      "name": "112",
+      "description": "Número Europeu de Emergência"
+    },
+    "anepc": {
+      "name": "ANEPC",
+      "description": "Proteção Civil"
+    },
+    "ipma": {
+      "name": "IPMA",
+      "description": "Alertas Meteorológicos"
+    },
+    "sns24": {
+      "name": "SNS 24",
+      "description": "Linha de Saúde"
+    },
+    "cruzVermelha": {
+      "name": "Cruz Vermelha",
+      "description": "Assistência Humanitária"
+    },
+    "117": {
+      "name": "117",
+      "description": "Fogos Florestais"
+    }
+  },
+  "usefulLinks": {
+    "avisosIpma": {
+      "name": "Avisos IPMA",
+      "description": "Avisos meteorológicos em tempo real"
+    },
+    "fogos": {
+      "name": "Fogos.pt",
+      "description": "Mapa de incêndios em Portugal"
+    },
+    "prociv": {
+      "name": "Prociv Incidentes",
+      "description": "Incidentes em tempo real"
+    },
+    "snirh": {
+      "name": "SNIRH",
+      "description": "Níveis de rios e albufeiras"
+    },
+    "infraestruturas": {
+      "name": "Infraestruturas de Portugal",
+      "description": "Estado das estradas"
+    }
+  }
+}

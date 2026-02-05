@@ -2,6 +2,7 @@
 
 import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function ThemeToggle() {
+  const t = useTranslations("header");
   const { theme, setTheme } = useTheme();
 
   return (
@@ -23,7 +25,7 @@ export function ThemeToggle() {
             variant="ghost"
             size="icon"
             className="h-7 w-7"
-            aria-label="Toggle theme"
+            aria-label={t("toggleTheme")}
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
             <SunIcon className="h-4 w-4 dark:hidden" />
@@ -31,7 +33,7 @@ export function ThemeToggle() {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Toggle theme</p>
+          <p>{t("toggleTheme")}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

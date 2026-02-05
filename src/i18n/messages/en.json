@@ -1,0 +1,207 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "back": "Back",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "close": "Close"
+  },
+  "header": {
+    "brandName": "Sentinela",
+    "toggleTheme": "Toggle theme",
+    "aboutSentinela": "About Sentinela",
+    "language": "Language"
+  },
+  "reports": {
+    "title": "Reports",
+    "nearby": "{count} nearby",
+    "noMatching": "No matching reports.",
+    "filterPlaceholder": "Filter {count} reports...",
+    "reportIncident": "Report incident",
+    "report": "Report",
+    "newReport": "New Report",
+    "viewReport": "View report"
+  },
+  "reportForm": {
+    "title": "New report",
+    "tapMapInstruction": "Tap the map to pin a location, then fill in details.",
+    "locationNotSelected": "Location: not selected yet",
+    "locationSelected": "Location: {lat}, {lng}",
+    "tapMapToPin": "Tap the map to pin location",
+    "useMyLocation": "Use my location",
+    "incidentType": "Incident type",
+    "selectIncidentType": "Select an incident type",
+    "description": "Description",
+    "descriptionPlaceholder": "What is happening? Any immediate hazards?",
+    "descriptionPlaceholderShort": "What is happening?",
+    "descriptionMax": "Max 2000 characters.",
+    "yourEmail": "Your email (optional)",
+    "emailPlaceholder": "you@example.com",
+    "emailDescription": "If provided, local government can contact you for details.",
+    "images": "Images",
+    "noImagesSelected": "No images selected",
+    "oneImageSelected": "1 image selected",
+    "imagesSelected": "{count} images selected",
+    "imagesLimit": "(up to {max})",
+    "submitting": "Submitting...",
+    "submitReport": "Submit report"
+  },
+  "reportDetail": {
+    "goTo": "Go to",
+    "addUpdate": "Add Update",
+    "addComment": "Add a comment... (optional for actions)",
+    "addImages": "+ Add images",
+    "imagesCount": "{count} image(s)",
+    "addYourEmail": "+ Add your email",
+    "yourEmailOptional": "Your email (optional)",
+    "submitUpdate": "Submit Update",
+    "updateDialogTitle": "Add Update",
+    "updateDialogDescription": "Add a comment, change status, or attach images to this report.",
+    "escalate": "Escalate",
+    "deescalate": "De-escalate",
+    "markSolved": "Solved",
+    "reopen": "Reopen",
+    "escalateTooltip": "Mark as more urgent",
+    "deescalateTooltip": "Mark as less urgent",
+    "alreadyVotedEscalate": "You already voted to escalate",
+    "alreadyVotedDeescalate": "You already voted to de-escalate",
+    "solvedTooltip": "Mark incident as resolved",
+    "reopenTooltip": "Report is not actually solved",
+    "osmLink": "OSM"
+  },
+  "status": {
+    "active": "Active",
+    "escalated": "Escalated",
+    "solved": "Solved",
+    "deescalated": "De-escalated",
+    "reopened": "Reopened",
+    "markedSolved": "Marked Solved"
+  },
+  "incidentTypes": {
+    "FLOOD": "Flood",
+    "FIRE": "Fire",
+    "EXPLOSION": "Explosion",
+    "EARTHQUAKE": "Earthquake",
+    "LANDSLIDE": "Landslide",
+    "STORM": "Storm",
+    "ROAD_CLOSURE": "Road closure",
+    "OTHER": "Other"
+  },
+  "relativeTime": {
+    "justNow": "just now",
+    "minutesAgo": "{count} min ago",
+    "hoursAgo": "{count}h ago",
+    "daysAgo": "{count}d ago"
+  },
+  "tooltips": {
+    "centerLocation": "Center on my location",
+    "openPanel": "Open panel",
+    "closePanel": "Close panel",
+    "escalationsMore": "{count} more escalation than de-escalations",
+    "escalationsMorePlural": "{count} more escalations than de-escalations",
+    "deescalationsMore": "{count} more de-escalation than escalations",
+    "deescalationsMorePlural": "{count} more de-escalations than escalations"
+  },
+  "toast": {
+    "reportSubmitted": "Report submitted.",
+    "commentAdded": "Comment added",
+    "escalatedWithComment": "Escalated with comment",
+    "escalated": "Escalated",
+    "deescalatedWithComment": "De-escalated with comment",
+    "deescalated": "De-escalated",
+    "markedSolvedWithComment": "Marked as solved with comment",
+    "markedSolved": "Marked as solved",
+    "reopenedWithComment": "Reopened with comment",
+    "reopened": "Reopened",
+    "copiedToClipboard": "Copied to clipboard.",
+    "failedToSubmit": "Failed to submit",
+    "failedToLoad": "Failed to load reports",
+    "addCommentFirst": "Add a comment or image first.",
+    "tapMapFirst": "Tap the map to drop a pin first.",
+    "attachImage": "Please attach at least one image.",
+    "attachMaxImages": "Please attach up to {max} images.",
+    "geolocationUnavailable": "Geolocation is not available in this browser.",
+    "locationPermissionDenied": "Unable to read your location. Check browser permissions."
+  },
+  "submitDialog": {
+    "title": "Report submitted",
+    "description": "Notify your local government using the actions below.",
+    "to": "To:",
+    "notConfigured": "not configured",
+    "copyMessage": "Copy message",
+    "sendEmail": "Send email",
+    "sendEmailDisabled": "Set GOV_CONTACT_EMAIL to enable mailto."
+  },
+  "about": {
+    "backToMap": "Back to map",
+    "title": "About Sentinela",
+    "intro": "Sentinela is a crowdsourced emergency reporting platform that empowers communities to report disasters, fires, floods, and other emergencies in real-time.",
+    "emergencyContactsTitle": "Emergency Contacts - Portugal",
+    "emergencyContactsDescription": "If you are facing a storm or flood-related emergency, contact emergency services immediately.",
+    "visitSite": "Visit site",
+    "usefulLinks": "Useful Links",
+    "howItWorksTitle": "How it works",
+    "howItWorks1": "Citizens report incidents by pinning locations on the map",
+    "howItWorks2": "The community validates reports through upvotes and comments",
+    "howItWorks3": "Escalated reports can be sent directly to local government",
+    "howItWorks4": "Everyone stays informed with real-time updates",
+    "freeTitle": "Free for everyone",
+    "freeHighlight": "completely free",
+    "freeParagraph1": "Sentinela is provided completely free to communities in Portugal and across Europe. We believe emergency reporting infrastructure should be accessible to everyone, everywhere - no subscriptions, no hidden fees, no barriers.",
+    "freeParagraph2": "Whether you're in Lisbon, Porto, or anywhere else in the world, Sentinela is here to help your community stay safe and informed.",
+    "builtByTitle": "Built by Darkmatter AI Labs",
+    "builtByParagraph1": "Sentinela is developed and maintained by Darkmatter AI Labs, a team focused on building AI-powered tools that make a real difference in people's lives.",
+    "builtByParagraph2": "We're committed to keeping Sentinela open, reliable, and always improving. If you have feedback or want to get in touch, visit us at darkmatter.is.",
+    "technicalNote": "Sentinela uses OpenStreetMap for mapping, and integrates with weather and seismic data providers to give you the most complete picture of what's happening in your area.",
+    "madeWith": "Made with care by",
+    "backToSentinela": "Back to Sentinela"
+  },
+  "emergencyContacts": {
+    "112": {
+      "name": "112",
+      "description": "European Emergency Number"
+    },
+    "anepc": {
+      "name": "ANEPC",
+      "description": "Civil Protection"
+    },
+    "ipma": {
+      "name": "IPMA",
+      "description": "Weather Alerts"
+    },
+    "sns24": {
+      "name": "SNS 24",
+      "description": "Health Line"
+    },
+    "cruzVermelha": {
+      "name": "Cruz Vermelha",
+      "description": "Humanitarian Assistance"
+    },
+    "117": {
+      "name": "117",
+      "description": "Forest Fires"
+    }
+  },
+  "usefulLinks": {
+    "avisosIpma": {
+      "name": "IPMA Alerts",
+      "description": "Real-time weather alerts"
+    },
+    "fogos": {
+      "name": "Fogos.pt",
+      "description": "Fire map of Portugal"
+    },
+    "prociv": {
+      "name": "Prociv Occurrences",
+      "description": "Real-time occurrences"
+    },
+    "snirh": {
+      "name": "SNIRH",
+      "description": "River and reservoir levels"
+    },
+    "infraestruturas": {
+      "name": "Infraestruturas de Portugal",
+      "description": "Road conditions"
+    }
+  }
+}

@@ -1,9 +1,9 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 import { Badge, type badgeVariants } from "@/components/ui/badge";
-import {
-  incidentTypeIcon,
-  incidentTypeLabel,
-  type IncidentType,
-} from "@/lib/reports/incident-types";
+import { incidentTypeIcon, type IncidentType } from "@/lib/reports/incident-types";
 import type { VariantProps } from "class-variance-authority";
 
 type IncidentTypeBadgeProps = {
@@ -17,11 +17,12 @@ export function IncidentTypeBadge({
   variant = "secondary",
   className,
 }: IncidentTypeBadgeProps) {
+  const t = useTranslations("incidentTypes");
   const Icon = incidentTypeIcon[type];
   return (
     <Badge variant={variant} className={className}>
       <Icon />
-      {incidentTypeLabel[type]}
+      {t(type)}
     </Badge>
   );
 }

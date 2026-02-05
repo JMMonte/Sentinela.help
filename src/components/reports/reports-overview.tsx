@@ -153,6 +153,38 @@ type GetReportResponse = {
 // Helpers
 // ---------------------------------------------------------------------------
 
+const VOTE_STORAGE_KEY = "sentinela_votes";
+
+type VoteRecord = {
+  escalate?: boolean;
+  deescalate?: boolean;
+};
+
+function getUserVotes(reportId: string): VoteRecord {
+  if (typeof window === "undefined") return {};
+  try {
+    const stored = localStorage.getItem(VOTE_STORAGE_KEY);
+    if (!stored) return {};
+    const votes = JSON.parse(stored) as Record<string, VoteRecord>;
+    return votes[reportId] || {};
+  } catch {
+    return {};
+  }
+}
+
+function setUserVote(reportId: string, voteType: "escalate" | "deescalate") {
+  if (typeof window === "undefined") return;
+  try {
+    const stored = localStorage.getItem(VOTE_STORAGE_KEY);
+    const votes: Record<string, VoteRecord> = stored ? JSON.parse(stored) : {};
+    if (!votes[reportId]) votes[reportId] = {};
+    votes[reportId][voteType] = true;
+    localStorage.setItem(VOTE_STORAGE_KEY, JSON.stringify(votes));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
 function useRelativeTimeFormatter() {
   const t = useTranslations("relativeTime");
 
@@ -359,8 +391,16 @@ function ReportDetailContent({
   const [inputFiles, setInputFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEmailInput, setShowEmailInput] = useState(false);
-  const [selectedAction, setSelectedAction] = useState<"ESCALATE" | "SOLVED" | "REOPEN" | null>(null);
+  const [selectedAction, setSelectedAction] = useState<"ESCALATE" | "DEESCALATE" | "SOLVED" | "REOPEN" | null>(null);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [userVotes, setUserVotes] = useState<VoteRecord>({});
+
+  // Load user's previous votes from localStorage
+  useEffect(() => {
+    if (report?.id) {
+      setUserVotes(getUserVotes(report.id));
+    }
+  }, [report?.id]);
 
   const osmUrl = useMemo(() => {
     if (!report) return null;
@@ -411,6 +451,16 @@ function ReportDetailContent({
         actionType === "REOPEN" ? (hasContent ? "reopenedWithComment" : "reopened") : "commentAdded";
 
       toast.success(t(`toast.${toastKey}`));
+
+      // Save vote to localStorage
+      if (actionType === "ESCALATE") {
+        setUserVote(report.id, "escalate");
+        setUserVotes((prev) => ({ ...prev, escalate: true }));
+      } else if (actionType === "DEESCALATE") {
+        setUserVote(report.id, "deescalate");
+        setUserVotes((prev) => ({ ...prev, deescalate: true }));
+      }
+
       setInputComment("");
       setInputEmail("");
       setInputFiles([]);
@@ -669,27 +719,46 @@ function ReportDetailContent({
                       size="sm"
                       className={cn(
                         "flex-1",
-                        selectedAction === "ESCALATE" && (isEscalated
-                          ? "ring-2 ring-blue-500 ring-offset-1"
-                          : "ring-2 ring-red-500 ring-offset-1")
+                        selectedAction === "ESCALATE" && "ring-2 ring-red-500 ring-offset-1"
                       )}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || userVotes.escalate}
                       onClick={() =>
                         setSelectedAction((prev) =>
                           prev === "ESCALATE" ? null : "ESCALATE"
                         )
                       }
                     >
-                      {isEscalated ? (
-                        <ChevronDown className="mr-1 h-4 w-4 text-blue-500" />
-                      ) : (
-                        <ChevronUp className="mr-1 h-4 w-4 text-red-500" />
-                      )}
-                      {isEscalated ? t("reportDetail.deescalate") : t("reportDetail.escalate")}
+                      <ChevronUp className="mr-1 h-4 w-4 text-red-500" />
+                      {t("reportDetail.escalate")}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{isEscalated ? t("reportDetail.deescalateTooltip") : t("reportDetail.escalateTooltip")}</p>
+                    <p>{userVotes.escalate ? t("reportDetail.alreadyVotedEscalate") : t("reportDetail.escalateTooltip")}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "flex-1",
+                        selectedAction === "DEESCALATE" && "ring-2 ring-blue-500 ring-offset-1"
+                      )}
+                      disabled={isSubmitting || userVotes.deescalate}
+                      onClick={() =>
+                        setSelectedAction((prev) =>
+                          prev === "DEESCALATE" ? null : "DEESCALATE"
+                        )
+                      }
+                    >
+                      <ChevronDown className="mr-1 h-4 w-4 text-blue-500" />
+                      {t("reportDetail.deescalate")}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{userVotes.deescalate ? t("reportDetail.alreadyVotedDeescalate") : t("reportDetail.deescalateTooltip")}</p>
                   </TooltipContent>
                 </Tooltip>
                 {isSolved ? (
@@ -770,7 +839,9 @@ function ReportDetailContent({
                 // Determine what action to submit
                 let actionType: ContributionType = "COMMENT";
                 if (selectedAction === "ESCALATE") {
-                  actionType = isEscalated ? "DEESCALATE" : "ESCALATE";
+                  actionType = "ESCALATE";
+                } else if (selectedAction === "DEESCALATE") {
+                  actionType = "DEESCALATE";
                 } else if (selectedAction === "SOLVED") {
                   actionType = "SOLVED";
                 } else if (selectedAction === "REOPEN") {
