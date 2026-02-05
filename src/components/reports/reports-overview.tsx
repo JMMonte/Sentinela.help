@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -778,6 +779,10 @@ export function ReportsOverview({
 }: {
   overlayConfig?: OverlayConfig;
 }) {
+  // ── Router / URL state ──
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   // ── Reports state ──
   const [reports, setReports] = useState<ReportMapItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -846,6 +851,15 @@ export function ReportsOverview({
       { enableHighAccuracy: true, timeout: 10_000 },
     );
   }, []);
+
+  // Sync selected report with URL search params for shareable links
+  useEffect(() => {
+    const reportId = searchParams.get("report");
+    if (reportId && reportId !== selectedReportId) {
+      setSelectedReportId(reportId);
+      setView("detail");
+    }
+  }, [searchParams, selectedReportId]);
 
   // Fetch report detail when selected
   useEffect(() => {
@@ -1039,11 +1053,20 @@ export function ReportsOverview({
   function handleSelectReport(reportId: string) {
     setSelectedReportId(reportId);
     setView("detail");
+    // Update URL for shareable links
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("report", reportId);
+    router.push(`?${params.toString()}`, { scroll: false });
   }
 
   function handleBackToList() {
     setSelectedReportId(null);
     setView("reports");
+    // Remove report param from URL
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("report");
+    const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
+    router.push(newUrl, { scroll: false });
   }
 
   const reportsContent = (
