@@ -1545,54 +1545,57 @@ export function ReportsOverview({
           activeSnap === "expanded" ? "h-[calc(100dvh-60px)]" : "h-[180px]"
         )}
       >
-        {/* Drag handle */}
-        <div
-          className="flex w-full shrink-0 cursor-grab items-center justify-center py-3 touch-none active:cursor-grabbing"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onMouseDown={handleMouseDown}
-          onClick={() => {
-            // Only toggle on click if not dragging (for accessibility)
-            if (!isDragging.current) {
-              setActiveSnap(activeSnap === "collapsed" ? "expanded" : "collapsed");
-            }
-          }}
-        >
-          <div className="h-1.5 w-12 rounded-full bg-muted-foreground/50" />
-        </div>
-
-        {/* Reports view header */}
+        {/* Reports view header - entire header is draggable except the button */}
           {view === "reports" && (
             <>
-              <div className="px-4 pt-1 pb-3">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h2 className="text-lg font-semibold">{t("reports.title")}</h2>
-                    <p className="text-sm text-muted-foreground">
-                      {isLoading ? t("common.loading") : t("reports.nearby", { count: filtered.length })}
-                    </p>
-                  </div>
-                  <Button
-                    size="sm"
-                    className="rounded-full h-8 px-3 text-xs"
-                    onClick={() => {
-                      setView("form");
-                      setActiveSnap("expanded");
-                    }}
-                  >
-                    {t("reports.reportIncident")}
-                  </Button>
+              <div
+                className="shrink-0 cursor-grab touch-none active:cursor-grabbing"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onMouseDown={handleMouseDown}
+                onClick={() => {
+                  if (!isDragging.current) {
+                    setActiveSnap(activeSnap === "collapsed" ? "expanded" : "collapsed");
+                  }
+                }}
+              >
+                {/* Drag handle indicator */}
+                <div className="flex w-full items-center justify-center py-3">
+                  <div className="h-1.5 w-12 rounded-full bg-muted-foreground/50" />
                 </div>
-                <Tabs value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
-                  <TabsList className="w-full h-9">
-                    {TIME_FILTER_OPTIONS.map((option) => (
-                      <TabsTrigger key={option.value} value={option.value} className="flex-1 text-xs">
-                        {option.label}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                </Tabs>
+                <div className="px-4 pb-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h2 className="text-lg font-semibold">{t("reports.title")}</h2>
+                      <p className="text-sm text-muted-foreground">
+                        {isLoading ? t("common.loading") : t("reports.nearby", { count: filtered.length })}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      className="rounded-full h-8 px-3 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setView("form");
+                        setActiveSnap("expanded");
+                      }}
+                      onTouchStart={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                    >
+                      {t("reports.reportIncident")}
+                    </Button>
+                  </div>
+                  <Tabs value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
+                    <TabsList className="w-full h-9">
+                      {TIME_FILTER_OPTIONS.map((option) => (
+                        <TabsTrigger key={option.value} value={option.value} className="flex-1 text-xs">
+                          {option.label}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                  </Tabs>
+                </div>
               </div>
               <Separator />
               <div
@@ -1615,59 +1618,99 @@ export function ReportsOverview({
 
           {/* Detail view */}
           {view === "detail" && (
-            <div
-              className={cn(
-                "flex-1 flex flex-col pb-[env(safe-area-inset-bottom)]",
-                activeSnap === "collapsed" ? "overflow-hidden" : "overflow-y-auto",
-              )}
-            >
-              <ReportDetailContent
-                report={selectedReport}
-                isLoading={detailLoading}
-                error={detailError}
-                onBack={handleBackToList}
-                onRefresh={refreshSelectedReport}
-                onReportsRefresh={fetchReports}
-                onGoTo={selectedReport ? () => {
-                  setFlyToLocation([selectedReport.latitude, selectedReport.longitude]);
-                  setActiveSnap("collapsed");
-                } : undefined}
-              />
-            </div>
+            <>
+              {/* Draggable header area */}
+              <div
+                className="shrink-0 cursor-grab touch-none active:cursor-grabbing"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onMouseDown={handleMouseDown}
+                onClick={() => {
+                  if (!isDragging.current) {
+                    setActiveSnap(activeSnap === "collapsed" ? "expanded" : "collapsed");
+                  }
+                }}
+              >
+                <div className="flex w-full items-center justify-center py-3">
+                  <div className="h-1.5 w-12 rounded-full bg-muted-foreground/50" />
+                </div>
+              </div>
+              <div
+                className={cn(
+                  "flex-1 flex flex-col pb-[env(safe-area-inset-bottom)]",
+                  activeSnap === "collapsed" ? "overflow-hidden" : "overflow-y-auto",
+                )}
+              >
+                <ReportDetailContent
+                  report={selectedReport}
+                  isLoading={detailLoading}
+                  error={detailError}
+                  onBack={handleBackToList}
+                  onRefresh={refreshSelectedReport}
+                  onReportsRefresh={fetchReports}
+                  onGoTo={selectedReport ? () => {
+                    setFlyToLocation([selectedReport.latitude, selectedReport.longitude]);
+                    setActiveSnap("collapsed");
+                  } : undefined}
+                />
+              </div>
+            </>
           )}
 
           {/* Form view */}
           {view === "form" && (
-            <div
-              className={cn(
-                "flex-1 pb-[env(safe-area-inset-bottom)]",
-                activeSnap === "collapsed" ? "overflow-hidden" : "overflow-y-auto",
-              )}
-            >
-              <div className="px-4 pt-1 pb-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-lg font-semibold">{t("reports.newReport")}</h2>
-                    <p className="text-sm text-muted-foreground">
-                      {pinLocation
-                        ? `${pinLocation.latitude.toFixed(4)}, ${pinLocation.longitude.toFixed(4)}`
-                        : t("reportForm.tapMapToPin")}
-                    </p>
+            <>
+              {/* Draggable header area */}
+              <div
+                className="shrink-0 cursor-grab touch-none active:cursor-grabbing"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onMouseDown={handleMouseDown}
+                onClick={() => {
+                  if (!isDragging.current) {
+                    setActiveSnap(activeSnap === "collapsed" ? "expanded" : "collapsed");
+                  }
+                }}
+              >
+                <div className="flex w-full items-center justify-center py-3">
+                  <div className="h-1.5 w-12 rounded-full bg-muted-foreground/50" />
+                </div>
+                <div className="px-4 pb-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-lg font-semibold">{t("reports.newReport")}</h2>
+                      <p className="text-sm text-muted-foreground">
+                        {pinLocation
+                          ? `${pinLocation.latitude.toFixed(4)}, ${pinLocation.longitude.toFixed(4)}`
+                          : t("reportForm.tapMapToPin")}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        cancelForm();
+                        setActiveSnap("collapsed");
+                      }}
+                      onTouchStart={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => {
-                      cancelForm();
-                      setActiveSnap("collapsed");
-                    }}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
               <Separator />
+              <div
+                className={cn(
+                  "flex-1 pb-[env(safe-area-inset-bottom)]",
+                  activeSnap === "collapsed" ? "overflow-hidden" : "overflow-y-auto",
+                )}
+              >
               <div className="px-4 py-4">
                 <div className="grid gap-2 pb-4">
                   <Button
@@ -1790,7 +1833,8 @@ export function ReportsOverview({
                   </form>
                 </Form>
               </div>
-            </div>
+              </div>
+            </>
           )}
       </div>
 
