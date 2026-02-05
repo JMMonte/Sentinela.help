@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -895,6 +895,87 @@ export function ReportsOverview({
   const [headerPortal, setHeaderPortal] = useState<HTMLElement | null>(null);
   const [activeSnap, setActiveSnap] = useState<"collapsed" | "expanded">("collapsed");
 
+  // ── Mobile bottom sheet drag state ──
+  const COLLAPSED_HEIGHT = 180;
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+  const dragStartY = useRef(0);
+  const dragStartHeight = useRef(0);
+
+  const getExpandedHeight = useCallback(() => {
+    return window.innerHeight - 60;
+  }, []);
+
+  const handleDragStart = useCallback((clientY: number) => {
+    if (!sheetRef.current) return;
+    isDragging.current = true;
+    dragStartY.current = clientY;
+    dragStartHeight.current = sheetRef.current.offsetHeight;
+    // Disable transition during drag for smooth movement
+    sheetRef.current.style.transition = "none";
+  }, []);
+
+  const handleDragMove = useCallback((clientY: number) => {
+    if (!isDragging.current || !sheetRef.current) return;
+    const delta = dragStartY.current - clientY;
+    const newHeight = Math.max(
+      COLLAPSED_HEIGHT,
+      Math.min(getExpandedHeight(), dragStartHeight.current + delta)
+    );
+    sheetRef.current.style.height = `${newHeight}px`;
+  }, [getExpandedHeight]);
+
+  const handleDragEnd = useCallback(() => {
+    if (!isDragging.current || !sheetRef.current) return;
+    isDragging.current = false;
+
+    const currentHeight = sheetRef.current.offsetHeight;
+    const expandedHeight = getExpandedHeight();
+    const midpoint = (COLLAPSED_HEIGHT + expandedHeight) / 2;
+
+    // Re-enable transition for snap animation
+    sheetRef.current.style.transition = "";
+    sheetRef.current.style.height = "";
+
+    // Snap to closest position
+    if (currentHeight > midpoint) {
+      setActiveSnap("expanded");
+    } else {
+      setActiveSnap("collapsed");
+    }
+  }, [getExpandedHeight]);
+
+  // Touch event handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    handleDragStart(e.touches[0].clientY);
+  }, [handleDragStart]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    handleDragMove(e.touches[0].clientY);
+  }, [handleDragMove]);
+
+  const handleTouchEnd = useCallback(() => {
+    handleDragEnd();
+  }, [handleDragEnd]);
+
+  // Mouse event handlers (for testing on desktop)
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    handleDragStart(e.clientY);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      handleDragMove(e.clientY);
+    };
+
+    const handleMouseUp = () => {
+      handleDragEnd();
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  }, [handleDragStart, handleDragMove, handleDragEnd]);
+
   // ── Detail view state ──
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [selectedReport, setSelectedReport] = useState<ReportDetailData | null>(null);
@@ -1455,19 +1536,28 @@ export function ReportsOverview({
 
       {/* ── Mobile bottom sheet ── */}
       <div
+        ref={sheetRef}
         className={cn(
           "fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-xl border-t bg-background/95 shadow-[0_-4px_30px_rgba(0,0,0,0.15)] backdrop-blur-xl transition-[height] duration-300 ease-out sm:hidden",
           activeSnap === "expanded" ? "h-[calc(100dvh-60px)]" : "h-[180px]"
         )}
       >
-        {/* Handle */}
-        <button
-          type="button"
-          className="flex w-full shrink-0 items-center justify-center py-3"
-          onClick={() => setActiveSnap(activeSnap === "collapsed" ? "expanded" : "collapsed")}
+        {/* Drag handle */}
+        <div
+          className="flex w-full shrink-0 cursor-grab items-center justify-center py-3 touch-none active:cursor-grabbing"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          onClick={() => {
+            // Only toggle on click if not dragging (for accessibility)
+            if (!isDragging.current) {
+              setActiveSnap(activeSnap === "collapsed" ? "expanded" : "collapsed");
+            }
+          }}
         >
           <div className="h-1.5 w-12 rounded-full bg-muted-foreground/50" />
-        </button>
+        </div>
 
         {/* Reports view header */}
           {view === "reports" && (
