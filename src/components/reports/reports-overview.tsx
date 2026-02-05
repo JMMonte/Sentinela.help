@@ -1586,15 +1586,21 @@ export function ReportsOverview({
                       {t("reports.reportIncident")}
                     </Button>
                   </div>
-                  <Tabs value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
-                    <TabsList className="w-full h-9">
-                      {TIME_FILTER_OPTIONS.map((option) => (
-                        <TabsTrigger key={option.value} value={option.value} className="flex-1 text-xs">
-                          {option.label}
-                        </TabsTrigger>
-                      ))}
-                    </TabsList>
-                  </Tabs>
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    onMouseDown={(e) => e.stopPropagation()}
+                  >
+                    <Tabs value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
+                      <TabsList className="w-full h-9">
+                        {TIME_FILTER_OPTIONS.map((option) => (
+                          <TabsTrigger key={option.value} value={option.value} className="flex-1 text-xs">
+                            {option.label}
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
+                    </Tabs>
+                  </div>
                 </div>
               </div>
               <Separator />
