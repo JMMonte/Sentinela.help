@@ -26,6 +26,8 @@ const envSchema = z.object({
   ENABLE_PROCIV_OVERLAY: z.coerce.boolean().default(false),
   // Rainfall overlay (IPMA)
   ENABLE_RAINFALL_OVERLAY: z.coerce.boolean().default(false),
+  // IPMA weather warnings overlay
+  ENABLE_WARNINGS_OVERLAY: z.coerce.boolean().default(false),
 });
 
 export const env = envSchema.parse({
@@ -42,4 +44,5 @@ export const env = envSchema.parse({
   SEISMIC_MIN_MAGNITUDE: process.env.SEISMIC_MIN_MAGNITUDE,
   ENABLE_PROCIV_OVERLAY: process.env.ENABLE_PROCIV_OVERLAY,
   ENABLE_RAINFALL_OVERLAY: process.env.ENABLE_RAINFALL_OVERLAY,
+  ENABLE_WARNINGS_OVERLAY: process.env.ENABLE_WARNINGS_OVERLAY,
 });

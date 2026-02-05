@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Layers, Cloud, Activity, Shield, Droplets, RefreshCw, Info } from "lucide-react";
+import { Layers, Cloud, Activity, Shield, Droplets, AlertTriangle, RefreshCw, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -20,6 +20,7 @@ import type { WeatherOverlayState } from "../hooks/use-weather-overlay";
 import type { SeismicOverlayState } from "../hooks/use-seismic-overlay";
 import type { ProCivOverlayState } from "../hooks/use-prociv-overlay";
 import type { RainfallOverlayState } from "../hooks/use-rainfall-overlay";
+import type { WarningsOverlayState } from "../hooks/use-warnings-overlay";
 import type { WeatherLayer } from "@/lib/overlays/weather-api";
 
 export type OverlayControlsProps = {
@@ -27,6 +28,7 @@ export type OverlayControlsProps = {
   seismic: SeismicOverlayState;
   prociv: ProCivOverlayState;
   rainfall: RainfallOverlayState;
+  warnings: WarningsOverlayState;
 };
 
 export function OverlayControls({
@@ -34,6 +36,7 @@ export function OverlayControls({
   seismic,
   prociv,
   rainfall,
+  warnings,
 }: OverlayControlsProps) {
   const [headerPortal, setHeaderPortal] = useState<HTMLElement | null>(null);
 
@@ -42,11 +45,11 @@ export function OverlayControls({
   }, []);
 
   // Don't render if no overlays are available
-  if (!weather.isAvailable && !seismic.isAvailable && !prociv.isAvailable && !rainfall.isAvailable) {
+  if (!weather.isAvailable && !seismic.isAvailable && !prociv.isAvailable && !rainfall.isAvailable && !warnings.isAvailable) {
     return null;
   }
 
-  const hasActiveOverlay = weather.enabled || seismic.enabled || prociv.enabled || rainfall.enabled;
+  const hasActiveOverlay = weather.enabled || seismic.enabled || prociv.enabled || rainfall.enabled || warnings.enabled;
 
   const trigger = (
     <TooltipProvider delayDuration={300}>
@@ -282,6 +285,60 @@ export function OverlayControls({
 
               {rainfall.error && (
                 <p className="text-xs text-destructive">{rainfall.error}</p>
+              )}
+            </div>
+          )}
+
+          {/* IPMA Warnings Layer */}
+          {warnings.isAvailable && (
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={warnings.enabled}
+                    onChange={(e) => warnings.setEnabled(e.target.checked)}
+                    className="rounded accent-primary"
+                  />
+                  <AlertTriangle className="size-4" />
+                  Avisos IPMA
+                </label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="size-3.5 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent side="left" className="max-w-48 text-xs">
+                    Official weather warnings from IPMA (wind, rain, snow, heat, cold, fog, thunderstorms). Updated every 30 min.
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+
+              {warnings.enabled && (
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>
+                    {warnings.isLoading
+                      ? "Loading..."
+                      : `${warnings.districts.length} distrito${warnings.districts.length !== 1 ? "s" : ""} com avisos`}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    onClick={() => void warnings.refresh()}
+                    disabled={warnings.isLoading}
+                    title="Refresh"
+                  >
+                    <RefreshCw
+                      className={cn(
+                        "size-3",
+                        warnings.isLoading && "animate-spin",
+                      )}
+                    />
+                  </Button>
+                </div>
+              )}
+
+              {warnings.error && (
+                <p className="text-xs text-destructive">{warnings.error}</p>
               )}
             </div>
           )}

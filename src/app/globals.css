@@ -482,3 +482,31 @@ input[type="checkbox"].accent-primary {
   right: calc(50% + 18px);
   transform: translateY(-50%);
 }
+
+/* ── IPMA Warning markers ── */
+
+.sentinela-warning-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.sentinela-warning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+  transition: transform 0.15s ease;
+}
+
+.sentinela-warning:hover {
+  transform: scale(1.15);
+}
+
+.sentinela-warning--red {
+  animation: sentinela-warning-pulse 2s ease-in-out infinite;
+}
+
+@keyframes sentinela-warning-pulse {
+  0%, 100% { filter: drop-shadow(0 1px 3px rgba(220, 38, 38, 0.3)); }
+  50% { filter: drop-shadow(0 2px 8px rgba(220, 38, 38, 0.6)); }
+}

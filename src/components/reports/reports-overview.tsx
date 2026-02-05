@@ -76,7 +76,7 @@ import {
   msToKmh,
   windDegToDirection,
 } from "@/lib/overlays/weather-api";
-import { fetchRoute, formatDistance, formatDuration, type RouteResult } from "@/lib/routing/osrm";
+import { fetchRoute, formatDistance, formatDuration, TRAVEL_MODES, type TravelMode } from "@/lib/routing/osrm";
 import { getNavigationLinks } from "@/lib/routing/navigation-links";
 import { cn } from "@/lib/utils";
 
@@ -168,6 +168,7 @@ type RouteData = {
   distance: number;
   duration: number;
   reportId: string;
+  travelMode: TravelMode;
 };
 
 // ---------------------------------------------------------------------------
@@ -420,6 +421,7 @@ function ReportDetailContent({
   routeData,
   routeLoading,
   onClearRoute,
+  onTravelModeChange,
   userLocation,
 }: {
   report: ReportDetailData | null;
@@ -433,6 +435,7 @@ function ReportDetailContent({
   routeData: RouteData | null;
   routeLoading: boolean;
   onClearRoute?: () => void;
+  onTravelModeChange?: (mode: TravelMode) => void;
   userLocation?: [number, number];
 }) {
   const t = useTranslations();
@@ -627,11 +630,32 @@ function ReportDetailContent({
               </Button>
             )}
           </div>
+          {onTravelModeChange && (
+            <div className="flex gap-1 mb-2">
+              {TRAVEL_MODES.map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  className={cn(
+                    "rounded-md border px-2 py-0.5 text-xs font-medium transition-colors",
+                    routeData.travelMode === mode
+                      ? "border-blue-500 bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-400"
+                      : "bg-background text-muted-foreground hover:bg-muted"
+                  )}
+                  disabled={routeLoading}
+                  onClick={() => onTravelModeChange(mode)}
+                >
+                  {t(`reportDetail.mode${mode.charAt(0).toUpperCase() + mode.slice(1)}` as "reportDetail.modeDriving")}
+                </button>
+              ))}
+            </div>
+          )}
           {userLocation && (
             <div className="flex flex-wrap gap-2">
               {getNavigationLinks(
                 userLocation,
-                [report.latitude, report.longitude]
+                [report.latitude, report.longitude],
+                routeData.travelMode,
               ).map((app) => (
                 <a
                   key={app.id}
@@ -1321,25 +1345,27 @@ export function ReportsOverview({
     );
   }
 
-  async function handleNavigate() {
+  async function handleNavigate(mode: TravelMode = "driving") {
     if (!userLocation || !selectedReport) {
       toast.error(t("toast.locationRequired"));
       return;
     }
-    // Skip if we already have a route for this report
-    if (routeData && routeData.reportId === selectedReport.id) return;
+    // Skip if we already have a route for this report with the same mode
+    if (routeData && routeData.reportId === selectedReport.id && routeData.travelMode === mode) return;
 
     setRouteLoading(true);
     try {
       const result = await fetchRoute(
         userLocation,
-        [selectedReport.latitude, selectedReport.longitude]
+        [selectedReport.latitude, selectedReport.longitude],
+        mode,
       );
       setRouteData({
         geometry: result.geometry,
         distance: result.distance,
         duration: result.duration,
         reportId: selectedReport.id,
+        travelMode: mode,
       });
     } catch {
       toast.error(t("toast.routeFailed"));
@@ -1483,10 +1509,11 @@ export function ReportsOverview({
       onRefresh={refreshSelectedReport}
       onReportsRefresh={fetchReports}
       onGoTo={selectedReport ? () => setFlyToLocation([selectedReport.latitude, selectedReport.longitude]) : undefined}
-      onNavigate={selectedReport ? handleNavigate : undefined}
+      onNavigate={selectedReport ? () => handleNavigate() : undefined}
       routeData={routeData}
       routeLoading={routeLoading}
       onClearRoute={clearRoute}
+      onTravelModeChange={selectedReport ? (mode) => handleNavigate(mode) : undefined}
       userLocation={userLocation}
     />
   );
@@ -1871,10 +1898,11 @@ export function ReportsOverview({
                     setFlyToLocation([selectedReport.latitude, selectedReport.longitude]);
                     setActiveSnap("collapsed");
                   } : undefined}
-                  onNavigate={selectedReport ? handleNavigate : undefined}
+                  onNavigate={selectedReport ? () => handleNavigate() : undefined}
                   routeData={routeData}
                   routeLoading={routeLoading}
                   onClearRoute={clearRoute}
+                  onTravelModeChange={selectedReport ? (mode) => handleNavigate(mode) : undefined}
                   userLocation={userLocation}
                 />
               </div>

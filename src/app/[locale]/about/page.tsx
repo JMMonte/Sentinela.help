@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Phone, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, ExternalLink, Phone, AlertTriangle, Github } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 type Props = {
@@ -24,6 +24,7 @@ export default async function AboutPage({ params }: Props) {
   const t = await getTranslations("about");
   const tEmergency = await getTranslations("emergencyContacts");
   const tLinks = await getTranslations("usefulLinks");
+  const tData = await getTranslations("dataSources");
 
   const emergencyContacts = [
     {
@@ -51,6 +52,33 @@ export default async function AboutPage({ params }: Props) {
     {
       key: "117",
       phone: "117",
+    },
+  ];
+
+  const dataSources = [
+    {
+      key: "openstreetmap",
+      url: "https://www.openstreetmap.org",
+    },
+    {
+      key: "openweathermap",
+      url: "https://openweathermap.org",
+    },
+    {
+      key: "usgs",
+      url: "https://earthquake.usgs.gov",
+    },
+    {
+      key: "fogos",
+      url: "https://fogos.pt",
+    },
+    {
+      key: "ipmaRainfall",
+      url: "https://api.ipma.pt",
+    },
+    {
+      key: "ipmaWarnings",
+      url: "https://www.ipma.pt/pt/otempo/prev-sam/",
     },
   ];
 
@@ -194,6 +222,23 @@ export default async function AboutPage({ params }: Props) {
           </section>
 
           <section className="mt-10">
+            <h2 className="text-xl font-semibold">{t("openSourceTitle")}</h2>
+            <p className="mt-4 text-muted-foreground">
+              {t("openSourceParagraph1")}
+            </p>
+            <p className="mt-3 text-muted-foreground">{t("openSourceParagraph2")}</p>
+            <a
+              href="https://github.com/JMMonte/Kaos"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-2 rounded-md border bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
+            >
+              <Github className="h-4 w-4" />
+              {t("viewOnGitHub")}
+            </a>
+          </section>
+
+          <section className="mt-10">
             <h2 className="text-xl font-semibold">{t("builtByTitle")}</h2>
             <p className="mt-4 text-muted-foreground">
               {t("builtByParagraph1")}
@@ -201,8 +246,29 @@ export default async function AboutPage({ params }: Props) {
             <p className="mt-3 text-muted-foreground">{t("builtByParagraph2")}</p>
           </section>
 
-          <section className="mt-10 rounded-lg border bg-muted/50 p-6">
-            <p className="text-sm text-muted-foreground">{t("technicalNote")}</p>
+          {/* Data Sources */}
+          <section className="mt-10">
+            <h2 className="text-xl font-semibold">{t("dataSourcesTitle")}</h2>
+            <p className="mt-4 text-muted-foreground">
+              {t("dataSourcesDescription")}
+            </p>
+            <ul className="mt-4 space-y-2">
+              {dataSources.map((source) => (
+                <li key={source.key} className="text-muted-foreground">
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-0.5 font-medium text-foreground hover:underline"
+                  >
+                    {tData(`${source.key}.name`)}
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </a>
+                  {" — "}
+                  {tData(`${source.key}.description`)}
+                </li>
+              ))}
+            </ul>
           </section>
         </div>
 

@@ -21,5 +21,8 @@ export function getOverlayConfig(): OverlayConfig {
     rainfall: {
       enabled: env.ENABLE_RAINFALL_OVERLAY,
     },
+    warnings: {
+      enabled: env.ENABLE_WARNINGS_OVERLAY,
+    },
   };
 }

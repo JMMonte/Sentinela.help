@@ -33,12 +33,14 @@ import { WeatherOverlay } from "./overlays/weather-overlay";
 import { SeismicOverlay } from "./overlays/seismic-overlay";
 import { ProCivOverlay } from "./overlays/prociv-overlay";
 import { RainfallOverlay } from "./overlays/rainfall-overlay";
+import { WarningsOverlay } from "./overlays/warnings-overlay";
 import { RouteOverlay } from "./overlays/route-overlay";
 import { OverlayControls } from "./overlays/overlay-controls";
 import { useWeatherOverlay, type WeatherOverlayConfig } from "./hooks/use-weather-overlay";
 import { useSeismicOverlay, type SeismicOverlayConfig } from "./hooks/use-seismic-overlay";
 import { useProCivOverlay, type ProCivOverlayConfig } from "./hooks/use-prociv-overlay";
 import { useRainfallOverlay, type RainfallOverlayConfig } from "./hooks/use-rainfall-overlay";
+import { useWarningsOverlay, type WarningsOverlayConfig } from "./hooks/use-warnings-overlay";
 import { useLocationWeather } from "./hooks/use-location-weather";
 import { UserLocationMarker, PinLocationMarker } from "./user-location-marker";
 
@@ -68,6 +70,7 @@ export type OverlayConfig = {
   seismic: SeismicOverlayConfig;
   prociv: ProCivOverlayConfig;
   rainfall: RainfallOverlayConfig;
+  warnings: WarningsOverlayConfig;
 };
 
 export type ReportsMapProps = {
@@ -184,6 +187,7 @@ const DEFAULT_OVERLAY_CONFIG: OverlayConfig = {
   seismic: { enabled: false, minMagnitude: 2.5 },
   prociv: { enabled: false },
   rainfall: { enabled: false },
+  warnings: { enabled: false },
 };
 
 export function ReportsMapClient({
@@ -211,6 +215,7 @@ export function ReportsMapClient({
   const seismic = useSeismicOverlay(overlayConfig.seismic, timeFilterHours);
   const prociv = useProCivOverlay(overlayConfig.prociv, timeFilterHours);
   const rainfall = useRainfallOverlay(overlayConfig.rainfall, timeFilterHours);
+  const warnings = useWarningsOverlay(overlayConfig.warnings);
 
   // Location weather (current weather at user position)
   const locationWeather = useLocationWeather(
@@ -316,6 +321,11 @@ export function ReportsMapClient({
           <RainfallOverlay stations={rainfall.stations} />
         )}
 
+        {/* IPMA Weather Warnings overlay */}
+        {warnings.enabled && warnings.districts.length > 0 && (
+          <WarningsOverlay districts={warnings.districts} />
+        )}
+
         {/* Route polyline (navigation route) */}
         {routeGeometry && routeGeometry.length >= 2 && (
           <RouteOverlay geometry={routeGeometry} />
@@ -355,7 +365,7 @@ export function ReportsMapClient({
       </MapContainer>
 
       {/* Overlay controls (portals itself into the header topbar) */}
-      <OverlayControls weather={weather} seismic={seismic} prociv={prociv} rainfall={rainfall} />
+      <OverlayControls weather={weather} seismic={seismic} prociv={prociv} rainfall={rainfall} warnings={warnings} />
     </div>
   );
 }

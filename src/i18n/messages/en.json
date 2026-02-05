@@ -82,7 +82,10 @@
     "reopenTooltip": "Report is not actually solved",
     "osmLink": "OSM",
     "navigate": "Navigate",
-    "clearRoute": "Clear route"
+    "clearRoute": "Clear route",
+    "modeDriving": "Car",
+    "modeCycling": "Bike",
+    "modeFoot": "Walk"
   },
   "status": {
     "active": "Active",
@@ -173,7 +176,8 @@
     "builtByTitle": "Built by Darkmatter AI Labs",
     "builtByParagraph1": "Sentinela is developed and maintained by Darkmatter AI Labs, a team focused on building AI-powered tools that make a real difference in people's lives.",
     "builtByParagraph2": "We're committed to keeping Sentinela open, reliable, and always improving. If you have feedback or want to get in touch, visit us at darkmatter.is.",
-    "technicalNote": "Sentinela uses OpenStreetMap for mapping, and integrates with weather and seismic data providers to give you the most complete picture of what's happening in your area.",
+    "dataSourcesTitle": "Data sources",
+    "dataSourcesDescription": "Sentinela integrates real-time data from multiple open sources to give you the most complete picture of what's happening in your area.",
     "madeWith": "Made with care by",
     "backToSentinela": "Back to Sentinela"
   },
@@ -223,6 +227,32 @@
     "infraestruturas": {
       "name": "Infraestruturas de Portugal",
       "description": "Road conditions"
+    }
+  },
+  "dataSources": {
+    "openstreetmap": {
+      "name": "OpenStreetMap",
+      "description": "Base map tiles and geographic data"
+    },
+    "openweathermap": {
+      "name": "OpenWeatherMap",
+      "description": "Weather overlays — precipitation, clouds, temperature, wind and pressure"
+    },
+    "usgs": {
+      "name": "USGS Earthquake Hazards Program",
+      "description": "Global seismic activity from the last 24 hours"
+    },
+    "fogos": {
+      "name": "Fogos.pt",
+      "description": "Active civil protection incidents in Portugal (fires, accidents, weather events)"
+    },
+    "ipmaRainfall": {
+      "name": "IPMA — Weather Stations",
+      "description": "Accumulated rainfall from 200+ stations across Portugal, updated every 10 minutes"
+    },
+    "ipmaWarnings": {
+      "name": "IPMA — Weather Warnings",
+      "description": "Official meteorological warnings by district (wind, rain, snow, heat, cold, fog, thunderstorms)"
     }
   }
 }

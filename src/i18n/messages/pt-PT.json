@@ -82,7 +82,10 @@
     "reopenTooltip": "O incidente não está realmente resolvido",
     "osmLink": "OSM",
     "navigate": "Navegar",
-    "clearRoute": "Limpar rota"
+    "clearRoute": "Limpar rota",
+    "modeDriving": "Carro",
+    "modeCycling": "Bicicleta",
+    "modeFoot": "A pé"
   },
   "status": {
     "active": "Ativo",
@@ -173,7 +176,8 @@
     "builtByTitle": "Desenvolvido por Darkmatter AI Labs",
     "builtByParagraph1": "O Sentinela é desenvolvido e mantido pela Darkmatter AI Labs, uma equipa focada em construir ferramentas baseadas em IA que fazem uma verdadeira diferença na vida das pessoas.",
     "builtByParagraph2": "Estamos comprometidos em manter o Sentinela aberto, fiável e em constante melhoria. Se tiver feedback ou quiser entrar em contacto, visite-nos em darkmatter.is.",
-    "technicalNote": "O Sentinela utiliza OpenStreetMap para mapeamento e integra com fornecedores de dados meteorológicos e sísmicos para lhe dar a imagem mais completa do que está a acontecer na sua área.",
+    "dataSourcesTitle": "Fontes de dados",
+    "dataSourcesDescription": "O Sentinela integra dados em tempo real de várias fontes abertas para lhe dar a imagem mais completa do que está a acontecer na sua área.",
     "madeWith": "Feito com carinho por",
     "backToSentinela": "Voltar ao Sentinela"
   },
@@ -223,6 +227,32 @@
     "infraestruturas": {
       "name": "Infraestruturas de Portugal",
       "description": "Estado das estradas"
+    }
+  },
+  "dataSources": {
+    "openstreetmap": {
+      "name": "OpenStreetMap",
+      "description": "Mapa base e dados geográficos"
+    },
+    "openweathermap": {
+      "name": "OpenWeatherMap",
+      "description": "Camadas meteorológicas — precipitação, nuvens, temperatura, vento e pressão"
+    },
+    "usgs": {
+      "name": "USGS Earthquake Hazards Program",
+      "description": "Atividade sísmica global das últimas 24 horas"
+    },
+    "fogos": {
+      "name": "Fogos.pt",
+      "description": "Ocorrências de proteção civil ativas em Portugal (incêndios, acidentes, eventos meteorológicos)"
+    },
+    "ipmaRainfall": {
+      "name": "IPMA — Estações Meteorológicas",
+      "description": "Precipitação acumulada de mais de 200 estações em Portugal, atualizada a cada 10 minutos"
+    },
+    "ipmaWarnings": {
+      "name": "IPMA — Avisos Meteorológicos",
+      "description": "Avisos meteorológicos oficiais por distrito (vento, chuva, neve, calor, frio, nevoeiro, trovoadas)"
     }
   }
 }

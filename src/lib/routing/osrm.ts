@@ -1,3 +1,6 @@
+export const TRAVEL_MODES = ["driving", "cycling", "foot"] as const;
+export type TravelMode = (typeof TRAVEL_MODES)[number];
+
 export type RouteResult = {
   geometry: [number, number][]; // [lat, lng] pairs (Leaflet convention)
   distance: number; // meters
@@ -17,16 +20,17 @@ type OsrmResponse = {
 };
 
 /**
- * Fetch a driving route from OSRM (OpenStreetMap Routing Machine).
+ * Fetch a route from OSRM (OpenStreetMap Routing Machine).
  * Uses the free public demo server. No API key needed.
  */
 export async function fetchRoute(
   origin: [number, number], // [lat, lng]
   destination: [number, number], // [lat, lng]
+  mode: TravelMode = "driving",
 ): Promise<RouteResult> {
   // OSRM expects lng,lat order
   const coords = `${origin[1]},${origin[0]};${destination[1]},${destination[0]}`;
-  const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`;
+  const url = `https://router.project-osrm.org/route/v1/${mode}/${coords}?overview=full&geometries=geojson`;
 
   const res = await fetch(url);
   if (!res.ok) throw new Error(`OSRM error: ${res.status}`);
