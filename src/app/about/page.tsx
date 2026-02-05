@@ -1,12 +1,75 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, Phone, AlertTriangle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "About",
   description:
     "Sentinela is a free crowdsourced emergency reporting platform built by Darkmatter AI Labs for communities in Portugal, Europe, and worldwide.",
 };
+
+const emergencyContacts = [
+  {
+    name: "112",
+    description: "Número Europeu de Emergência",
+    phone: "112",
+    primary: true,
+  },
+  {
+    name: "ANEPC",
+    description: "Proteção Civil",
+    url: "https://prociv.gov.pt",
+  },
+  {
+    name: "IPMA",
+    description: "Alertas Meteorológicos",
+    url: "https://www.ipma.pt/pt/otempo/prev-sam/",
+  },
+  {
+    name: "SNS 24",
+    description: "Linha de Saúde",
+    phone: "808 24 24 24",
+  },
+  {
+    name: "Cruz Vermelha",
+    description: "Assistência Humanitária",
+    url: "https://www.cruzvermelha.pt",
+    phone: "808 200 690",
+  },
+  {
+    name: "Bombeiros",
+    description: "Emergência de Incêndio",
+    phone: "117",
+  },
+];
+
+const usefulLinks = [
+  {
+    name: "Avisos IPMA",
+    description: "Avisos meteorológicos em tempo real",
+    url: "https://www.ipma.pt/pt/otempo/prev-sam/",
+  },
+  {
+    name: "Fogos.pt",
+    description: "Mapa de incêndios em Portugal",
+    url: "https://fogos.pt",
+  },
+  {
+    name: "Prociv Alertas",
+    description: "Ocorrências da Proteção Civil",
+    url: "https://prociv.gov.pt/pt/parcerias/copy_of_rss/",
+  },
+  {
+    name: "SNIRH",
+    description: "Níveis de rios e albufeiras",
+    url: "https://snirh.apambiente.pt",
+  },
+  {
+    name: "Infraestruturas de Portugal",
+    description: "Estado das estradas",
+    url: "https://www.infraestruturasdeportugal.pt/pt-pt/centro-de-informacao",
+  },
+];
 
 export default function AboutPage() {
   return (
@@ -27,6 +90,85 @@ export default function AboutPage() {
             Sentinela is a crowdsourced emergency reporting platform that empowers communities to
             report disasters, fires, floods, and other emergencies in real-time.
           </p>
+
+          {/* Emergency Contacts for Portugal */}
+          <section className="mt-10 rounded-lg border-2 border-red-500/50 bg-red-500/5 p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              <h2 className="text-xl font-semibold text-red-600 dark:text-red-400">
+                Contactos de Emergência — Portugal
+              </h2>
+            </div>
+            <p className="mb-4 text-sm text-muted-foreground">
+              Se está a enfrentar uma emergência relacionada com tempestades ou cheias, contacte
+              imediatamente os serviços de emergência.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {emergencyContacts.map((contact) => (
+                <div
+                  key={contact.name}
+                  className={`rounded-md border p-3 ${
+                    contact.primary
+                      ? "border-red-500 bg-red-500/10"
+                      : "border-border bg-background/50"
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3
+                        className={`font-semibold ${contact.primary ? "text-red-600 dark:text-red-400" : ""}`}
+                      >
+                        {contact.name}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">{contact.description}</p>
+                    </div>
+                    {contact.phone && (
+                      <a
+                        href={`tel:${contact.phone.replace(/\s/g, "")}`}
+                        className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary hover:bg-primary/20"
+                      >
+                        <Phone className="h-3 w-3" />
+                        {contact.phone}
+                      </a>
+                    )}
+                  </div>
+                  {contact.url && (
+                    <a
+                      href={contact.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                    >
+                      Visitar site
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Useful Links */}
+          <section className="mt-8 rounded-lg border bg-muted/30 p-6">
+            <h2 className="mb-4 text-lg font-semibold">Links Úteis</h2>
+            <div className="space-y-3">
+              {usefulLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between rounded-md border bg-background/50 p-3 transition-colors hover:bg-background"
+                >
+                  <div>
+                    <h3 className="font-medium">{link.name}</h3>
+                    <p className="text-xs text-muted-foreground">{link.description}</p>
+                  </div>
+                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                </a>
+              ))}
+            </div>
+          </section>
 
           <section className="mt-10">
             <h2 className="text-xl font-semibold">How it works</h2>
