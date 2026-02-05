@@ -121,6 +121,7 @@
     "failedToLoad": "Falha ao carregar incidentes",
     "addCommentFirst": "Adicione primeiro um comentário ou imagem.",
     "tapMapFirst": "Toque no mapa para colocar um marcador primeiro.",
+    "locationRequired": "Localização é obrigatória. Por favor, ative os serviços de localização ou toque no mapa para colocar um marcador.",
     "attachImage": "Por favor, anexe pelo menos uma imagem.",
     "attachMaxImages": "Por favor, anexe até {max} imagens.",
     "geolocationUnavailable": "A geolocalização não está disponível neste navegador.",

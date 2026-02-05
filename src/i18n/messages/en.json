@@ -121,6 +121,7 @@
     "failedToLoad": "Failed to load reports",
     "addCommentFirst": "Add a comment or image first.",
     "tapMapFirst": "Tap the map to drop a pin first.",
+    "locationRequired": "Location is required. Please enable location services or tap the map to drop a pin.",
     "attachImage": "Please attach at least one image.",
     "attachMaxImages": "Please attach up to {max} images.",
     "geolocationUnavailable": "Geolocation is not available in this browser.",
