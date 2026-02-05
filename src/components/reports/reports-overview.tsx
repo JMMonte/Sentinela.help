@@ -379,18 +379,31 @@ function ContributionTypeBadge({ type }: { type: ContributionType }) {
 
 function WeatherSnapshotRow({ snapshot }: { snapshot: WeatherSnapshot }) {
   const temp = Math.round(snapshot.temp);
+  const feelsLike = Math.round(snapshot.feels_like);
   const wind = msToKmh(snapshot.wind_speed);
   const windDir = windDegToDirection(snapshot.wind_deg);
   const iconUrl = getWeatherIconUrl(snapshot.icon);
+  const visibility = (snapshot.visibility / 1000).toFixed(1);
 
   return (
-    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+    <div className="flex items-center gap-2.5 rounded-md bg-muted/50 px-2.5 py-1.5 text-xs">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={iconUrl} alt={snapshot.description} className="h-5 w-5 -my-0.5" />
-      <span className="font-medium text-foreground">{temp}&deg;C</span>
-      <span>{wind}<small className="opacity-70 ml-px">km/h</small> {windDir}</span>
-      <span>{snapshot.humidity}<small className="opacity-70 ml-px">%</small></span>
-      <span>{snapshot.pressure}<small className="opacity-70 ml-px">hPa</small></span>
+      <img src={iconUrl} alt={snapshot.description} className="h-8 w-8 -ml-0.5" />
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <div className="flex items-baseline gap-1.5">
+          <span className="font-semibold text-foreground text-sm leading-none">{temp}&deg;C</span>
+          <span className="text-muted-foreground capitalize truncate">{snapshot.description}</span>
+        </div>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <span>Feels {feelsLike}&deg;</span>
+          <span className="text-muted-foreground/40">&middot;</span>
+          <span>{wind} km/h {windDir}</span>
+          <span className="text-muted-foreground/40">&middot;</span>
+          <span>{snapshot.humidity}%</span>
+          <span className="text-muted-foreground/40 hidden sm:inline">&middot;</span>
+          <span className="hidden sm:inline">{visibility} km</span>
+        </div>
+      </div>
     </div>
   );
 }
