@@ -1475,11 +1475,11 @@ export function ReportsOverview({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-7 w-7"
+                    className="h-10 w-10 sm:h-7 sm:w-7"
                     onClick={requestLocation}
                     aria-label={t("tooltips.centerLocation")}
                   >
-                    <Locate className="h-4 w-4" />
+                    <Locate className="h-5 w-5 sm:h-4 sm:w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -1513,7 +1513,7 @@ export function ReportsOverview({
             <Button
               type="button"
               size="sm"
-              className="rounded-full h-7 px-3 text-xs"
+              className="hidden sm:inline-flex rounded-full h-7 px-3 text-xs"
               onClick={() => {
                 setView("form");
                 setPanelOpen(true);
@@ -1578,7 +1578,7 @@ export function ReportsOverview({
                       setActiveSnap("expanded");
                     }}
                   >
-                    {t("reports.report")}
+                    {t("reports.reportIncident")}
                   </Button>
                 </div>
                 <Tabs value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>

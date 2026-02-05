@@ -45,11 +45,11 @@ export function LanguageSelector() {
             type="button"
             variant="ghost"
             size="icon"
-            className="h-7 w-7"
+            className="h-10 w-10 sm:h-7 sm:w-7"
             aria-label={t("language")}
             onClick={handleLocaleChange}
           >
-            <span className="text-xs font-medium">
+            <span className="text-sm sm:text-xs font-medium">
               {locale === "en" ? "EN" : "PT"}
             </span>
           </Button>

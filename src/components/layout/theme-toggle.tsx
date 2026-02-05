@@ -24,12 +24,12 @@ export function ThemeToggle() {
             type="button"
             variant="ghost"
             size="icon"
-            className="h-7 w-7"
+            className="h-10 w-10 sm:h-7 sm:w-7"
             aria-label={t("toggleTheme")}
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
-            <SunIcon className="h-4 w-4 dark:hidden" />
-            <MoonIcon className="hidden h-4 w-4 dark:block" />
+            <SunIcon className="h-5 w-5 sm:h-4 sm:w-4 dark:hidden" />
+            <MoonIcon className="hidden h-5 w-5 sm:h-4 sm:w-4 dark:block" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
