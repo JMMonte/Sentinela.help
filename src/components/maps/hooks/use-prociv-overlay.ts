@@ -2,19 +2,18 @@
 
 import { useEffect, useState, useCallback } from "react";
 import {
-  fetchEarthquakes,
-  type EarthquakeFeature,
-} from "@/lib/overlays/seismic-api";
+  fetchIncidents,
+  type ProCivIncident,
+} from "@/lib/overlays/prociv-api";
 
-export type SeismicOverlayConfig = {
+export type ProCivOverlayConfig = {
   enabled: boolean;
-  minMagnitude: number;
 };
 
-export type SeismicOverlayState = {
+export type ProCivOverlayState = {
   isAvailable: boolean;
   enabled: boolean;
-  earthquakes: EarthquakeFeature[];
+  incidents: ProCivIncident[];
   isLoading: boolean;
   error: string | null;
   lastUpdated: Date | null;
@@ -22,14 +21,14 @@ export type SeismicOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const REFRESH_INTERVAL = 2 * 60 * 1000; // 2 minutes
 
-export function useSeismicOverlay(
-  config: SeismicOverlayConfig,
-  timeFilterHours: number = 24,
-): SeismicOverlayState {
+export function useProCivOverlay(
+  config: ProCivOverlayConfig,
+  timeFilterHours: number = 8
+): ProCivOverlayState {
   const [enabled, setEnabled] = useState(false);
-  const [earthquakes, setEarthquakes] = useState<EarthquakeFeature[]>([]);
+  const [incidents, setIncidents] = useState<ProCivIncident[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -43,15 +42,15 @@ export function useSeismicOverlay(
     setError(null);
 
     try {
-      const data = await fetchEarthquakes(config.minMagnitude, timeFilterHours);
-      setEarthquakes(data.features);
+      const data = await fetchIncidents(timeFilterHours);
+      setIncidents(data);
       setLastUpdated(new Date());
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to fetch earthquake data");
+      setError(e instanceof Error ? e.message : "Failed to fetch ProCiv data");
     } finally {
       setIsLoading(false);
     }
-  }, [isAvailable, config.minMagnitude, timeFilterHours]);
+  }, [isAvailable, timeFilterHours]);
 
   // Fetch on enable and auto-refresh
   useEffect(() => {
@@ -65,7 +64,7 @@ export function useSeismicOverlay(
   return {
     isAvailable,
     enabled: enabled && isAvailable,
-    earthquakes,
+    incidents,
     isLoading,
     error,
     lastUpdated,

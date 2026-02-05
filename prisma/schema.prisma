@@ -32,38 +32,40 @@ enum ContributionType {
 }
 
 model Jurisdiction {
-  id               String   @id @default(cuid())
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  name             String
-  countryCode      String?
-  admin1           String?
-  admin2           String?
-  admin3           String?
+  name        String
+  countryCode String?
+  admin1      String?
+  admin2      String?
+  admin3      String?
 
-  contactEmail     String?
+  contactEmail      String?
   contactWebhookUrl String?
 }
 
 model Report {
-  id            String       @id @default(cuid())
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  type          IncidentType
-  status        ReportStatus @default(NEW)
+  type   IncidentType
+  status ReportStatus @default(NEW)
 
   description   String?
   reporterEmail String?
 
-  latitude      Float
-  longitude     Float
-  address       String?
+  latitude  Float
+  longitude Float
+  address   String?
 
   // Scoring: net score = escalateCount - deescalateCount
   escalateCount   Int @default(0)
   deescalateCount Int @default(0)
+
+  weatherSnapshot Json?
 
   images        ReportImage[]
   contributions Contribution[]
@@ -73,29 +75,31 @@ model ReportImage {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
 
-  reportId  String
-  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reportId String
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
 
-  url       String
-  mimeType  String
-  bytes     Int
+  url      String
+  mimeType String
+  bytes    Int
 
-  width     Int?
-  height    Int?
+  width  Int?
+  height Int?
 }
 
 model Contribution {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
 
-  reportId  String
-  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reportId String
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
 
   type             ContributionType @default(COMMENT)
   contributorEmail String?
   comment          String?
 
-  images    ContributionImage[]
+  weatherSnapshot Json?
+
+  images ContributionImage[]
 }
 
 model ContributionImage {
@@ -105,10 +109,10 @@ model ContributionImage {
   contributionId String
   contribution   Contribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
 
-  url       String
-  mimeType  String
-  bytes     Int
+  url      String
+  mimeType String
+  bytes    Int
 
-  width     Int?
-  height    Int?
+  width  Int?
+  height Int?
 }

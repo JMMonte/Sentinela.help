@@ -6,6 +6,7 @@ import { env } from "@/lib/env";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { createContributionFieldsSchema } from "@/lib/reports/validation";
 import { isAllowedImageMimeType, saveImage } from "@/lib/uploads";
+import { fetchWeatherSnapshot } from "@/lib/overlays/weather-api";
 
 export const runtime = "nodejs";
 
@@ -46,10 +47,10 @@ export async function POST(
   try {
     const { id: reportId } = await params;
 
-    // Verify report exists
+    // Verify report exists (include coords for weather snapshot)
     const report = await prisma.report.findUnique({
       where: { id: reportId },
-      select: { id: true },
+      select: { id: true, latitude: true, longitude: true },
     });
 
     if (!report) {
@@ -101,8 +102,13 @@ export async function POST(
       files.push(value);
     }
 
-    // Store images
-    const storedImages = await Promise.all(files.map((file) => saveImage(file)));
+    // Store images and fetch weather in parallel
+    const [storedImages, weatherSnapshot] = await Promise.all([
+      Promise.all(files.map((file) => saveImage(file))),
+      env.OPENWEATHERMAP_API_KEY
+        ? fetchWeatherSnapshot(report.latitude, report.longitude, env.OPENWEATHERMAP_API_KEY)
+        : Promise.resolve(null),
+    ]);
 
     // Determine new report status and score updates based on contribution type
     let newReportStatus: "NEW" | "NOTIFIED" | "CLOSED" | null = null;
@@ -135,6 +141,7 @@ export async function POST(
           type: contributionType,
           comment: nullIfEmpty(fields.comment),
           contributorEmail: nullIfEmpty(fields.contributorEmail),
+          weatherSnapshot: weatherSnapshot ?? undefined,
           images: {
             create: storedImages.map((image) => ({
               url: image.url,

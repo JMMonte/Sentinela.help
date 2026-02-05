@@ -13,7 +13,17 @@
     "language": "Idioma"
   },
   "map": {
-    "yourLocation": "A sua localização"
+    "yourLocation": "A sua localização",
+    "weatherFeelsLike": "Sensação",
+    "weatherHumidity": "Humidade",
+    "weatherMinMax": "Mín/Máx",
+    "weatherPressure": "Pressão",
+    "weatherWind": "Vento",
+    "weatherClouds": "Nuvens",
+    "weatherGusts": "Rajadas",
+    "weatherVisibility": "Visibilidade",
+    "weatherSunrise": "Nascer do sol",
+    "weatherSunset": "Pôr do sol"
   },
   "reports": {
     "title": "Incidentes",

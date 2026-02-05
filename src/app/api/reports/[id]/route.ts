@@ -39,6 +39,7 @@ export async function GET(
         reporterEmail: report.reporterEmail,
         images: report.images,
         score: report.escalateCount - report.deescalateCount,
+        weatherSnapshot: report.weatherSnapshot,
         contributions: report.contributions.map((c) => ({
           id: c.id,
           createdAt: c.createdAt.toISOString(),
@@ -46,6 +47,7 @@ export async function GET(
           contributorEmail: c.contributorEmail,
           comment: c.comment,
           images: c.images,
+          weatherSnapshot: c.weatherSnapshot,
         })),
       },
     });

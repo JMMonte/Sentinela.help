@@ -2,19 +2,18 @@
 
 import { useEffect, useState, useCallback } from "react";
 import {
-  fetchEarthquakes,
-  type EarthquakeFeature,
-} from "@/lib/overlays/seismic-api";
+  fetchRainfallObservations,
+  type StationObservation,
+} from "@/lib/overlays/rainfall-api";
 
-export type SeismicOverlayConfig = {
+export type RainfallOverlayConfig = {
   enabled: boolean;
-  minMagnitude: number;
 };
 
-export type SeismicOverlayState = {
+export type RainfallOverlayState = {
   isAvailable: boolean;
   enabled: boolean;
-  earthquakes: EarthquakeFeature[];
+  stations: StationObservation[];
   isLoading: boolean;
   error: string | null;
   lastUpdated: Date | null;
@@ -22,19 +21,22 @@ export type SeismicOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes (IPMA updates hourly)
 
-export function useSeismicOverlay(
-  config: SeismicOverlayConfig,
+export function useRainfallOverlay(
+  config: RainfallOverlayConfig,
   timeFilterHours: number = 24,
-): SeismicOverlayState {
+): RainfallOverlayState {
   const [enabled, setEnabled] = useState(false);
-  const [earthquakes, setEarthquakes] = useState<EarthquakeFeature[]>([]);
+  const [stations, setStations] = useState<StationObservation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const isAvailable = config.enabled;
+
+  // IPMA only provides 24h of data, so cap the filter
+  const effectiveHours = Math.min(timeFilterHours, 24);
 
   const refresh = useCallback(async () => {
     if (!isAvailable) return;
@@ -43,17 +45,16 @@ export function useSeismicOverlay(
     setError(null);
 
     try {
-      const data = await fetchEarthquakes(config.minMagnitude, timeFilterHours);
-      setEarthquakes(data.features);
+      const data = await fetchRainfallObservations(effectiveHours);
+      setStations(data);
       setLastUpdated(new Date());
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to fetch earthquake data");
+      setError(e instanceof Error ? e.message : "Failed to fetch rainfall data");
     } finally {
       setIsLoading(false);
     }
-  }, [isAvailable, config.minMagnitude, timeFilterHours]);
+  }, [isAvailable, effectiveHours]);
 
-  // Fetch on enable and auto-refresh
   useEffect(() => {
     if (!enabled || !isAvailable) return;
 
@@ -65,7 +66,7 @@ export function useSeismicOverlay(
   return {
     isAvailable,
     enabled: enabled && isAvailable,
-    earthquakes,
+    stations,
     isLoading,
     error,
     lastUpdated,

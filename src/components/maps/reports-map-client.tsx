@@ -4,9 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 import {
-  CircleMarker,
   MapContainer,
-  Popup,
   TileLayer,
   useMap,
   useMapEvents,
@@ -15,6 +13,12 @@ import type { LatLngExpression } from "leaflet";
 
 import { cn } from "@/lib/utils";
 import { type IncidentType } from "@/lib/reports/incident-types";
+import {
+  type CurrentWeatherData,
+  getWeatherIconUrl,
+  msToKmh,
+  windDegToDirection,
+} from "@/lib/overlays/weather-api";
 import {
   createClusterIcon,
   createImageMarkerIcon,
@@ -27,9 +31,15 @@ import {
 import { MarkerClusterGroup, type ClusteredMarker } from "./marker-cluster-group";
 import { WeatherOverlay } from "./overlays/weather-overlay";
 import { SeismicOverlay } from "./overlays/seismic-overlay";
+import { ProCivOverlay } from "./overlays/prociv-overlay";
+import { RainfallOverlay } from "./overlays/rainfall-overlay";
 import { OverlayControls } from "./overlays/overlay-controls";
 import { useWeatherOverlay, type WeatherOverlayConfig } from "./hooks/use-weather-overlay";
 import { useSeismicOverlay, type SeismicOverlayConfig } from "./hooks/use-seismic-overlay";
+import { useProCivOverlay, type ProCivOverlayConfig } from "./hooks/use-prociv-overlay";
+import { useRainfallOverlay, type RainfallOverlayConfig } from "./hooks/use-rainfall-overlay";
+import { useLocationWeather } from "./hooks/use-location-weather";
+import { UserLocationMarker, PinLocationMarker } from "./user-location-marker";
 
 const TILE_LIGHT =
   "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
@@ -55,6 +65,8 @@ export type ReportMapItem = {
 export type OverlayConfig = {
   weather: WeatherOverlayConfig;
   seismic: SeismicOverlayConfig;
+  prociv: ProCivOverlayConfig;
+  rainfall: RainfallOverlayConfig;
 };
 
 export type ReportsMapProps = {
@@ -73,6 +85,8 @@ export type ReportsMapProps = {
   className?: string;
   /** Configuration for map overlays (weather, seismic). */
   overlayConfig?: OverlayConfig;
+  /** Time filter in hours – controls how far back overlays fetch data. */
+  timeFilterHours?: number;
 };
 
 function FlyToCenter({ center }: { center?: LatLngExpression }) {
@@ -116,7 +130,29 @@ type PopupTranslations = {
   viewReport: string;
 };
 
-function buildPopupHtml(report: ReportMapItem, translations: PopupTranslations): string {
+function buildWeatherRowHtml(w: CurrentWeatherData): string {
+  const temp = Math.round(w.main.temp);
+  const iconUrl = getWeatherIconUrl(w.weather[0].icon);
+  const wind = msToKmh(w.wind.speed);
+  const windDir = windDegToDirection(w.wind.deg);
+  const humidity = w.main.humidity;
+  const description = w.weather[0].description;
+
+  return `
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#71717a;border-top:1px solid #e4e4e7;padding-top:6px;">
+      <img src="${iconUrl}" alt="${description}" style="width:24px;height:24px;margin:-2px 0;" />
+      <span style="font-weight:600;color:#18181b;">${temp}&deg;C</span>
+      <span>${wind}<small style="font-size:9px;opacity:0.7;margin-left:1px;">km/h</small> ${windDir}</span>
+      <span>${humidity}<small style="font-size:9px;opacity:0.7;margin-left:1px;">%</small></span>
+    </div>
+  `;
+}
+
+function buildPopupHtml(
+  report: ReportMapItem,
+  translations: PopupTranslations,
+  weather?: CurrentWeatherData | null,
+): string {
   const imageHtml = report.imageUrl
     ? `<img src="${report.imageUrl}" alt="" style="height:96px;width:100%;border-radius:4px;object-fit:cover;" />`
     : "";
@@ -124,6 +160,7 @@ function buildPopupHtml(report: ReportMapItem, translations: PopupTranslations):
   const date = new Date(report.createdAt).toLocaleString();
   const scoreColor = report.score > 0 ? "#ef4444" : report.score < 0 ? "#3b82f6" : "#71717a";
   const scoreLabel = report.score > 0 ? `+${report.score}` : String(report.score);
+  const weatherHtml = weather ? buildWeatherRowHtml(weather) : "";
 
   return `
     <div style="display:grid;gap:8px;min-width:180px;">
@@ -133,6 +170,7 @@ function buildPopupHtml(report: ReportMapItem, translations: PopupTranslations):
         <span style="font-size:11px;font-weight:600;color:${scoreColor};">${scoreLabel}</span>
         <span style="font-size:11px;color:#71717a;">${date}</span>
       </div>
+      ${weatherHtml}
       <button data-report-id="${report.id}" style="font-size:14px;text-decoration:underline;background:none;border:none;padding:0;cursor:pointer;text-align:left;color:inherit;">${translations.viewReport}</button>
     </div>
   `;
@@ -141,6 +179,8 @@ function buildPopupHtml(report: ReportMapItem, translations: PopupTranslations):
 const DEFAULT_OVERLAY_CONFIG: OverlayConfig = {
   weather: { enabled: false, apiKey: undefined },
   seismic: { enabled: false, minMagnitude: 2.5 },
+  prociv: { enabled: false },
+  rainfall: { enabled: false },
 };
 
 export function ReportsMapClient({
@@ -154,6 +194,7 @@ export function ReportsMapClient({
   zoom,
   className,
   overlayConfig = DEFAULT_OVERLAY_CONFIG,
+  timeFilterHours = 8,
 }: ReportsMapProps) {
   const { resolvedTheme } = useTheme();
   const tileUrl = resolvedTheme === "dark" ? TILE_DARK : TILE_LIGHT;
@@ -163,7 +204,21 @@ export function ReportsMapClient({
 
   // Overlay state
   const weather = useWeatherOverlay(overlayConfig.weather);
-  const seismic = useSeismicOverlay(overlayConfig.seismic);
+  const seismic = useSeismicOverlay(overlayConfig.seismic, timeFilterHours);
+  const prociv = useProCivOverlay(overlayConfig.prociv, timeFilterHours);
+  const rainfall = useRainfallOverlay(overlayConfig.rainfall, timeFilterHours);
+
+  // Location weather (current weather at user position)
+  const locationWeather = useLocationWeather(
+    weather.isAvailable ? userLocation : undefined,
+    overlayConfig.weather.apiKey
+  );
+
+  // Weather at pin location (for yellow marker popup)
+  const pinWeather = useLocationWeather(
+    weather.isAvailable ? pinLocation : undefined,
+    overlayConfig.weather.apiKey
+  );
 
   // Handle clicks on "View report" buttons in popups
   useEffect(() => {
@@ -211,13 +266,17 @@ export function ReportsMapClient({
           id: report.id,
           position: [report.latitude, report.longitude] as [number, number],
           icon,
-          popupContent: buildPopupHtml(report, {
-            typeLabel: tIncidentTypes(report.type),
-            viewReport: tReports("viewReport"),
-          }),
+          popupContent: buildPopupHtml(
+            report,
+            {
+              typeLabel: tIncidentTypes(report.type),
+              viewReport: tReports("viewReport"),
+            },
+            locationWeather.data,
+          ),
         };
       }),
-    [reports, tIncidentTypes, tReports]
+    [reports, tIncidentTypes, tReports, locationWeather.data]
   );
 
   return (
@@ -243,34 +302,38 @@ export function ReportsMapClient({
           <SeismicOverlay earthquakes={seismic.earthquakes} />
         )}
 
-        {/* User location (blue dot) */}
+        {/* ProCiv overlay (civil protection occurrences) */}
+        {prociv.enabled && prociv.incidents.length > 0 && (
+          <ProCivOverlay incidents={prociv.incidents} />
+        )}
+
+        {/* Rainfall overlay (IPMA station observations) */}
+        {rainfall.enabled && rainfall.stations.length > 0 && (
+          <RainfallOverlay stations={rainfall.stations} />
+        )}
+
+        {/* User location (blue dot + ambient weather) */}
         {userLocation && (
-          <CircleMarker
-            center={userLocation}
-            radius={10}
-            pathOptions={{
-              color: "#3b82f6",
-              fillColor: "#3b82f6",
-              fillOpacity: 0.3,
-              weight: 3,
-            }}
-          >
-            <Popup>
-              <span className="text-sm font-medium">{tMap("yourLocation")}</span>
-            </Popup>
-          </CircleMarker>
+          <UserLocationMarker
+            position={userLocation}
+            weather={locationWeather.data}
+            locationLabel={tMap("yourLocation")}
+            reportLabel={tReports("reportIncident")}
+            onReportIncident={
+              onMapClick
+                ? () => onMapClick(userLocation[0], userLocation[1])
+                : undefined
+            }
+          />
         )}
 
         {/* User's new report pin (yellow) */}
         {pinLocation && (
-          <CircleMarker
-            center={pinLocation}
-            radius={10}
-            pathOptions={{
-              color: "#eab308",
-              fillColor: "#eab308",
-              fillOpacity: 0.35,
-            }}
+          <PinLocationMarker
+            position={pinLocation}
+            weather={pinWeather.data}
+            locationLabel={tMap("yourLocation")}
+            reportLabel={tReports("reportIncident")}
           />
         )}
 
@@ -282,8 +345,8 @@ export function ReportsMapClient({
         />
       </MapContainer>
 
-      {/* Overlay controls (outside MapContainer for proper z-index) */}
-      <OverlayControls weather={weather} seismic={seismic} />
+      {/* Overlay controls (portals itself into the header topbar) */}
+      <OverlayControls weather={weather} seismic={seismic} prociv={prociv} rainfall={rainfall} />
     </div>
   );
 }

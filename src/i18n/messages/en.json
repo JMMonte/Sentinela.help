@@ -13,7 +13,17 @@
     "language": "Language"
   },
   "map": {
-    "yourLocation": "Your location"
+    "yourLocation": "Your location",
+    "weatherFeelsLike": "Feels like",
+    "weatherHumidity": "Humidity",
+    "weatherMinMax": "Min/Max",
+    "weatherPressure": "Pressure",
+    "weatherWind": "Wind",
+    "weatherClouds": "Clouds",
+    "weatherGusts": "Gusts",
+    "weatherVisibility": "Visibility",
+    "weatherSunrise": "Sunrise",
+    "weatherSunset": "Sunset"
   },
   "reports": {
     "title": "Reports",

@@ -105,6 +105,9 @@ export function MarkerClusterGroup({
           existing.setLatLng(markerData.position);
         }
         existing.setIcon(markerData.icon);
+        if (markerData.popupContent) {
+          existing.setPopupContent(markerData.popupContent);
+        }
       } else {
         // Create new marker
         const marker = L.marker(markerData.position, { icon: markerData.icon });

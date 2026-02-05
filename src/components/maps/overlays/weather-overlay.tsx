@@ -7,7 +7,7 @@ export type WeatherOverlayProps = {
   opacity?: number;
 };
 
-export function WeatherOverlay({ tileUrl, opacity = 0.6 }: WeatherOverlayProps) {
+export function WeatherOverlay({ tileUrl, opacity = 1.0 }: WeatherOverlayProps) {
   return (
     <TileLayer
       url={tileUrl}

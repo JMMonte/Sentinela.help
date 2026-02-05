@@ -67,6 +67,12 @@ import {
   incidentTypes,
   type IncidentType,
 } from "@/lib/reports/incident-types";
+import {
+  type WeatherSnapshot,
+  getWeatherIconUrl,
+  msToKmh,
+  windDegToDirection,
+} from "@/lib/overlays/weather-api";
 import { cn } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
@@ -129,6 +135,7 @@ type ContributionData = {
   contributorEmail: string | null;
   comment: string | null;
   images: Array<{ url: string }>;
+  weatherSnapshot: WeatherSnapshot | null;
 };
 
 type ReportDetailData = {
@@ -143,6 +150,7 @@ type ReportDetailData = {
   reporterEmail: string | null;
   images: Array<{ url: string }>;
   score: number;
+  weatherSnapshot: WeatherSnapshot | null;
   contributions: ContributionData[];
 };
 
@@ -369,6 +377,24 @@ function ContributionTypeBadge({ type }: { type: ContributionType }) {
   return null; // COMMENT type doesn't need a badge
 }
 
+function WeatherSnapshotRow({ snapshot }: { snapshot: WeatherSnapshot }) {
+  const temp = Math.round(snapshot.temp);
+  const wind = msToKmh(snapshot.wind_speed);
+  const windDir = windDegToDirection(snapshot.wind_deg);
+  const iconUrl = getWeatherIconUrl(snapshot.icon);
+
+  return (
+    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={iconUrl} alt={snapshot.description} className="h-5 w-5 -my-0.5" />
+      <span className="font-medium text-foreground">{temp}&deg;C</span>
+      <span>{wind}<small className="opacity-70 ml-px">km/h</small> {windDir}</span>
+      <span>{snapshot.humidity}<small className="opacity-70 ml-px">%</small></span>
+      <span>{snapshot.pressure}<small className="opacity-70 ml-px">hPa</small></span>
+    </div>
+  );
+}
+
 function ReportDetailContent({
   report,
   isLoading,
@@ -553,6 +579,9 @@ function ReportDetailContent({
                 </>
               )}
             </div>
+            {report.weatherSnapshot && (
+              <WeatherSnapshotRow snapshot={report.weatherSnapshot} />
+            )}
             {report.description && (
               <p className="whitespace-pre-wrap text-sm">{report.description}</p>
             )}
@@ -614,6 +643,9 @@ function ReportDetailContent({
                   )}
                   <ContributionTypeBadge type={contribution.type} />
                 </div>
+                {contribution.weatherSnapshot && (
+                  <WeatherSnapshotRow snapshot={contribution.weatherSnapshot} />
+                )}
                 {contribution.comment && (
                   <p className="whitespace-pre-wrap text-sm">{contribution.comment}</p>
                 )}
@@ -1146,13 +1178,19 @@ export function ReportsOverview({
 
   // ── Derived ──
 
+  const timeFilterHours = useMemo(() => {
+    const opt = TIME_FILTER_OPTIONS.find((o) => o.value === timeFilter);
+    return opt ? opt.hours : 8;
+  }, [timeFilter]);
+
   const filtered = useMemo(() => {
     // First apply time filter
-    const filterOption = TIME_FILTER_OPTIONS.find((o) => o.value === timeFilter);
-    const cutoffMs = filterOption ? filterOption.hours * 60 * 60 * 1000 : 8 * 60 * 60 * 1000;
+    const cutoffMs = timeFilterHours * 60 * 60 * 1000;
     const cutoffDate = new Date(Date.now() - cutoffMs);
 
-    let result = reports.filter((r) => new Date(r.createdAt) >= cutoffDate);
+    let result = reports.filter(
+      (r) => r.status !== "CLOSED" || new Date(r.createdAt) >= cutoffDate,
+    );
 
     // Then apply text filter
     const q = query.trim().toLowerCase();
@@ -1495,6 +1533,7 @@ export function ReportsOverview({
           }}
           className="h-full w-full rounded-none"
           overlayConfig={overlayConfig}
+          timeFilterHours={timeFilterHours}
         />
       </div>
 
@@ -1510,6 +1549,7 @@ export function ReportsOverview({
                     variant="ghost"
                     size="icon"
                     className="h-10 w-10 sm:h-7 sm:w-7"
+                    style={{ order: 1 }}
                     onClick={requestLocation}
                     aria-label={t("tooltips.centerLocation")}
                   >
@@ -1529,6 +1569,7 @@ export function ReportsOverview({
                     variant="ghost"
                     size="icon"
                     className="hidden h-7 w-7 sm:inline-flex"
+                    style={{ order: 4 }}
                     onClick={() => setPanelOpen((prev) => !prev)}
                     aria-label={panelOpen ? t("tooltips.closePanel") : t("tooltips.openPanel")}
                   >
@@ -1548,6 +1589,7 @@ export function ReportsOverview({
               type="button"
               size="sm"
               className="hidden sm:inline-flex rounded-full h-7 px-3 text-xs"
+              style={{ order: 3 }}
               onClick={() => {
                 setView("form");
                 setPanelOpen(true);

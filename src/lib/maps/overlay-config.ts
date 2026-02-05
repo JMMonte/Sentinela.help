@@ -15,5 +15,11 @@ export function getOverlayConfig(): OverlayConfig {
       enabled: env.ENABLE_SEISMIC_OVERLAY,
       minMagnitude: env.SEISMIC_MIN_MAGNITUDE,
     },
+    prociv: {
+      enabled: env.ENABLE_PROCIV_OVERLAY,
+    },
+    rainfall: {
+      enabled: env.ENABLE_RAINFALL_OVERLAY,
+    },
   };
 }

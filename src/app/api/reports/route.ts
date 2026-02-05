@@ -9,6 +9,7 @@ import { env } from "@/lib/env";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { createReportFieldsSchema } from "@/lib/reports/validation";
 import { isAllowedImageMimeType, saveImage } from "@/lib/uploads";
+import { fetchWeatherSnapshot } from "@/lib/overlays/weather-api";
 
 export const runtime = "nodejs";
 
@@ -132,8 +133,13 @@ export async function POST(request: Request) {
 
     const storedImages = await Promise.all(files.map((file) => saveImage(file)));
 
+    // Fetch geocode and weather in parallel (both non-blocking)
     let address: string | null = null;
     let geocode: ReverseGeocodeResult | null = null;
+    const weatherPromise = env.OPENWEATHERMAP_API_KEY
+      ? fetchWeatherSnapshot(fields.latitude, fields.longitude, env.OPENWEATHERMAP_API_KEY)
+      : Promise.resolve(null);
+
     try {
       geocode = await reverseGeocode({
         latitude: fields.latitude,
@@ -144,6 +150,8 @@ export async function POST(request: Request) {
       address = null;
     }
 
+    const weatherSnapshot = await weatherPromise;
+
     const report = await prisma.report.create({
       data: {
         type: fields.type,
@@ -152,6 +160,7 @@ export async function POST(request: Request) {
         latitude: fields.latitude,
         longitude: fields.longitude,
         address,
+        weatherSnapshot: weatherSnapshot ?? undefined,
         images: {
           create: storedImages.map((image) => ({
             url: image.url,

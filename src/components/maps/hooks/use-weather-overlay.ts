@@ -29,7 +29,7 @@ export function useWeatherOverlay(
 ): WeatherOverlayState {
   const [enabled, setEnabled] = useState(false);
   const [activeLayer, setActiveLayer] = useState<WeatherLayer>("precipitation_new");
-  const [opacity, setOpacity] = useState(0.6);
+  const [opacity, setOpacity] = useState(0.85);
 
   const isAvailable = config.enabled && !!config.apiKey;
 

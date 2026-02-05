@@ -22,6 +22,10 @@ const envSchema = z.object({
   // Seismic overlay (USGS)
   ENABLE_SEISMIC_OVERLAY: z.coerce.boolean().default(false),
   SEISMIC_MIN_MAGNITUDE: z.coerce.number().min(0).max(10).default(2.5),
+  // ProCiv / Fogos.pt overlay
+  ENABLE_PROCIV_OVERLAY: z.coerce.boolean().default(false),
+  // Rainfall overlay (IPMA)
+  ENABLE_RAINFALL_OVERLAY: z.coerce.boolean().default(false),
 });
 
 export const env = envSchema.parse({
@@ -36,4 +40,6 @@ export const env = envSchema.parse({
   OPENWEATHERMAP_API_KEY: process.env.OPENWEATHERMAP_API_KEY,
   ENABLE_SEISMIC_OVERLAY: process.env.ENABLE_SEISMIC_OVERLAY,
   SEISMIC_MIN_MAGNITUDE: process.env.SEISMIC_MIN_MAGNITUDE,
+  ENABLE_PROCIV_OVERLAY: process.env.ENABLE_PROCIV_OVERLAY,
+  ENABLE_RAINFALL_OVERLAY: process.env.ENABLE_RAINFALL_OVERLAY,
 });
