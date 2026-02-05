@@ -377,34 +377,22 @@ function ContributionTypeBadge({ type }: { type: ContributionType }) {
   return null; // COMMENT type doesn't need a badge
 }
 
-function WeatherSnapshotRow({ snapshot }: { snapshot: WeatherSnapshot }) {
+function WeatherSnapshotInline({ snapshot }: { snapshot: WeatherSnapshot }) {
   const temp = Math.round(snapshot.temp);
-  const feelsLike = Math.round(snapshot.feels_like);
   const wind = msToKmh(snapshot.wind_speed);
   const windDir = windDegToDirection(snapshot.wind_deg);
   const iconUrl = getWeatherIconUrl(snapshot.icon);
-  const visibility = (snapshot.visibility / 1000).toFixed(1);
 
   return (
-    <div className="flex items-center gap-2.5 rounded-md bg-muted/50 px-2.5 py-1.5 text-xs">
+    <span className="inline-flex items-center gap-1">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={iconUrl} alt={snapshot.description} className="h-8 w-8 -ml-0.5" />
-      <div className="flex flex-col gap-0.5 min-w-0">
-        <div className="flex items-baseline gap-1.5">
-          <span className="font-semibold text-foreground text-sm leading-none">{temp}&deg;C</span>
-          <span className="text-muted-foreground capitalize truncate">{snapshot.description}</span>
-        </div>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <span>Feels {feelsLike}&deg;</span>
-          <span className="text-muted-foreground/40">&middot;</span>
-          <span>{wind} km/h {windDir}</span>
-          <span className="text-muted-foreground/40">&middot;</span>
-          <span>{snapshot.humidity}%</span>
-          <span className="text-muted-foreground/40 hidden sm:inline">&middot;</span>
-          <span className="hidden sm:inline">{visibility} km</span>
-        </div>
-      </div>
-    </div>
+      <img src={iconUrl} alt={snapshot.description} className="h-4 w-4" />
+      <span>{temp}&deg;</span>
+      <span className="text-muted-foreground/40">&middot;</span>
+      <span>{wind} km/h {windDir}</span>
+      <span className="text-muted-foreground/40">&middot;</span>
+      <span>{snapshot.humidity}%</span>
+    </span>
   );
 }
 
@@ -583,18 +571,37 @@ function ReportDetailContent({
         <div className="divide-y">
           {/* Original report entry */}
           <div className="px-4 py-3 space-y-2">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-              <span>{new Date(report.createdAt).toLocaleString()}</span>
-              {report.reporterEmail && (
-                <>
-                  <span>•</span>
-                  <span>{report.reporterEmail}</span>
-                </>
+            <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span>{new Date(report.createdAt).toLocaleString()}</span>
+                {report.reporterEmail && (
+                  <>
+                    <span>•</span>
+                    <span>{report.reporterEmail}</span>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span>
+                  {report.address ?? `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`}
+                </span>
+                {osmUrl && (
+                  <a
+                    href={osmUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:underline"
+                  >
+                    OSM ↗
+                  </a>
+                )}
+              </div>
+              {report.weatherSnapshot && (
+                <div className="flex items-center gap-1">
+                  <WeatherSnapshotInline snapshot={report.weatherSnapshot} />
+                </div>
               )}
             </div>
-            {report.weatherSnapshot && (
-              <WeatherSnapshotRow snapshot={report.weatherSnapshot} />
-            )}
             {report.description && (
               <p className="whitespace-pre-wrap text-sm">{report.description}</p>
             )}
@@ -621,21 +628,6 @@ function ReportDetailContent({
                 ))}
               </div>
             )}
-            <div className="flex items-center gap-3 pt-1 text-xs text-muted-foreground">
-              <span>
-                {report.address ?? `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`}
-              </span>
-              {osmUrl && (
-                <a
-                  href={osmUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:underline"
-                >
-                  OSM ↗
-                </a>
-              )}
-            </div>
           </div>
 
           {/* Contributions */}
@@ -646,19 +638,23 @@ function ReportDetailContent({
 
             return (
               <div key={contribution.id} className="px-4 py-3 space-y-2">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-                  <span>{new Date(contribution.createdAt).toLocaleString()}</span>
-                  {contribution.contributorEmail && (
-                    <>
-                      <span>•</span>
-                      <span>{contribution.contributorEmail}</span>
-                    </>
+                <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span>{new Date(contribution.createdAt).toLocaleString()}</span>
+                    {contribution.contributorEmail && (
+                      <>
+                        <span>•</span>
+                        <span>{contribution.contributorEmail}</span>
+                      </>
+                    )}
+                    <ContributionTypeBadge type={contribution.type} />
+                  </div>
+                  {contribution.weatherSnapshot && (
+                    <div className="flex items-center gap-1">
+                      <WeatherSnapshotInline snapshot={contribution.weatherSnapshot} />
+                    </div>
                   )}
-                  <ContributionTypeBadge type={contribution.type} />
                 </div>
-                {contribution.weatherSnapshot && (
-                  <WeatherSnapshotRow snapshot={contribution.weatherSnapshot} />
-                )}
                 {contribution.comment && (
                   <p className="whitespace-pre-wrap text-sm">{contribution.comment}</p>
                 )}
