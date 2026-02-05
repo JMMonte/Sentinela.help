@@ -34,11 +34,11 @@ const emergencyContacts = [
     name: "Cruz Vermelha",
     description: "Assistência Humanitária",
     url: "https://www.cruzvermelha.pt",
-    phone: "808 200 690",
+    phone: "+351 213 913 900",
   },
   {
-    name: "Bombeiros",
-    description: "Emergência de Incêndio",
+    name: "117",
+    description: "Fogos Florestais",
     phone: "117",
   },
 ];
@@ -55,9 +55,9 @@ const usefulLinks = [
     url: "https://fogos.pt",
   },
   {
-    name: "Prociv Alertas",
-    description: "Ocorrências da Proteção Civil",
-    url: "https://prociv.gov.pt/pt/parcerias/copy_of_rss/",
+    name: "Prociv Ocorrências",
+    description: "Ocorrências em tempo real",
+    url: "https://prociv.gov.pt/pt/ocorrencias/",
   },
   {
     name: "SNIRH",
