@@ -12,10 +12,13 @@ import { useTranslations } from "next-intl";
 import {
   AlertTriangle,
   ArrowLeft,
+  Bike,
+  Car,
   Check,
   ChevronDown,
   ChevronUp,
   ExternalLink,
+  Footprints,
   Loader2,
   Locate,
   MapPin,
@@ -631,23 +634,29 @@ function ReportDetailContent({
             )}
           </div>
           {onTravelModeChange && (
-            <div className="flex gap-1 mb-2">
-              {TRAVEL_MODES.map((mode) => (
-                <button
-                  key={mode}
-                  type="button"
-                  className={cn(
-                    "rounded-md border px-2 py-0.5 text-xs font-medium transition-colors",
-                    routeData.travelMode === mode
-                      ? "border-blue-500 bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-400"
-                      : "bg-background text-muted-foreground hover:bg-muted"
-                  )}
-                  disabled={routeLoading}
-                  onClick={() => onTravelModeChange(mode)}
-                >
-                  {t(`reportDetail.mode${mode.charAt(0).toUpperCase() + mode.slice(1)}` as "reportDetail.modeDriving")}
-                </button>
-              ))}
+            <div className="inline-flex rounded-lg border bg-muted p-0.5 mb-2">
+              {TRAVEL_MODES.map((mode) => {
+                const Icon = mode === "driving" ? Car : mode === "cycling" ? Bike : Footprints;
+                const isActive = routeData.travelMode === mode;
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    title={t(`reportDetail.mode${mode.charAt(0).toUpperCase() + mode.slice(1)}` as "reportDetail.modeDriving")}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+                      isActive
+                        ? "bg-background text-blue-700 shadow-sm dark:text-blue-300"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                    disabled={routeLoading}
+                    onClick={() => onTravelModeChange(mode)}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {t(`reportDetail.mode${mode.charAt(0).toUpperCase() + mode.slice(1)}` as "reportDetail.modeDriving")}
+                  </button>
+                );
+              })}
             </div>
           )}
           {userLocation && (

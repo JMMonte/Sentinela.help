@@ -4,12 +4,14 @@ Crowdsourced emergency reporting for Portugal. Citizens report incidents on an i
 
 **Live at [sentinela.help](https://sentinela.help)**
 
+![Sentinela — real-time emergency map with weather, seismic, civil protection, rainfall, and IPMA warning overlays](public/sentinela_github.png)
+
 ## Features
 
 - **Report incidents** — pin fires, floods, landslides, storms, explosions, earthquakes, road closures on the map with photos and descriptions
 - **Community validation** — escalate, de-escalate, comment, mark solved, or reopen reports
 - **Government notification** — escalated incidents can be forwarded to local authorities via email/webhook
-- **Real-time data overlays** — weather (OpenWeatherMap), seismic activity (USGS), civil protection incidents (Fogos.pt/ProCiv), rainfall (IPMA)
+- **Real-time data overlays** — weather (OpenWeatherMap), seismic activity (USGS), civil protection incidents (Fogos.pt/ProCiv), rainfall (IPMA), weather warnings (IPMA)
 - **Multi-language** — Portuguese and English
 - **Mobile-first** — responsive design with dark mode
 
@@ -69,6 +71,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | Earthquakes | [USGS Earthquake Hazards](https://earthquake.usgs.gov) | No |
 | Civil Protection | [Fogos.pt](https://fogos.pt) | No |
 | Rainfall | [IPMA](https://api.ipma.pt) | No |
+| Weather Warnings | [IPMA](https://api.ipma.pt) | No |
 
 ## Notes
 
