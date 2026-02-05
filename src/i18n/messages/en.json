@@ -178,6 +178,8 @@
     "builtByParagraph2": "We're committed to keeping Sentinela open, reliable, and always improving. If you have feedback or want to get in touch, visit us at darkmatter.is.",
     "dataSourcesTitle": "Data sources",
     "dataSourcesDescription": "Sentinela integrates real-time data from multiple open sources to give you the most complete picture of what's happening in your area.",
+    "communityProjectsTitle": "Community projects",
+    "communityProjectsDescription": "Sentinela is part of a growing ecosystem of civic tech projects in Portugal. Here are some other initiatives doing important work in emergency response and community safety.",
     "madeWith": "Made with care by",
     "backToSentinela": "Back to Sentinela"
   },
@@ -227,6 +229,24 @@
     "infraestruturas": {
       "name": "Infraestruturas de Portugal",
       "description": "Road conditions"
+    }
+  },
+  "communityProjects": {
+    "vostpt": {
+      "name": "VOST Portugal",
+      "description": "Digital Volunteers in Emergency Situations — a non-profit that monitors and communicates real-time emergency information"
+    },
+    "fogos": {
+      "name": "Fogos.pt",
+      "description": "Real-time fire and civil protection monitoring using official ANEPC data"
+    },
+    "sosleiria": {
+      "name": "SOS Leiria",
+      "description": "Community emergency reporting platform for the Leiria region, with offline support"
+    },
+    "safecommunities": {
+      "name": "Safe Communities Portugal",
+      "description": "Non-profit promoting safety awareness and crime prevention for residents and visitors"
     }
   },
   "dataSources": {

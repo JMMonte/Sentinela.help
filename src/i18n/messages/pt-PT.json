@@ -178,6 +178,8 @@
     "builtByParagraph2": "Estamos comprometidos em manter o Sentinela aberto, fiável e em constante melhoria. Se tiver feedback ou quiser entrar em contacto, visite-nos em darkmatter.is.",
     "dataSourcesTitle": "Fontes de dados",
     "dataSourcesDescription": "O Sentinela integra dados em tempo real de várias fontes abertas para lhe dar a imagem mais completa do que está a acontecer na sua área.",
+    "communityProjectsTitle": "Projetos da comunidade",
+    "communityProjectsDescription": "O Sentinela faz parte de um ecossistema crescente de projetos de tecnologia cívica em Portugal. Aqui estão outras iniciativas que fazem um trabalho importante na resposta a emergências e segurança comunitária.",
     "madeWith": "Feito com carinho por",
     "backToSentinela": "Voltar ao Sentinela"
   },
@@ -227,6 +229,24 @@
     "infraestruturas": {
       "name": "Infraestruturas de Portugal",
       "description": "Estado das estradas"
+    }
+  },
+  "communityProjects": {
+    "vostpt": {
+      "name": "VOST Portugal",
+      "description": "Voluntários Digitais em Situações de Emergência — associação sem fins lucrativos que monitoriza e comunica informação de emergência em tempo real"
+    },
+    "fogos": {
+      "name": "Fogos.pt",
+      "description": "Monitorização de incêndios e proteção civil em tempo real usando dados oficiais da ANEPC"
+    },
+    "sosleiria": {
+      "name": "SOS Leiria",
+      "description": "Plataforma comunitária de reporte de emergências para a região de Leiria, com suporte offline"
+    },
+    "safecommunities": {
+      "name": "Safe Communities Portugal",
+      "description": "Associação sem fins lucrativos que promove a segurança e prevenção criminal para residentes e visitantes"
     }
   },
   "dataSources": {

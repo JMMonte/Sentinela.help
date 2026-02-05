@@ -25,6 +25,7 @@ export default async function AboutPage({ params }: Props) {
   const tEmergency = await getTranslations("emergencyContacts");
   const tLinks = await getTranslations("usefulLinks");
   const tData = await getTranslations("dataSources");
+  const tCommunity = await getTranslations("communityProjects");
 
   const emergencyContacts = [
     {
@@ -79,6 +80,25 @@ export default async function AboutPage({ params }: Props) {
     {
       key: "ipmaWarnings",
       url: "https://www.ipma.pt/pt/otempo/prev-sam/",
+    },
+  ];
+
+  const communityProjects = [
+    {
+      key: "vostpt",
+      url: "https://vost.pt",
+    },
+    {
+      key: "fogos",
+      url: "https://fogos.pt",
+    },
+    {
+      key: "sosleiria",
+      url: "https://sosleiria.pt",
+    },
+    {
+      key: "safecommunities",
+      url: "https://www.safecommunitiesportugal.com",
     },
   ];
 
@@ -242,6 +262,31 @@ export default async function AboutPage({ params }: Props) {
               {t("builtByParagraph1")}
             </p>
             <p className="mt-3 text-muted-foreground">{t("builtByParagraph2")}</p>
+          </section>
+
+          {/* Community Projects */}
+          <section className="mt-10">
+            <h2 className="text-xl font-semibold">{t("communityProjectsTitle")}</h2>
+            <p className="mt-4 text-muted-foreground">
+              {t("communityProjectsDescription")}
+            </p>
+            <ul className="mt-4 space-y-2">
+              {communityProjects.map((project) => (
+                <li key={project.key} className="text-muted-foreground">
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-0.5 font-medium text-foreground hover:underline"
+                  >
+                    {tCommunity(`${project.key}.name`)}
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </a>
+                  {" — "}
+                  {tCommunity(`${project.key}.description`)}
+                </li>
+              ))}
+            </ul>
           </section>
 
           {/* Data Sources */}
