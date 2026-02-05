@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { Info } from "lucide-react";
 
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
   return (
@@ -14,6 +16,12 @@ export function SiteHeader() {
         </Link>
 
         <ThemeToggle />
+
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" asChild>
+          <Link href="/about" aria-label="About Sentinela">
+            <Info className="h-4 w-4" />
+          </Link>
+        </Button>
 
         {/* Portal target for page-specific actions (e.g. panel toggle, report button) */}
         <div id="header-actions" className="contents" />
