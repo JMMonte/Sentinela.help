@@ -43,6 +43,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { ImageLightbox } from "@/components/ui/image-lightbox";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -394,6 +395,18 @@ function ReportDetailContent({
   const [selectedAction, setSelectedAction] = useState<"ESCALATE" | "DEESCALATE" | "SOLVED" | "REOPEN" | null>(null);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [userVotes, setUserVotes] = useState<VoteRecord>({});
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // Collect all images for lightbox navigation
+  const allImages = useMemo(() => {
+    if (!report) return [];
+    const images = [...report.images];
+    for (const contribution of report.contributions) {
+      images.push(...contribution.images);
+    }
+    return images;
+  }, [report]);
 
   // Load user's previous votes from localStorage
   useEffect(() => {
@@ -545,22 +558,24 @@ function ReportDetailContent({
             )}
             {report.images.length > 0 && (
               <div className="grid grid-cols-2 gap-2 pt-1">
-                {report.images.map((image) => (
-                  <a
+                {report.images.map((image, imageIndex) => (
+                  <button
                     key={image.url}
-                    href={image.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="overflow-hidden rounded-md"
+                    type="button"
+                    className="overflow-hidden rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    onClick={() => {
+                      setLightboxIndex(imageIndex);
+                      setLightboxOpen(true);
+                    }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={image.url}
                       alt=""
-                      className="h-28 w-full object-cover"
+                      className="h-28 w-full object-cover transition-transform hover:scale-105"
                       loading="lazy"
                     />
-                  </a>
+                  </button>
                 ))}
               </div>
             )}
@@ -582,44 +597,52 @@ function ReportDetailContent({
           </div>
 
           {/* Contributions */}
-          {report.contributions.map((contribution) => (
-            <div key={contribution.id} className="px-4 py-3 space-y-2">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-                <span>{new Date(contribution.createdAt).toLocaleString()}</span>
-                {contribution.contributorEmail && (
-                  <>
-                    <span>•</span>
-                    <span>{contribution.contributorEmail}</span>
-                  </>
-                )}
-                <ContributionTypeBadge type={contribution.type} />
-              </div>
-              {contribution.comment && (
-                <p className="whitespace-pre-wrap text-sm">{contribution.comment}</p>
-              )}
-              {contribution.images.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  {contribution.images.map((image) => (
-                    <a
-                      key={image.url}
-                      href={image.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="overflow-hidden rounded-md"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={image.url}
-                        alt=""
-                        className="h-28 w-full object-cover"
-                        loading="lazy"
-                      />
-                    </a>
-                  ))}
+          {report.contributions.map((contribution, contributionIndex) => {
+            // Calculate base index for this contribution's images in allImages array
+            const baseIndex = report.images.length +
+              report.contributions.slice(0, contributionIndex).reduce((acc, c) => acc + c.images.length, 0);
+
+            return (
+              <div key={contribution.id} className="px-4 py-3 space-y-2">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                  <span>{new Date(contribution.createdAt).toLocaleString()}</span>
+                  {contribution.contributorEmail && (
+                    <>
+                      <span>•</span>
+                      <span>{contribution.contributorEmail}</span>
+                    </>
+                  )}
+                  <ContributionTypeBadge type={contribution.type} />
                 </div>
-              )}
-            </div>
-          ))}
+                {contribution.comment && (
+                  <p className="whitespace-pre-wrap text-sm">{contribution.comment}</p>
+                )}
+                {contribution.images.length > 0 && (
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    {contribution.images.map((image, imageIndex) => (
+                      <button
+                        key={image.url}
+                        type="button"
+                        className="overflow-hidden rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        onClick={() => {
+                          setLightboxIndex(baseIndex + imageIndex);
+                          setLightboxOpen(true);
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={image.url}
+                          alt=""
+                          className="h-28 w-full object-cover transition-transform hover:scale-105"
+                          loading="lazy"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -855,6 +878,14 @@ function ReportDetailContent({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Image lightbox */}
+      <ImageLightbox
+        images={allImages}
+        initialIndex={lightboxIndex}
+        open={lightboxOpen}
+        onOpenChange={setLightboxOpen}
+      />
     </div>
   );
 }
