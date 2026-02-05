@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { LatLngExpression } from "leaflet";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -152,29 +153,35 @@ type GetReportResponse = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatRelativeTime(date: Date): string {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
+function useRelativeTimeFormatter() {
+  const t = useTranslations("relativeTime");
 
-  if (diffMins < 1) return "just now";
-  if (diffMins < 60) return `${diffMins} min ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString();
+  return function formatRelativeTime(date: Date): string {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return t("justNow");
+    if (diffMins < 60) return t("minutesAgo", { count: diffMins });
+    if (diffHours < 24) return t("hoursAgo", { count: diffHours });
+    if (diffDays < 7) return t("daysAgo", { count: diffDays });
+    return date.toLocaleDateString();
+  };
 }
 
 function ScoreBadge({ score }: { score: number }) {
+  const t = useTranslations("tooltips");
+
   if (score === 0) return null;
 
   const isPositive = score > 0;
   const Icon = isPositive ? ChevronUp : ChevronDown;
   const absScore = Math.abs(score);
   const tooltipText = isPositive
-    ? `${absScore} more escalation${absScore !== 1 ? "s" : ""} than de-escalations`
-    : `${absScore} more de-escalation${absScore !== 1 ? "s" : ""} than escalations`;
+    ? t(absScore !== 1 ? "escalationsMorePlural" : "escalationsMore", { count: absScore })
+    : t(absScore !== 1 ? "deescalationsMorePlural" : "deescalationsMore", { count: absScore });
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -213,13 +220,16 @@ function ReportListItems({
   onHover?: (reportId: string | null) => void;
   onSelect?: (reportId: string) => void;
 }) {
+  const t = useTranslations();
+  const formatRelativeTime = useRelativeTimeFormatter();
+
   if (isLoading) {
-    return <p className="px-4 text-sm text-muted-foreground">Loading…</p>;
+    return <p className="px-4 text-sm text-muted-foreground">{t("common.loading")}</p>;
   }
   if (reports.length === 0) {
     return (
       <p className="px-4 text-sm text-muted-foreground">
-        No matching reports.
+        {t("reports.noMatching")}
       </p>
     );
   }
@@ -265,11 +275,13 @@ function ReportListItems({
 }
 
 function StatusBadge({ status }: { status: ReportStatus }) {
+  const t = useTranslations("status");
+
   if (status === "CLOSED") {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
         <Check className="h-3 w-3" />
-        Solved
+        {t("solved")}
       </span>
     );
   }
@@ -277,30 +289,32 @@ function StatusBadge({ status }: { status: ReportStatus }) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-400">
         <AlertTriangle className="h-3 w-3" />
-        Escalated
+        {t("escalated")}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-      Active
+      {t("active")}
     </span>
   );
 }
 
 function ContributionTypeBadge({ type }: { type: ContributionType }) {
+  const t = useTranslations("status");
+
   if (type === "ESCALATE") {
     return (
       <span className="inline-flex items-center gap-1 rounded bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
         <AlertTriangle className="h-3 w-3" />
-        Escalated
+        {t("escalated")}
       </span>
     );
   }
   if (type === "DEESCALATE") {
     return (
       <span className="inline-flex items-center gap-1 rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-        De-escalated
+        {t("deescalated")}
       </span>
     );
   }
@@ -308,14 +322,14 @@ function ContributionTypeBadge({ type }: { type: ContributionType }) {
     return (
       <span className="inline-flex items-center gap-1 rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
         <Check className="h-3 w-3" />
-        Marked Solved
+        {t("markedSolved")}
       </span>
     );
   }
   if (type === "REOPEN") {
     return (
       <span className="inline-flex items-center gap-1 rounded bg-yellow-100 px-1.5 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
-        Reopened
+        {t("reopened")}
       </span>
     );
   }
@@ -339,6 +353,7 @@ function ReportDetailContent({
   onReportsRefresh: () => void;
   onGoTo?: () => void;
 }) {
+  const t = useTranslations();
   const [inputComment, setInputComment] = useState("");
   const [inputEmail, setInputEmail] = useState("");
   const [inputFiles, setInputFiles] = useState<File[]>([]);
@@ -365,7 +380,7 @@ function ReportDetailContent({
 
     // For COMMENT type, require content
     if (actionType === "COMMENT" && !hasContent) {
-      toast.error("Add a comment or image first.");
+      toast.error(t("toast.addCommentFirst"));
       return;
     }
 
@@ -386,16 +401,16 @@ function ReportDetailContent({
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to submit");
+        throw new Error(data.error || t("toast.failedToSubmit"));
       }
 
-      const actionLabel =
-        actionType === "ESCALATE" ? "Escalated" :
-        actionType === "DEESCALATE" ? "De-escalated" :
-        actionType === "SOLVED" ? "Marked as solved" :
-        actionType === "REOPEN" ? "Reopened" : "Comment added";
+      const toastKey =
+        actionType === "ESCALATE" ? (hasContent ? "escalatedWithComment" : "escalated") :
+        actionType === "DEESCALATE" ? (hasContent ? "deescalatedWithComment" : "deescalated") :
+        actionType === "SOLVED" ? (hasContent ? "markedSolvedWithComment" : "markedSolved") :
+        actionType === "REOPEN" ? (hasContent ? "reopenedWithComment" : "reopened") : "commentAdded";
 
-      toast.success(actionLabel + (hasContent && actionType !== "COMMENT" ? " with comment" : ""));
+      toast.success(t(`toast.${toastKey}`));
       setInputComment("");
       setInputEmail("");
       setInputFiles([]);
@@ -407,7 +422,7 @@ function ReportDetailContent({
         onReportsRefresh();
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to submit");
+      toast.error(e instanceof Error ? e.message : t("toast.failedToSubmit"));
     } finally {
       setIsSubmitting(false);
     }
@@ -418,7 +433,7 @@ function ReportDetailContent({
       <div className="p-4">
         <Button variant="ghost" size="sm" className="mb-4 -ml-2" onClick={onBack}>
           <ArrowLeft className="mr-1 h-4 w-4" />
-          Back
+          {t("common.back")}
         </Button>
         <p className="text-sm text-muted-foreground">{error}</p>
       </div>
@@ -430,9 +445,9 @@ function ReportDetailContent({
       <div className="p-4">
         <Button variant="ghost" size="sm" className="mb-4 -ml-2" onClick={onBack}>
           <ArrowLeft className="mr-1 h-4 w-4" />
-          Back
+          {t("common.back")}
         </Button>
-        <p className="text-sm text-muted-foreground">Loading…</p>
+        <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
       </div>
     );
   }
@@ -446,7 +461,7 @@ function ReportDetailContent({
       <div className="shrink-0 border-b px-4 py-3">
         <Button variant="ghost" size="sm" className="-ml-2 mb-2" onClick={onBack}>
           <ArrowLeft className="mr-1 h-4 w-4" />
-          Back
+          {t("common.back")}
         </Button>
         <div className="flex items-center gap-2 flex-wrap">
           <IncidentTypeBadge type={report.type} />
@@ -455,7 +470,7 @@ function ReportDetailContent({
           {onGoTo && (
             <Button variant="ghost" size="sm" className="h-6 px-2" onClick={onGoTo}>
               <MapPin className="mr-1 h-3 w-3" />
-              Go to
+              {t("reportDetail.goTo")}
             </Button>
           )}
         </div>
@@ -565,23 +580,26 @@ function ReportDetailContent({
           size="lg"
           onClick={() => setIsUpdateDialogOpen(true)}
         >
-          Add Update
+          {t("reportDetail.addUpdate")}
         </Button>
       </div>
 
       {/* Update dialog */}
       <Dialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent
+          className="sm:max-w-md"
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
           <DialogHeader>
-            <DialogTitle>Add Update</DialogTitle>
+            <DialogTitle>{t("reportDetail.updateDialogTitle")}</DialogTitle>
             <DialogDescription>
-              Add a comment, change status, or attach images to this report.
+              {t("reportDetail.updateDialogDescription")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-2">
             <Textarea
-              placeholder="Add a comment... (optional for actions)"
+              placeholder={t("reportDetail.addComment")}
               value={inputComment}
               onChange={(e) => setInputComment(e.target.value)}
               className="min-h-20 resize-none"
@@ -603,9 +621,9 @@ function ReportDetailContent({
                 />
                 <div className="flex h-9 items-center gap-2 rounded-md border bg-muted/50 px-3 text-sm text-muted-foreground hover:bg-muted">
                   {inputFiles.length === 0 ? (
-                    <span>+ Add images</span>
+                    <span>{t("reportDetail.addImages")}</span>
                   ) : (
-                    <span>{inputFiles.length} image(s)</span>
+                    <span>{t("reportDetail.imagesCount", { count: inputFiles.length })}</span>
                   )}
                 </div>
               </label>
@@ -625,7 +643,7 @@ function ReportDetailContent({
             {showEmailInput ? (
               <Input
                 type="email"
-                placeholder="Your email (optional)"
+                placeholder={t("reportDetail.yourEmailOptional")}
                 value={inputEmail}
                 onChange={(e) => setInputEmail(e.target.value)}
                 disabled={isSubmitting}
@@ -636,7 +654,7 @@ function ReportDetailContent({
                 className="text-xs text-muted-foreground hover:underline text-left"
                 onClick={() => setShowEmailInput(true)}
               >
-                + Add your email
+                {t("reportDetail.addYourEmail")}
               </button>
             )}
 
@@ -667,11 +685,11 @@ function ReportDetailContent({
                       ) : (
                         <ChevronUp className="mr-1 h-4 w-4 text-red-500" />
                       )}
-                      {isEscalated ? "De-escalate" : "Escalate"}
+                      {isEscalated ? t("reportDetail.deescalate") : t("reportDetail.escalate")}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{isEscalated ? "Mark as less urgent" : "Mark as more urgent"}</p>
+                    <p>{isEscalated ? t("reportDetail.deescalateTooltip") : t("reportDetail.escalateTooltip")}</p>
                   </TooltipContent>
                 </Tooltip>
                 {isSolved ? (
@@ -693,11 +711,11 @@ function ReportDetailContent({
                         }
                       >
                         <AlertTriangle className="mr-1 h-4 w-4 text-yellow-500" />
-                        Reopen
+                        {t("reportDetail.reopen")}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Report is not actually solved</p>
+                      <p>{t("reportDetail.reopenTooltip")}</p>
                     </TooltipContent>
                   </Tooltip>
                 ) : (
@@ -719,11 +737,11 @@ function ReportDetailContent({
                         }
                       >
                         <Check className="mr-1 h-4 w-4 text-green-500" />
-                        Solved
+                        {t("reportDetail.markSolved")}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Mark incident as resolved</p>
+                      <p>{t("reportDetail.solvedTooltip")}</p>
                     </TooltipContent>
                   </Tooltip>
                 )}
@@ -744,7 +762,7 @@ function ReportDetailContent({
               }}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               disabled={isSubmitting || (!hasContent && !selectedAction)}
@@ -761,7 +779,7 @@ function ReportDetailContent({
                 handleSubmit(actionType);
               }}
             >
-              {isSubmitting ? "Submitting..." : "Submit Update"}
+              {isSubmitting ? t("reportForm.submitting") : t("reportDetail.submitUpdate")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -779,6 +797,8 @@ export function ReportsOverview({
 }: {
   overlayConfig?: OverlayConfig;
 }) {
+  const t = useTranslations();
+
   // ── Router / URL state ──
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -824,10 +844,10 @@ export function ReportsOverview({
 
   const maxImages = 3;
   const selectedCountText = useMemo(() => {
-    if (files.length === 0) return "No images selected";
-    if (files.length === 1) return "1 image selected";
-    return `${files.length} images selected`;
-  }, [files.length]);
+    if (files.length === 0) return t("reportForm.noImagesSelected");
+    if (files.length === 1) return t("reportForm.oneImageSelected");
+    return t("reportForm.imagesSelected", { count: files.length });
+  }, [files.length, t]);
 
   // ── Effects ──
 
@@ -928,7 +948,7 @@ export function ReportsOverview({
       } catch (e) {
         if (v === version)
           toast.error(
-            e instanceof Error ? e.message : "Failed to load reports",
+            e instanceof Error ? e.message : t("toast.failedToLoad"),
           );
       } finally {
         if (v === version) setIsLoading(false);
@@ -978,9 +998,7 @@ export function ReportsOverview({
         setFlyToLocation(loc);
       },
       () =>
-        toast.error(
-          "Unable to read your location. Check browser permissions.",
-        ),
+        toast.error(t("toast.locationPermissionDenied")),
       { enableHighAccuracy: true, timeout: 10_000 },
     );
   }
@@ -993,15 +1011,15 @@ export function ReportsOverview({
 
   async function onSubmit(values: ReportFormValues) {
     if (!pinLocation) {
-      toast.error("Tap the map to drop a pin first.");
+      toast.error(t("toast.tapMapFirst"));
       return;
     }
     if (files.length === 0) {
-      toast.error("Please attach at least one image.");
+      toast.error(t("toast.attachImage"));
       return;
     }
     if (files.length > maxImages) {
-      toast.error(`Please attach up to ${maxImages} images.`);
+      toast.error(t("toast.attachMaxImages", { max: maxImages }));
       return;
     }
 
@@ -1031,7 +1049,7 @@ export function ReportsOverview({
 
       const data = (await response.json()) as CreateReportResponse;
       setSubmitResult(data);
-      toast.success("Report submitted.");
+      toast.success(t("toast.reportSubmitted"));
 
       // Reset form
       form.reset();
@@ -1041,7 +1059,7 @@ export function ReportsOverview({
       void fetchReports();
     } catch (e) {
       toast.error(
-        e instanceof Error ? e.message : "Failed to submit report",
+        e instanceof Error ? e.message : t("toast.failedToSubmit"),
       );
     } finally {
       setIsSubmitting(false);
@@ -1062,11 +1080,11 @@ export function ReportsOverview({
   function handleBackToList() {
     setSelectedReportId(null);
     setView("reports");
-    // Remove report param from URL
+    // Remove report param from URL (use replace to avoid adding history entry)
     const params = new URLSearchParams(searchParams.toString());
     params.delete("report");
     const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
-    router.push(newUrl, { scroll: false });
+    router.replace(newUrl, { scroll: false });
   }
 
   const reportsContent = (
@@ -1082,7 +1100,7 @@ export function ReportsOverview({
           </TabsList>
         </Tabs>
         <Input
-          placeholder={isLoading ? "Loading…" : `Filter ${filtered.length} reports…`}
+          placeholder={isLoading ? t("common.loading") : t("reports.filterPlaceholder", { count: filtered.length })}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -1120,7 +1138,7 @@ export function ReportsOverview({
   const formContent = (
     <div className="flex-1 overflow-y-auto px-4 pb-6">
       <div className="flex items-center justify-between pb-3">
-        <p className="text-sm text-muted-foreground">New report</p>
+        <p className="text-sm text-muted-foreground">{t("reportForm.title")}</p>
         <Button
           type="button"
           variant="ghost"
@@ -1133,12 +1151,12 @@ export function ReportsOverview({
       </div>
       <div className="grid gap-2 pb-4 text-sm">
         <p className="text-muted-foreground">
-          Tap the map to pin a location, then fill in details.
+          {t("reportForm.tapMapInstruction")}
         </p>
         <div className="text-muted-foreground">
           {pinLocation
-            ? `Location: ${pinLocation.latitude.toFixed(6)}, ${pinLocation.longitude.toFixed(6)}`
-            : "Location: not selected yet"}
+            ? t("reportForm.locationSelected", { lat: pinLocation.latitude.toFixed(6), lng: pinLocation.longitude.toFixed(6) })
+            : t("reportForm.locationNotSelected")}
         </div>
         <Button
           type="button"
@@ -1147,7 +1165,7 @@ export function ReportsOverview({
           className="w-full"
           onClick={() => {
             if (!navigator.geolocation) {
-              toast.error("Geolocation is not available in this browser.");
+              toast.error(t("toast.geolocationUnavailable"));
               return;
             }
             navigator.geolocation.getCurrentPosition(
@@ -1158,14 +1176,12 @@ export function ReportsOverview({
                 });
               },
               () =>
-                toast.error(
-                  "Unable to read your location. Check browser permissions.",
-                ),
+                toast.error(t("toast.locationPermissionDenied")),
               { enableHighAccuracy: true, timeout: 10_000 },
             );
           }}
         >
-          Use my location
+          {t("reportForm.useMyLocation")}
         </Button>
       </div>
 
@@ -1179,14 +1195,14 @@ export function ReportsOverview({
             name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Incident type</FormLabel>
+                <FormLabel>{t("reportForm.incidentType")}</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select an incident type" />
+                      <SelectValue placeholder={t("reportForm.selectIncidentType")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -1195,7 +1211,7 @@ export function ReportsOverview({
                       return (
                         <SelectItem key={type} value={type}>
                           <Icon className="mr-2 inline-block size-4" />
-                          {incidentTypeLabel[type]}
+                          {t(`incidentTypes.${type}`)}
                         </SelectItem>
                       );
                     })}
@@ -1211,15 +1227,15 @@ export function ReportsOverview({
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>{t("reportForm.description")}</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="What is happening? Any immediate hazards?"
+                    placeholder={t("reportForm.descriptionPlaceholder")}
                     className="min-h-28"
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>Max 2000 characters.</FormDescription>
+                <FormDescription>{t("reportForm.descriptionMax")}</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -1230,12 +1246,12 @@ export function ReportsOverview({
             name="reporterEmail"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Your email (optional)</FormLabel>
+                <FormLabel>{t("reportForm.yourEmail")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="you@example.com" {...field} />
+                  <Input placeholder={t("reportForm.emailPlaceholder")} {...field} />
                 </FormControl>
                 <FormDescription>
-                  If provided, local government can contact you for details.
+                  {t("reportForm.emailDescription")}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -1243,7 +1259,7 @@ export function ReportsOverview({
           />
 
           <div className="grid gap-2">
-            <div className="text-sm font-medium">Images</div>
+            <div className="text-sm font-medium">{t("reportForm.images")}</div>
             <Input
               type="file"
               accept="image/*"
@@ -1255,12 +1271,12 @@ export function ReportsOverview({
               }}
             />
             <div className="text-sm text-muted-foreground">
-              {selectedCountText} (up to {maxImages})
+              {selectedCountText} {t("reportForm.imagesLimit", { max: maxImages })}
             </div>
           </div>
 
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting…" : "Submit report"}
+            {isSubmitting ? t("reportForm.submitting") : t("reportForm.submitReport")}
           </Button>
         </form>
       </Form>
@@ -1303,13 +1319,13 @@ export function ReportsOverview({
                     size="icon"
                     className="h-7 w-7"
                     onClick={requestLocation}
-                    aria-label="Center on my location"
+                    aria-label={t("tooltips.centerLocation")}
                   >
                     <Locate className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Center on my location</p>
+                  <p>{t("tooltips.centerLocation")}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -1322,7 +1338,7 @@ export function ReportsOverview({
                     size="icon"
                     className="hidden h-7 w-7 sm:inline-flex"
                     onClick={() => setPanelOpen((prev) => !prev)}
-                    aria-label={panelOpen ? "Close panel" : "Open panel"}
+                    aria-label={panelOpen ? t("tooltips.closePanel") : t("tooltips.openPanel")}
                   >
                     {panelOpen ? (
                       <PanelRightClose className="h-4 w-4" />
@@ -1332,7 +1348,7 @@ export function ReportsOverview({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{panelOpen ? "Close panel" : "Open panel"}</p>
+                  <p>{panelOpen ? t("tooltips.closePanel") : t("tooltips.openPanel")}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -1345,7 +1361,7 @@ export function ReportsOverview({
                 setPanelOpen(true);
               }}
             >
-              Report incident
+              {t("reports.reportIncident")}
             </Button>
           </>,
           headerPortal,
@@ -1382,9 +1398,9 @@ export function ReportsOverview({
               <div className="px-4 pt-1 pb-3">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h2 className="text-lg font-semibold">Reports</h2>
+                    <h2 className="text-lg font-semibold">{t("reports.title")}</h2>
                     <p className="text-sm text-muted-foreground">
-                      {isLoading ? "Loading…" : `${filtered.length} nearby`}
+                      {isLoading ? t("common.loading") : t("reports.nearby", { count: filtered.length })}
                     </p>
                   </div>
                   <Button
@@ -1395,7 +1411,7 @@ export function ReportsOverview({
                       setActiveSnap("expanded");
                     }}
                   >
-                    Report
+                    {t("reports.report")}
                   </Button>
                 </div>
                 <Tabs value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
@@ -1461,11 +1477,11 @@ export function ReportsOverview({
               <div className="px-4 pt-1 pb-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold">New Report</h2>
+                    <h2 className="text-lg font-semibold">{t("reports.newReport")}</h2>
                     <p className="text-sm text-muted-foreground">
                       {pinLocation
                         ? `${pinLocation.latitude.toFixed(4)}, ${pinLocation.longitude.toFixed(4)}`
-                        : "Tap the map to pin location"}
+                        : t("reportForm.tapMapToPin")}
                     </p>
                   </div>
                   <Button
@@ -1491,7 +1507,7 @@ export function ReportsOverview({
                     className="w-full"
                     onClick={() => {
                       if (!navigator.geolocation) {
-                        toast.error("Geolocation is not available in this browser.");
+                        toast.error(t("toast.geolocationUnavailable"));
                         return;
                       }
                       navigator.geolocation.getCurrentPosition(
@@ -1502,15 +1518,13 @@ export function ReportsOverview({
                           });
                         },
                         () =>
-                          toast.error(
-                            "Unable to read your location. Check browser permissions.",
-                          ),
+                          toast.error(t("toast.locationPermissionDenied")),
                         { enableHighAccuracy: true, timeout: 10_000 },
                       );
                     }}
                   >
                     <Locate className="mr-2 h-4 w-4" />
-                    Use my location
+                    {t("reportForm.useMyLocation")}
                   </Button>
                 </div>
 
@@ -1524,14 +1538,14 @@ export function ReportsOverview({
                       name="type"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Incident type</FormLabel>
+                          <FormLabel>{t("reportForm.incidentType")}</FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select an incident type" />
+                                <SelectValue placeholder={t("reportForm.selectIncidentType")} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -1540,7 +1554,7 @@ export function ReportsOverview({
                                 return (
                                   <SelectItem key={type} value={type}>
                                     <Icon className="mr-2 inline-block size-4" />
-                                    {incidentTypeLabel[type]}
+                                    {t(`incidentTypes.${type}`)}
                                   </SelectItem>
                                 );
                               })}
@@ -1556,10 +1570,10 @@ export function ReportsOverview({
                       name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Description</FormLabel>
+                          <FormLabel>{t("reportForm.description")}</FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="What is happening?"
+                              placeholder={t("reportForm.descriptionPlaceholderShort")}
                               className="min-h-20"
                               {...field}
                             />
@@ -1574,9 +1588,9 @@ export function ReportsOverview({
                       name="reporterEmail"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Your email (optional)</FormLabel>
+                          <FormLabel>{t("reportForm.yourEmail")}</FormLabel>
                           <FormControl>
-                            <Input placeholder="you@example.com" {...field} />
+                            <Input placeholder={t("reportForm.emailPlaceholder")} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1584,7 +1598,7 @@ export function ReportsOverview({
                     />
 
                     <div className="grid gap-2">
-                      <div className="text-sm font-medium">Images</div>
+                      <div className="text-sm font-medium">{t("reportForm.images")}</div>
                       <Input
                         type="file"
                         accept="image/*"
@@ -1596,12 +1610,12 @@ export function ReportsOverview({
                         }}
                       />
                       <div className="text-sm text-muted-foreground">
-                        {selectedCountText} (up to {maxImages})
+                        {selectedCountText} {t("reportForm.imagesLimit", { max: maxImages })}
                       </div>
                     </div>
 
                     <Button type="submit" disabled={isSubmitting} className="w-full">
-                      {isSubmitting ? "Submitting…" : "Submit report"}
+                      {isSubmitting ? t("reportForm.submitting") : t("reportForm.submitReport")}
                     </Button>
                   </form>
                 </Form>
@@ -1617,9 +1631,9 @@ export function ReportsOverview({
       >
         <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Report submitted</DialogTitle>
+            <DialogTitle>{t("submitDialog.title")}</DialogTitle>
             <DialogDescription>
-              Notify your local government using the actions below.
+              {t("submitDialog.description")}
             </DialogDescription>
           </DialogHeader>
 
@@ -1659,18 +1673,18 @@ export function ReportsOverview({
 
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">
-                  To:{" "}
+                  {t("submitDialog.to")}{" "}
                   {draft?.to ? (
                     <span className="text-foreground">{draft.to}</span>
                   ) : (
-                    <span className="italic">not configured</span>
+                    <span className="italic">{t("submitDialog.notConfigured")}</span>
                   )}
                 </span>
                 <Link
                   href={`/reports/${submitResult.report.id}`}
                   className="text-xs underline"
                 >
-                  View report
+                  {t("reports.viewReport")}
                 </Link>
               </div>
             </div>
@@ -1685,10 +1699,10 @@ export function ReportsOverview({
                 await navigator.clipboard.writeText(
                   `${draft.subject}\n\n${draft.body}`,
                 );
-                toast.success("Copied to clipboard.");
+                toast.success(t("toast.copiedToClipboard"));
               }}
             >
-              Copy message
+              {t("submitDialog.copyMessage")}
             </Button>
 
             <Button
@@ -1697,14 +1711,14 @@ export function ReportsOverview({
               asChild={!!draft?.mailto}
               title={
                 !draft?.mailto
-                  ? "Set GOV_CONTACT_EMAIL to enable mailto."
+                  ? t("submitDialog.sendEmailDisabled")
                   : undefined
               }
             >
               {draft?.mailto ? (
-                <a href={draft.mailto}>Send email</a>
+                <a href={draft.mailto}>{t("submitDialog.sendEmail")}</a>
               ) : (
-                <span>Send email</span>
+                <span>{t("submitDialog.sendEmail")}</span>
               )}
             </Button>
           </DialogFooter>
