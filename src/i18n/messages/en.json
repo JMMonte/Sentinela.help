@@ -12,6 +12,9 @@
     "aboutSentinela": "About Sentinela",
     "language": "Language"
   },
+  "map": {
+    "yourLocation": "Your location"
+  },
   "reports": {
     "title": "Reports",
     "nearby": "{count} nearby",

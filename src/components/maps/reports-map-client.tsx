@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 import {
   CircleMarker,
   MapContainer,
@@ -13,7 +14,7 @@ import {
 import type { LatLngExpression } from "leaflet";
 
 import { cn } from "@/lib/utils";
-import { incidentTypeLabel, type IncidentType } from "@/lib/reports/incident-types";
+import { type IncidentType } from "@/lib/reports/incident-types";
 import {
   createClusterIcon,
   createImageMarkerIcon,
@@ -110,12 +111,16 @@ function ClickHandler({
   return null;
 }
 
-function buildPopupHtml(report: ReportMapItem): string {
+type PopupTranslations = {
+  typeLabel: string;
+  viewReport: string;
+};
+
+function buildPopupHtml(report: ReportMapItem, translations: PopupTranslations): string {
   const imageHtml = report.imageUrl
     ? `<img src="${report.imageUrl}" alt="" style="height:96px;width:100%;border-radius:4px;object-fit:cover;" />`
     : "";
 
-  const typeLabel = incidentTypeLabel[report.type] ?? report.type;
   const date = new Date(report.createdAt).toLocaleString();
   const scoreColor = report.score > 0 ? "#ef4444" : report.score < 0 ? "#3b82f6" : "#71717a";
   const scoreLabel = report.score > 0 ? `+${report.score}` : String(report.score);
@@ -124,11 +129,11 @@ function buildPopupHtml(report: ReportMapItem): string {
     <div style="display:grid;gap:8px;min-width:180px;">
       ${imageHtml}
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span style="font-size:12px;font-weight:500;background:#f4f4f5;padding:2px 6px;border-radius:4px;">${typeLabel}</span>
+        <span style="font-size:12px;font-weight:500;background:#f4f4f5;padding:2px 6px;border-radius:4px;">${translations.typeLabel}</span>
         <span style="font-size:11px;font-weight:600;color:${scoreColor};">${scoreLabel}</span>
         <span style="font-size:11px;color:#71717a;">${date}</span>
       </div>
-      <button data-report-id="${report.id}" style="font-size:14px;text-decoration:underline;background:none;border:none;padding:0;cursor:pointer;text-align:left;color:inherit;">View report</button>
+      <button data-report-id="${report.id}" style="font-size:14px;text-decoration:underline;background:none;border:none;padding:0;cursor:pointer;text-align:left;color:inherit;">${translations.viewReport}</button>
     </div>
   `;
 }
@@ -152,6 +157,9 @@ export function ReportsMapClient({
 }: ReportsMapProps) {
   const { resolvedTheme } = useTheme();
   const tileUrl = resolvedTheme === "dark" ? TILE_DARK : TILE_LIGHT;
+  const tIncidentTypes = useTranslations("incidentTypes");
+  const tReports = useTranslations("reports");
+  const tMap = useTranslations("map");
 
   // Overlay state
   const weather = useWeatherOverlay(overlayConfig.weather);
@@ -203,10 +211,13 @@ export function ReportsMapClient({
           id: report.id,
           position: [report.latitude, report.longitude] as [number, number],
           icon,
-          popupContent: buildPopupHtml(report),
+          popupContent: buildPopupHtml(report, {
+            typeLabel: tIncidentTypes(report.type),
+            viewReport: tReports("viewReport"),
+          }),
         };
       }),
-    [reports]
+    [reports, tIncidentTypes, tReports]
   );
 
   return (
@@ -245,7 +256,7 @@ export function ReportsMapClient({
             }}
           >
             <Popup>
-              <span className="text-sm font-medium">Your location</span>
+              <span className="text-sm font-medium">{tMap("yourLocation")}</span>
             </Popup>
           </CircleMarker>
         )}

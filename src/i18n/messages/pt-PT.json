@@ -12,6 +12,9 @@
     "aboutSentinela": "Sobre o Sentinela",
     "language": "Idioma"
   },
+  "map": {
+    "yourLocation": "A sua localização"
+  },
   "reports": {
     "title": "Incidentes",
     "nearby": "{count} próximos",

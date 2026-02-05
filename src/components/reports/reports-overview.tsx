@@ -1163,8 +1163,11 @@ export function ReportsOverview({
   }
 
   async function onSubmit(values: ReportFormValues) {
-    if (!pinLocation) {
-      toast.error(t("toast.tapMapFirst"));
+    // Use pinLocation if set, otherwise fall back to user's current location
+    const location = pinLocation ?? (userLocation ? { latitude: userLocation[0], longitude: userLocation[1] } : null);
+
+    if (!location) {
+      toast.error(t("toast.locationRequired"));
       return;
     }
     if (files.length === 0) {
@@ -1182,8 +1185,8 @@ export function ReportsOverview({
       formData.append("type", values.type);
       formData.append("description", values.description ?? "");
       formData.append("reporterEmail", values.reporterEmail ?? "");
-      formData.append("latitude", String(pinLocation.latitude));
-      formData.append("longitude", String(pinLocation.longitude));
+      formData.append("latitude", String(location.latitude));
+      formData.append("longitude", String(location.longitude));
       for (const file of files) formData.append("images", file);
 
       const response = await fetch("/api/reports", {
