@@ -872,14 +872,15 @@ export function ReportsOverview({
     );
   }, []);
 
-  // Sync selected report with URL search params for shareable links
+  // Load report from URL on initial mount only (for shareable links)
   useEffect(() => {
     const reportId = searchParams.get("report");
-    if (reportId && reportId !== selectedReportId) {
+    if (reportId) {
       setSelectedReportId(reportId);
       setView("detail");
     }
-  }, [searchParams, selectedReportId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount - after that, local state is source of truth
 
   // Fetch report detail when selected
   useEffect(() => {
@@ -1301,6 +1302,11 @@ export function ReportsOverview({
               : undefined
           }
           onMapClick={handleMapClick}
+          onReportSelect={(reportId) => {
+            handleSelectReport(reportId);
+            setPanelOpen(true);
+            setActiveSnap("expanded");
+          }}
           className="h-full w-full rounded-none"
           overlayConfig={overlayConfig}
         />

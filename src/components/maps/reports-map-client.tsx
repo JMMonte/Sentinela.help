@@ -66,6 +66,8 @@ export type ReportsMapProps = {
   pinLocation?: [number, number];
   /** Called when the user clicks the map to drop a pin. */
   onMapClick?: (lat: number, lng: number) => void;
+  /** Called when user clicks "View report" in a popup. */
+  onReportSelect?: (reportId: string) => void;
   zoom?: number;
   className?: string;
   /** Configuration for map overlays (weather, seismic). */
@@ -126,7 +128,7 @@ function buildPopupHtml(report: ReportMapItem): string {
         <span style="font-size:11px;font-weight:600;color:${scoreColor};">${scoreLabel}</span>
         <span style="font-size:11px;color:#71717a;">${date}</span>
       </div>
-      <a href="/reports/${report.id}" style="font-size:14px;text-decoration:underline;">View report</a>
+      <button data-report-id="${report.id}" style="font-size:14px;text-decoration:underline;background:none;border:none;padding:0;cursor:pointer;text-align:left;color:inherit;">View report</button>
     </div>
   `;
 }
@@ -143,6 +145,7 @@ export function ReportsMapClient({
   userLocation,
   pinLocation,
   onMapClick,
+  onReportSelect,
   zoom,
   className,
   overlayConfig = DEFAULT_OVERLAY_CONFIG,
@@ -153,6 +156,24 @@ export function ReportsMapClient({
   // Overlay state
   const weather = useWeatherOverlay(overlayConfig.weather);
   const seismic = useSeismicOverlay(overlayConfig.seismic);
+
+  // Handle clicks on "View report" buttons in popups
+  useEffect(() => {
+    if (!onReportSelect) return;
+
+    const selectReport = onReportSelect;
+    function handlePopupClick(e: MouseEvent) {
+      const target = e.target as HTMLElement;
+      const reportId = target.getAttribute("data-report-id");
+      if (reportId) {
+        e.preventDefault();
+        selectReport(reportId);
+      }
+    }
+
+    document.addEventListener("click", handlePopupClick);
+    return () => document.removeEventListener("click", handlePopupClick);
+  }, [onReportSelect]);
 
   // Convert reports to clustered markers
   const clusteredMarkers: ClusteredMarker[] = useMemo(
