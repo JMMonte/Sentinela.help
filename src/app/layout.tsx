@@ -28,6 +28,10 @@ export const metadata: Metadata = {
     "community safety",
     "incident map",
   ],
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
   openGraph: {
     title: "Sentinela",
     description:
@@ -35,12 +39,21 @@ export const metadata: Metadata = {
     url: "https://sentinela.help",
     siteName: "Sentinela",
     type: "website",
+    images: [
+      {
+        url: "/og_share.png",
+        width: 1200,
+        height: 630,
+        alt: "Sentinela - Crowdsourced Emergency Reporting",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Sentinela",
     description:
       "Crowdsourced emergency reporting — report disasters on a map, validated by the community.",
+    images: ["/og_share.png"],
   },
   metadataBase: new URL("https://sentinela.help"),
 };
