@@ -142,38 +142,36 @@ export default async function AboutPage({ params }: Props) {
                       : "border-border bg-background/50"
                   }`}
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3
-                        className={`font-semibold ${contact.primary ? "text-red-600 dark:text-red-400" : ""}`}
-                      >
-                        {tEmergency(`${contact.key}.name`)}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">
-                        {tEmergency(`${contact.key}.description`)}
-                      </p>
-                    </div>
+                  <h3
+                    className={`font-semibold ${contact.primary ? "text-red-600 dark:text-red-400" : ""}`}
+                  >
+                    {tEmergency(`${contact.key}.name`)}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {tEmergency(`${contact.key}.description`)}
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
                     {contact.phone && (
                       <a
                         href={`tel:${contact.phone.replace(/\s/g, "")}`}
-                        className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary hover:bg-primary/20"
+                        className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary hover:bg-primary/20"
                       >
-                        <Phone className="h-3 w-3" />
+                        <Phone className="h-3 w-3 shrink-0" />
                         {contact.phone}
                       </a>
                     )}
+                    {contact.url && (
+                      <a
+                        href={contact.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                      >
+                        {t("visitSite")}
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
                   </div>
-                  {contact.url && (
-                    <a
-                      href={contact.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                    >
-                      {t("visitSite")}
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
                 </div>
               ))}
             </div>
@@ -228,7 +226,7 @@ export default async function AboutPage({ params }: Props) {
             </p>
             <p className="mt-3 text-muted-foreground">{t("openSourceParagraph2")}</p>
             <a
-              href="https://github.com/JMMonte/Kaos"
+              href="https://github.com/JMMonte/Sentinela.help"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-2 rounded-md border bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
