@@ -1294,29 +1294,48 @@ export function ReportsOverview({
       {headerPortal &&
         createPortal(
           <>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={requestLocation}
-              title="Center on my location"
-            >
-              <Locate className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="hidden h-7 w-7 sm:inline-flex"
-              onClick={() => setPanelOpen((prev) => !prev)}
-            >
-              {panelOpen ? (
-                <PanelRightClose className="h-4 w-4" />
-              ) : (
-                <PanelRightOpen className="h-4 w-4" />
-              )}
-            </Button>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={requestLocation}
+                    aria-label="Center on my location"
+                  >
+                    <Locate className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Center on my location</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="hidden h-7 w-7 sm:inline-flex"
+                    onClick={() => setPanelOpen((prev) => !prev)}
+                    aria-label={panelOpen ? "Close panel" : "Open panel"}
+                  >
+                    {panelOpen ? (
+                      <PanelRightClose className="h-4 w-4" />
+                    ) : (
+                      <PanelRightOpen className="h-4 w-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{panelOpen ? "Close panel" : "Open panel"}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <Button
               type="button"
               size="sm"

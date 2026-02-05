@@ -3,6 +3,12 @@ import { Info } from "lucide-react";
 
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function SiteHeader() {
   return (
@@ -17,11 +23,20 @@ export function SiteHeader() {
 
         <ThemeToggle />
 
-        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" asChild>
-          <Link href="/about" aria-label="About Sentinela">
-            <Info className="h-4 w-4" />
-          </Link>
-        </Button>
+        <TooltipProvider delayDuration={300}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" asChild>
+                <Link href="/about" aria-label="About Sentinela">
+                  <Info className="h-4 w-4" />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>About Sentinela</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
         {/* Portal target for page-specific actions (e.g. panel toggle, report button) */}
         <div id="header-actions" className="contents" />
