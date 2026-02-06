@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 import {
@@ -34,14 +34,43 @@ import { SeismicOverlay } from "./overlays/seismic-overlay";
 import { ProCivOverlay } from "./overlays/prociv-overlay";
 import { RainfallOverlay } from "./overlays/rainfall-overlay";
 import { WarningsOverlay } from "./overlays/warnings-overlay";
+import { WindOverlay } from "./overlays/wind-overlay";
 import { RouteOverlay } from "./overlays/route-overlay";
+import { TemperatureOverlay } from "./overlays/temperature-overlay";
+import { HumidityOverlay } from "./overlays/humidity-overlay";
+import { PrecipitationGfsOverlay } from "./overlays/precipitation-gfs-overlay";
+import { CloudCoverOverlay } from "./overlays/cloud-cover-overlay";
+import { CapeOverlay } from "./overlays/cape-overlay";
+import { FireWeatherOverlay } from "./overlays/fire-weather-overlay";
+import { FiresOverlay } from "./overlays/fires-overlay";
+import { AuroraOverlay } from "./overlays/aurora-overlay";
+import { AirQualityOverlay } from "./overlays/air-quality-overlay";
+import { UvIndexOverlay } from "./overlays/uv-index-overlay";
+import { WavesOverlay } from "./overlays/waves-overlay";
+import { OceanCurrentsOverlay } from "./overlays/ocean-currents-overlay";
+import { SstOverlay } from "./overlays/sst-overlay";
 import { OverlayControls } from "./overlays/overlay-controls";
 import { useWeatherOverlay, type WeatherOverlayConfig } from "./hooks/use-weather-overlay";
 import { useSeismicOverlay, type SeismicOverlayConfig } from "./hooks/use-seismic-overlay";
 import { useProCivOverlay, type ProCivOverlayConfig } from "./hooks/use-prociv-overlay";
 import { useRainfallOverlay, type RainfallOverlayConfig } from "./hooks/use-rainfall-overlay";
 import { useWarningsOverlay, type WarningsOverlayConfig } from "./hooks/use-warnings-overlay";
+import { useWindOverlay, type WindOverlayConfig } from "./hooks/use-wind-overlay";
+import { useTemperatureOverlay, type TemperatureOverlayConfig } from "./hooks/use-temperature-overlay";
+import { useHumidityOverlay, type HumidityOverlayConfig } from "./hooks/use-humidity-overlay";
+import { usePrecipitationOverlay, type PrecipitationOverlayConfig } from "./hooks/use-precipitation-overlay";
+import { useCloudCoverOverlay, type CloudCoverOverlayConfig } from "./hooks/use-cloud-cover-overlay";
+import { useCapeOverlay, type CapeOverlayConfig } from "./hooks/use-cape-overlay";
+import { useFireWeatherOverlay, type FireWeatherOverlayConfig } from "./hooks/use-fire-weather-overlay";
+import { useFiresOverlay, type FiresOverlayConfig } from "./hooks/use-fires-overlay";
+import { useAuroraOverlay, type AuroraOverlayConfig } from "./hooks/use-aurora-overlay";
+import { useAirQualityOverlay, type AirQualityOverlayConfig } from "./hooks/use-air-quality-overlay";
+import { useUvIndexOverlay, type UvIndexOverlayConfig } from "./hooks/use-uv-index-overlay";
+import { useWavesOverlay, type WavesOverlayConfig } from "./hooks/use-waves-overlay";
+import { useOceanCurrentsOverlay, type OceanCurrentsOverlayConfig } from "./hooks/use-ocean-currents-overlay";
+import { useSstOverlay, type SstOverlayConfig } from "./hooks/use-sst-overlay";
 import { useLocationWeather } from "./hooks/use-location-weather";
+import { useOverlayValues, type OverlayValueConfig } from "./hooks/use-overlay-values";
 import { UserLocationMarker, PinLocationMarker } from "./user-location-marker";
 
 const TILE_LIGHT =
@@ -71,6 +100,21 @@ export type OverlayConfig = {
   prociv: ProCivOverlayConfig;
   rainfall: RainfallOverlayConfig;
   warnings: WarningsOverlayConfig;
+  wind: WindOverlayConfig;
+  // GFS forecast overlays
+  temperature: TemperatureOverlayConfig;
+  humidity: HumidityOverlayConfig;
+  precipitation: PrecipitationOverlayConfig;
+  cloudCover: CloudCoverOverlayConfig;
+  cape: CapeOverlayConfig;
+  fireWeather: FireWeatherOverlayConfig;
+  fires: FiresOverlayConfig;
+  aurora: AuroraOverlayConfig;
+  airQuality: AirQualityOverlayConfig;
+  uvIndex: UvIndexOverlayConfig;
+  waves: WavesOverlayConfig;
+  oceanCurrents: OceanCurrentsOverlayConfig;
+  sst: SstOverlayConfig;
 };
 
 export type ReportsMapProps = {
@@ -183,11 +227,26 @@ function buildPopupHtml(
 }
 
 const DEFAULT_OVERLAY_CONFIG: OverlayConfig = {
-  weather: { enabled: false, apiKey: undefined },
+  weather: { enabled: false },
   seismic: { enabled: false, minMagnitude: 2.5 },
   prociv: { enabled: false },
   rainfall: { enabled: false },
   warnings: { enabled: false },
+  wind: { enabled: false },
+  // GFS forecast overlays
+  temperature: { enabled: false },
+  humidity: { enabled: false },
+  precipitation: { enabled: false },
+  cloudCover: { enabled: false },
+  cape: { enabled: false },
+  fireWeather: { enabled: false },
+  fires: { enabled: false },
+  aurora: { enabled: false },
+  airQuality: { enabled: false },
+  uvIndex: { enabled: false },
+  waves: { enabled: false },
+  oceanCurrents: { enabled: false },
+  sst: { enabled: false },
 };
 
 export function ReportsMapClient({
@@ -216,18 +275,63 @@ export function ReportsMapClient({
   const prociv = useProCivOverlay(overlayConfig.prociv, timeFilterHours);
   const rainfall = useRainfallOverlay(overlayConfig.rainfall, timeFilterHours);
   const warnings = useWarningsOverlay(overlayConfig.warnings);
+  const wind = useWindOverlay(overlayConfig.wind);
+
+  // GFS forecast overlays
+  const temperature = useTemperatureOverlay(overlayConfig.temperature);
+  const humidity = useHumidityOverlay(overlayConfig.humidity);
+  const precipitation = usePrecipitationOverlay(overlayConfig.precipitation);
+  const cloudCover = useCloudCoverOverlay(overlayConfig.cloudCover);
+  const cape = useCapeOverlay(overlayConfig.cape);
+  const fireWeather = useFireWeatherOverlay(overlayConfig.fireWeather);
+  const fires = useFiresOverlay(overlayConfig.fires);
+  const aurora = useAuroraOverlay(overlayConfig.aurora);
+  const airQuality = useAirQualityOverlay(overlayConfig.airQuality);
+  const uvIndex = useUvIndexOverlay(overlayConfig.uvIndex);
+  const waves = useWavesOverlay(overlayConfig.waves);
+  const oceanCurrents = useOceanCurrentsOverlay(overlayConfig.oceanCurrents);
+  const sst = useSstOverlay(overlayConfig.sst);
 
   // Location weather (current weather at user position)
+  // API key handled server-side via proxy
   const locationWeather = useLocationWeather(
-    weather.isAvailable ? userLocation : undefined,
-    overlayConfig.weather.apiKey
+    userLocation,
+    weather.isAvailable
   );
 
   // Weather at pin location (for yellow marker popup)
   const pinWeather = useLocationWeather(
-    weather.isAvailable ? pinLocation : undefined,
-    overlayConfig.weather.apiKey
+    pinLocation,
+    weather.isAvailable
   );
+
+  // Build overlay config for value sampling
+  const overlayValueConfigs: OverlayValueConfig[] = useMemo(
+    () => [
+      { type: "temperature", data: temperature.data, enabled: temperature.enabled },
+      { type: "humidity", data: humidity.data, enabled: humidity.enabled },
+      { type: "precipitation", data: precipitation.data, enabled: precipitation.enabled },
+      { type: "cloudCover", data: cloudCover.data, enabled: cloudCover.enabled },
+      { type: "cape", data: cape.data, enabled: cape.enabled },
+      { type: "fireWeather", data: fireWeather.data, enabled: fireWeather.enabled },
+      { type: "uvIndex", data: uvIndex.data, enabled: uvIndex.enabled },
+      { type: "airQuality", data: airQuality.data, enabled: airQuality.enabled },
+    ],
+    [
+      temperature.data, temperature.enabled,
+      humidity.data, humidity.enabled,
+      precipitation.data, precipitation.enabled,
+      cloudCover.data, cloudCover.enabled,
+      cape.data, cape.enabled,
+      fireWeather.data, fireWeather.enabled,
+      uvIndex.data, uvIndex.enabled,
+      airQuality.data, airQuality.enabled,
+    ]
+  );
+
+  // Sample overlay values at user and pin locations
+  const userOverlayValues = useOverlayValues(userLocation, overlayValueConfigs);
+  const pinOverlayValues = useOverlayValues(pinLocation, overlayValueConfigs);
 
   // Handle clicks on "View report" buttons in popups
   useEffect(() => {
@@ -295,6 +399,8 @@ export function ReportsMapClient({
         zoom={zoom ?? (center ? 11 : 4)}
         className={cn("h-[420px] w-full rounded-md z-0", className)}
         scrollWheelZoom
+        maxBounds={[[-85.05, -Infinity], [85.05, Infinity]]}
+        maxBoundsViscosity={1.0}
       >
         <TileLayer key={tileUrl} attribution={TILE_ATTR} url={tileUrl} />
         <ResizeInvalidator />
@@ -304,6 +410,11 @@ export function ReportsMapClient({
         {/* Weather overlay (above base tiles, below markers) */}
         {weather.enabled && weather.tileUrl && (
           <WeatherOverlay tileUrl={weather.tileUrl} opacity={weather.opacity} />
+        )}
+
+        {/* Wind particle overlay (animated wind flow - independent of weather tiles) */}
+        {wind.enabled && wind.data && (
+          <WindOverlay data={wind.data} />
         )}
 
         {/* Seismic overlay (above weather, below user markers) */}
@@ -326,6 +437,67 @@ export function ReportsMapClient({
           <WarningsOverlay districts={warnings.districts} />
         )}
 
+        {/* GFS Forecast overlays */}
+        {temperature.enabled && temperature.data && (
+          <TemperatureOverlay data={temperature.data} opacity={0.6} />
+        )}
+
+        {humidity.enabled && humidity.data && (
+          <HumidityOverlay data={humidity.data} opacity={0.6} />
+        )}
+
+        {precipitation.enabled && precipitation.data && (
+          <PrecipitationGfsOverlay data={precipitation.data} opacity={0.6} />
+        )}
+
+        {cloudCover.enabled && cloudCover.data && (
+          <CloudCoverOverlay data={cloudCover.data} opacity={0.5} />
+        )}
+
+        {cape.enabled && cape.data && (
+          <CapeOverlay data={cape.data} opacity={0.6} />
+        )}
+
+        {/* Fire Weather Index overlay */}
+        {fireWeather.enabled && fireWeather.data && (
+          <FireWeatherOverlay data={fireWeather.data} opacity={0.6} />
+        )}
+
+        {/* NASA FIRMS Fire Detection overlay */}
+        {fires.enabled && fires.hotspots.length > 0 && (
+          <FiresOverlay hotspots={fires.hotspots} />
+        )}
+
+        {/* Aurora Borealis/Australis overlay */}
+        {aurora.enabled && aurora.data && (
+          <AuroraOverlay data={aurora.data} opacity={0.7} />
+        )}
+
+        {/* Air Quality overlay (WAQI stations, IDW interpolated) */}
+        {airQuality.enabled && airQuality.data && (
+          <AirQualityOverlay data={airQuality.data} />
+        )}
+
+        {/* UV Index overlay (GFS ozone data) */}
+        {uvIndex.enabled && uvIndex.data && (
+          <UvIndexOverlay data={uvIndex.data} />
+        )}
+
+        {/* Ocean Waves overlay (PacIOOS WAVEWATCH III) */}
+        {waves.enabled && waves.data && (
+          <WavesOverlay data={waves.data} opacity={0.7} />
+        )}
+
+        {/* Sea Surface Temperature overlay (NOAA OISST) */}
+        {sst.enabled && sst.data && (
+          <SstOverlay data={sst.data} opacity={0.6} />
+        )}
+
+        {/* Ocean Currents overlay (NOAA CoastWatch ERDDAP) */}
+        {oceanCurrents.enabled && oceanCurrents.data && (
+          <OceanCurrentsOverlay data={oceanCurrents.data} />
+        )}
+
         {/* Route polyline (navigation route) */}
         {routeGeometry && routeGeometry.length >= 2 && (
           <RouteOverlay geometry={routeGeometry} />
@@ -336,6 +508,7 @@ export function ReportsMapClient({
           <UserLocationMarker
             position={userLocation}
             weather={locationWeather.data}
+            overlayValues={userOverlayValues}
             locationLabel={tMap("yourLocation")}
             reportLabel={tReports("reportIncident")}
             onReportIncident={
@@ -351,6 +524,7 @@ export function ReportsMapClient({
           <PinLocationMarker
             position={pinLocation}
             weather={pinWeather.data}
+            overlayValues={pinOverlayValues}
             locationLabel={tMap("yourLocation")}
             reportLabel={tReports("reportIncident")}
           />
@@ -364,8 +538,28 @@ export function ReportsMapClient({
         />
       </MapContainer>
 
-      {/* Overlay controls (portals itself into the header topbar) */}
-      <OverlayControls weather={weather} seismic={seismic} prociv={prociv} rainfall={rainfall} warnings={warnings} />
+      {/* Overlay controls (floating sidebar on map left side) */}
+      <OverlayControls
+        weather={weather}
+        seismic={seismic}
+        prociv={prociv}
+        rainfall={rainfall}
+        warnings={warnings}
+        wind={wind}
+        temperature={temperature}
+        humidity={humidity}
+        precipitation={precipitation}
+        cloudCover={cloudCover}
+        cape={cape}
+        fireWeather={fireWeather}
+        fires={fires}
+        aurora={aurora}
+        airQuality={airQuality}
+        uvIndex={uvIndex}
+        waves={waves}
+        oceanCurrents={oceanCurrents}
+        sst={sst}
+      />
     </div>
   );
 }

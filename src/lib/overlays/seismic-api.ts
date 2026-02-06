@@ -24,35 +24,20 @@ export type EarthquakeGeoJSON = {
   };
 };
 
-const USGS_FEED_DAY =
-  "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
-const USGS_FEED_WEEK =
-  "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
-const USGS_FEED_MONTH =
-  "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson";
-
 export async function fetchEarthquakes(
   minMagnitude: number = 2.5,
   hours: number = 24,
 ): Promise<EarthquakeGeoJSON> {
-  // Pick the smallest feed that covers the requested window
-  const url = hours <= 24 ? USGS_FEED_DAY : hours <= 168 ? USGS_FEED_WEEK : USGS_FEED_MONTH;
-
-  const response = await fetch(url);
+  // Fetch via server proxy (caches USGS responses)
+  const response = await fetch(
+    `/api/seismic?hours=${hours}&minMag=${minMagnitude}`,
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to fetch earthquake data: ${response.status}`);
   }
 
-  const data = (await response.json()) as EarthquakeGeoJSON;
-  const cutoff = Date.now() - hours * 60 * 60 * 1000;
-
-  return {
-    ...data,
-    features: data.features.filter(
-      (f) => f.properties.mag >= minMagnitude && f.properties.time >= cutoff,
-    ),
-  };
+  return (await response.json()) as EarthquakeGeoJSON;
 }
 
 export function getMagnitudeColor(magnitude: number): string {

@@ -28,6 +28,28 @@ const envSchema = z.object({
   ENABLE_RAINFALL_OVERLAY: z.coerce.boolean().default(false),
   // IPMA weather warnings overlay
   ENABLE_WARNINGS_OVERLAY: z.coerce.boolean().default(false),
+  // Wind particle overlay (NOAA GFS, no key required)
+  ENABLE_WIND_OVERLAY: z.coerce.boolean().default(false),
+  // GFS forecast overlays (temperature, humidity, precipitation, etc.)
+  ENABLE_GFS_OVERLAYS: z.coerce.boolean().default(false),
+  // Fire Weather Index overlay (composite of temp + humidity)
+  ENABLE_FIRE_WEATHER_OVERLAY: z.coerce.boolean().default(false),
+  // NASA FIRMS fire detection (requires API key)
+  ENABLE_FIRES_OVERLAY: z.coerce.boolean().default(false),
+  NASA_FIRMS_API_KEY: z.string().min(1).optional(),
+  // Aurora Borealis/Australis overlay (NOAA SWPC, no key required)
+  ENABLE_AURORA_OVERLAY: z.coerce.boolean().default(false),
+  // Ocean currents overlay (NOAA CoastWatch ERDDAP, no key required)
+  ENABLE_OCEAN_CURRENTS_OVERLAY: z.coerce.boolean().default(false),
+  // Air Quality overlay (WAQI stations, requires API key)
+  ENABLE_AIR_QUALITY_OVERLAY: z.coerce.boolean().default(false),
+  WAQI_API_KEY: z.string().optional(),
+  // UV Index overlay (Open-Meteo, no key required)
+  ENABLE_UV_INDEX_OVERLAY: z.coerce.boolean().default(false),
+  // Ocean waves overlay (PacIOOS WAVEWATCH III, no key required)
+  ENABLE_WAVES_OVERLAY: z.coerce.boolean().default(false),
+  // Sea Surface Temperature overlay (NOAA OISST, no key required)
+  ENABLE_SST_OVERLAY: z.coerce.boolean().default(false),
 });
 
 export const env = envSchema.parse({
@@ -45,4 +67,16 @@ export const env = envSchema.parse({
   ENABLE_PROCIV_OVERLAY: process.env.ENABLE_PROCIV_OVERLAY,
   ENABLE_RAINFALL_OVERLAY: process.env.ENABLE_RAINFALL_OVERLAY,
   ENABLE_WARNINGS_OVERLAY: process.env.ENABLE_WARNINGS_OVERLAY,
+  ENABLE_WIND_OVERLAY: process.env.ENABLE_WIND_OVERLAY,
+  ENABLE_GFS_OVERLAYS: process.env.ENABLE_GFS_OVERLAYS,
+  ENABLE_FIRE_WEATHER_OVERLAY: process.env.ENABLE_FIRE_WEATHER_OVERLAY,
+  ENABLE_FIRES_OVERLAY: process.env.ENABLE_FIRES_OVERLAY,
+  NASA_FIRMS_API_KEY: process.env.NASA_FIRMS_API_KEY,
+  ENABLE_AURORA_OVERLAY: process.env.ENABLE_AURORA_OVERLAY,
+  ENABLE_OCEAN_CURRENTS_OVERLAY: process.env.ENABLE_OCEAN_CURRENTS_OVERLAY,
+  ENABLE_AIR_QUALITY_OVERLAY: process.env.ENABLE_AIR_QUALITY_OVERLAY,
+  WAQI_API_KEY: process.env.WAQI_API_KEY,
+  ENABLE_UV_INDEX_OVERLAY: process.env.ENABLE_UV_INDEX_OVERLAY,
+  ENABLE_WAVES_OVERLAY: process.env.ENABLE_WAVES_OVERLAY,
+  ENABLE_SST_OVERLAY: process.env.ENABLE_SST_OVERLAY,
 });

@@ -9,12 +9,14 @@ import {
   windDegToDirection,
   msToKmh,
 } from "@/lib/overlays/weather-api";
+import type { OverlayValue } from "./hooks/use-overlay-values";
 
 type DotVariant = "blue" | "yellow";
 
 export type UserLocationMarkerProps = {
   position: [number, number];
   weather: CurrentWeatherData | null;
+  overlayValues?: OverlayValue[];
   locationLabel: string;
   reportLabel: string;
   onReportIncident?: () => void;
@@ -23,24 +25,26 @@ export type UserLocationMarkerProps = {
 export type PinLocationMarkerProps = {
   position: [number, number];
   weather: CurrentWeatherData | null;
+  overlayValues?: OverlayValue[];
   locationLabel: string;
   reportLabel: string;
 };
 
 function buildAmbientHtml(
-  w: CurrentWeatherData,
-  variant: DotVariant
+  w: CurrentWeatherData | null,
+  variant: DotVariant,
+  overlayValues?: OverlayValue[]
 ): string {
-  const temp = Math.round(w.main.temp);
-  const iconUrl = getWeatherIconUrl(w.weather[0].icon);
-  const wind = msToKmh(w.wind.speed);
-  const humidity = w.main.humidity;
   const mod = variant === "yellow" ? " sentinela-location--yellow" : "";
 
-  return `
-    <div class="sentinela-location${mod}">
-      <div class="sentinela-location__dot"></div>
-      <div class="sentinela-location__pulse"></div>
+  // Weather data row
+  let weatherHtml = "";
+  if (w) {
+    const temp = Math.round(w.main.temp);
+    const iconUrl = getWeatherIconUrl(w.weather[0].icon);
+    const wind = msToKmh(w.wind.speed);
+    const humidity = w.main.humidity;
+    weatherHtml = `
       <div class="sentinela-location__label sentinela-location__label--temp">
         <img src="${iconUrl}" alt="" class="sentinela-location__icon" />
         <span>${temp}&deg;</span>
@@ -51,51 +55,128 @@ function buildAmbientHtml(
       <div class="sentinela-location__label sentinela-location__label--humidity">
         ${humidity}<small>%</small>
       </div>
-    </div>
-  `;
-}
+    `;
+  }
 
-function buildPlainHtml(variant: DotVariant): string {
-  const mod = variant === "yellow" ? " sentinela-location--yellow" : "";
+  // Overlay values row (below the dot)
+  let overlayHtml = "";
+  if (overlayValues && overlayValues.length > 0) {
+    const overlayItems = overlayValues
+      .map(
+        (ov) =>
+          `<div class="sentinela-location__overlay-item">
+            <span class="sentinela-location__overlay-icon">${ov.iconSvg}</span>
+            <span>${ov.formatted}<small>${ov.unit}</small></span>
+          </div>`
+      )
+      .join("");
+    overlayHtml = `<div class="sentinela-location__overlay-row">${overlayItems}</div>`;
+  }
+
   return `
     <div class="sentinela-location${mod}">
       <div class="sentinela-location__dot"></div>
       <div class="sentinela-location__pulse"></div>
+      ${weatherHtml}
+      ${overlayHtml}
     </div>
   `;
 }
 
-function buildIcon(weather: CurrentWeatherData | null, variant: DotVariant) {
-  const html = weather
-    ? buildAmbientHtml(weather, variant)
-    : buildPlainHtml(variant);
-  const size = weather ? 120 : 24;
-  const anchor = size / 2;
+function buildIcon(
+  weather: CurrentWeatherData | null,
+  variant: DotVariant,
+  overlayValues?: OverlayValue[]
+) {
+  const hasContent = weather || (overlayValues && overlayValues.length > 0);
+  const html = hasContent
+    ? buildAmbientHtml(weather, variant, overlayValues)
+    : `<div class="sentinela-location${variant === "yellow" ? " sentinela-location--yellow" : ""}">
+        <div class="sentinela-location__dot"></div>
+        <div class="sentinela-location__pulse"></div>
+      </div>`;
+
+  // Use consistent size - anchor always at center
+  const size = hasContent ? 160 : 24;
+
   return L.divIcon({
     className: "sentinela-location-marker",
     html,
     iconSize: L.point(size, size),
-    iconAnchor: L.point(anchor, anchor),
+    iconAnchor: L.point(size / 2, size / 2),
   });
 }
 
 export function WeatherPopupContent({
   weather,
+  overlayValues,
   locationLabel,
   reportLabel,
   onReportIncident,
 }: {
   weather: CurrentWeatherData | null;
+  overlayValues?: OverlayValue[];
   locationLabel: string;
   reportLabel: string;
   onReportIncident?: () => void;
 }) {
-  if (!weather) {
+  if (!weather && (!overlayValues || overlayValues.length === 0)) {
     return (
       <div style={{ display: "grid", gap: "6px" }}>
         <span style={{ fontSize: "14px", fontWeight: 500 }}>
           {locationLabel}
         </span>
+        {onReportIncident && (
+          <button
+            onClick={onReportIncident}
+            style={{
+              fontSize: "13px",
+              fontWeight: 500,
+              padding: "4px 12px",
+              borderRadius: "6px",
+              border: "none",
+              backgroundColor: "#18181b",
+              color: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            {reportLabel}
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // If no weather but have overlay values, show simplified view
+  if (!weather) {
+    return (
+      <div style={{ display: "grid", gap: "8px", minWidth: "180px" }}>
+        <span style={{ fontSize: "14px", fontWeight: 500 }}>
+          {locationLabel}
+        </span>
+        {overlayValues && overlayValues.length > 0 && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "4px 12px",
+              fontSize: "12px",
+            }}
+          >
+            {overlayValues.map((ov) => (
+              <div key={ov.type} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <span dangerouslySetInnerHTML={{ __html: ov.iconSvg }} />
+                <span>
+                  {ov.label}{" "}
+                  <span style={{ fontWeight: 500 }}>
+                    {ov.formatted}
+                    {ov.unit}
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
         {onReportIncident && (
           <button
             onClick={onReportIncident}
@@ -234,6 +315,33 @@ export function WeatherPopupContent({
         <span>Sunset {sunset}</span>
       </div>
 
+      {/* Overlay values (GFS forecast data) */}
+      {overlayValues && overlayValues.length > 0 && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "2px 12px",
+            fontSize: "12px",
+            borderTop: "1px solid #e4e4e7",
+            paddingTop: "6px",
+          }}
+        >
+          {overlayValues.map((ov) => (
+            <div key={ov.type} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+              <span dangerouslySetInnerHTML={{ __html: ov.iconSvg }} />
+              <span>
+                {ov.label}{" "}
+                <span style={{ fontWeight: 500 }}>
+                  {ov.formatted}
+                  {ov.unit}
+                </span>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Report button */}
       {onReportIncident && (
         <button
@@ -260,17 +368,22 @@ export function WeatherPopupContent({
 export function UserLocationMarker({
   position,
   weather,
+  overlayValues,
   locationLabel,
   reportLabel,
   onReportIncident,
 }: UserLocationMarkerProps) {
-  const icon = useMemo(() => buildIcon(weather, "blue"), [weather]);
+  const icon = useMemo(
+    () => buildIcon(weather, "blue", overlayValues),
+    [weather, overlayValues]
+  );
 
   return (
     <Marker position={position} icon={icon} zIndexOffset={1000}>
       <Popup>
         <WeatherPopupContent
           weather={weather}
+          overlayValues={overlayValues}
           locationLabel={locationLabel}
           reportLabel={reportLabel}
           onReportIncident={onReportIncident}
@@ -283,16 +396,21 @@ export function UserLocationMarker({
 export function PinLocationMarker({
   position,
   weather,
+  overlayValues,
   locationLabel,
   reportLabel,
 }: PinLocationMarkerProps) {
-  const icon = useMemo(() => buildIcon(weather, "yellow"), [weather]);
+  const icon = useMemo(
+    () => buildIcon(weather, "yellow", overlayValues),
+    [weather, overlayValues]
+  );
 
   return (
     <Marker position={position} icon={icon} zIndexOffset={900}>
       <Popup>
         <WeatherPopupContent
           weather={weather}
+          overlayValues={overlayValues}
           locationLabel={locationLabel}
           reportLabel={reportLabel}
         />

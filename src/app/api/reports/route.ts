@@ -9,7 +9,7 @@ import { env } from "@/lib/env";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { createReportFieldsSchema } from "@/lib/reports/validation";
 import { isAllowedImageMimeType, saveImage } from "@/lib/uploads";
-import { fetchWeatherSnapshot } from "@/lib/overlays/weather-api";
+import { fetchWeatherSnapshotServer } from "@/lib/overlays/weather-api";
 
 export const runtime = "nodejs";
 
@@ -137,7 +137,7 @@ export async function POST(request: Request) {
     let address: string | null = null;
     let geocode: ReverseGeocodeResult | null = null;
     const weatherPromise = env.OPENWEATHERMAP_API_KEY
-      ? fetchWeatherSnapshot(fields.latitude, fields.longitude, env.OPENWEATHERMAP_API_KEY)
+      ? fetchWeatherSnapshotServer(fields.latitude, fields.longitude, env.OPENWEATHERMAP_API_KEY)
       : Promise.resolve(null);
 
     try {

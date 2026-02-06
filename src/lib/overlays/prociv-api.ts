@@ -34,47 +34,19 @@ type FogosResponse = {
   data: ProCivIncident[];
 };
 
-const FOGOS_ACTIVE_URL = "https://api.fogos.pt/v2/incidents/active";
-const FOGOS_SEARCH_URL = "https://api.fogos.pt/v2/incidents/search";
-
 /**
  * Fetch incidents within the given time window (in hours).
- * Merges currently active incidents with recent ones from the
- * search endpoint so the overlay respects the app's time filter.
+ * Uses server proxy that caches Fogos.pt responses.
  */
 export async function fetchIncidents(hours: number = 8): Promise<ProCivIncident[]> {
-  const cutoff = Date.now() - hours * 60 * 60 * 1000;
+  const response = await fetch(`/api/prociv?hours=${hours}`);
 
-  // Always include currently active incidents
-  const activeRes = await fetch(FOGOS_ACTIVE_URL);
-  let active: ProCivIncident[] = [];
-  if (activeRes.ok) {
-    const activeData = (await activeRes.json()) as FogosResponse;
-    if (activeData.success) {
-      active = activeData.data;
-    }
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ProCiv data: ${response.status}`);
   }
 
-  // Also fetch recent incidents from the search endpoint
-  const since = new Date(cutoff);
-  const after = `${since.getFullYear()}-${String(since.getMonth() + 1).padStart(2, "0")}-${String(since.getDate()).padStart(2, "0")}`;
-  const searchRes = await fetch(`${FOGOS_SEARCH_URL}?after=${after}&limit=100`);
-
-  let recent: ProCivIncident[] = [];
-  if (searchRes.ok) {
-    const searchData = (await searchRes.json()) as FogosResponse;
-    if (searchData.success) {
-      recent = searchData.data.filter(
-        (i) => i.dateTime.sec * 1000 >= cutoff
-      );
-    }
-  }
-
-  // Merge, deduplicating by id (active takes priority)
-  const byId = new Map<string, ProCivIncident>();
-  for (const i of recent) byId.set(i.id, i);
-  for (const i of active) byId.set(i.id, i); // overwrites with active version
-  return Array.from(byId.values());
+  const data = (await response.json()) as FogosResponse;
+  return data.success ? data.data : [];
 }
 
 /**

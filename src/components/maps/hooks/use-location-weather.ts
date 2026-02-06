@@ -15,9 +15,13 @@ export type LocationWeatherState = {
 
 const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
+/**
+ * Hook to fetch current weather for a location.
+ * Uses server-side proxy - API key is not needed client-side.
+ */
 export function useLocationWeather(
   location: [number, number] | undefined,
-  apiKey: string | undefined
+  enabled: boolean = true
 ): LocationWeatherState {
   const [data, setData] = useState<CurrentWeatherData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,13 +33,14 @@ export function useLocationWeather(
   const lon = location?.[1];
 
   const fetchWeather = useCallback(async () => {
-    if (lat == null || lon == null || !apiKey) return;
+    if (lat == null || lon == null || !enabled) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const result = await fetchCurrentWeather(lat, lon, apiKey);
+      // API key handled by server proxy
+      const result = await fetchCurrentWeather(lat, lon);
       setData(result);
       setLastUpdated(new Date());
     } catch (e) {
@@ -43,10 +48,10 @@ export function useLocationWeather(
     } finally {
       setIsLoading(false);
     }
-  }, [lat, lon, apiKey]);
+  }, [lat, lon, enabled]);
 
   useEffect(() => {
-    if (lat == null || lon == null || !apiKey) {
+    if (lat == null || lon == null || !enabled) {
       setData(null);
       return;
     }
@@ -59,7 +64,7 @@ export function useLocationWeather(
 
     const interval = setInterval(() => void fetchWeather(), REFRESH_INTERVAL);
     return () => clearInterval(interval);
-  }, [lat, lon, apiKey, fetchWeather]);
+  }, [lat, lon, enabled, fetchWeather]);
 
   return { data, isLoading, error, lastUpdated };
 }

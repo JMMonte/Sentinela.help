@@ -1,18 +1,9 @@
 /**
  * IPMA rainfall / meteorological observations API.
  *
- * Uses the open IPMA API to fetch hourly observations from ~220 weather
- * stations across Portugal, including accumulated precipitation (mm).
- *
- * Endpoints:
- *   Stations: https://api.ipma.pt/open-data/observation/meteorology/stations/stations.json
- *   Observations: https://api.ipma.pt/open-data/observation/meteorology/stations/observations.json
+ * Fetches via server proxy (/api/rainfall) that caches IPMA responses,
+ * then aggregates per-station on the client side based on user's time filter.
  */
-
-const STATIONS_URL =
-  "https://api.ipma.pt/open-data/observation/meteorology/stations/stations.json";
-const OBSERVATIONS_URL =
-  "https://api.ipma.pt/open-data/observation/meteorology/stations/observations.json";
 
 export type IpmaStation = {
   id: string;
@@ -57,32 +48,22 @@ type RawObservation = {
 
 type RawObservations = Record<string, Record<string, RawObservation>>;
 
-let stationsCache: IpmaStation[] | null = null;
+export async function fetchRainfallObservations(hours: number = 24): Promise<StationObservation[]> {
+  // Fetch via server proxy (caches IPMA responses)
+  const res = await fetch("/api/rainfall");
+  if (!res.ok) throw new Error(`Failed to fetch rainfall data: ${res.status}`);
 
-async function fetchStations(): Promise<IpmaStation[]> {
-  if (stationsCache) return stationsCache;
+  const { stations: rawStations, observations } = (await res.json()) as {
+    stations: RawStation[];
+    observations: RawObservations;
+  };
 
-  const res = await fetch(STATIONS_URL);
-  if (!res.ok) throw new Error(`Failed to fetch IPMA stations: ${res.status}`);
-
-  const data = (await res.json()) as RawStation[];
-  stationsCache = data.map((s) => ({
+  const stations: IpmaStation[] = rawStations.map((s) => ({
     id: String(s.properties.idEstacao),
     name: s.properties.localEstacao,
     lat: s.geometry.coordinates[1],
     lng: s.geometry.coordinates[0],
   }));
-  return stationsCache;
-}
-
-export async function fetchRainfallObservations(hours: number = 24): Promise<StationObservation[]> {
-  const [stations, obsRes] = await Promise.all([
-    fetchStations(),
-    fetch(OBSERVATIONS_URL),
-  ]);
-
-  if (!obsRes.ok) throw new Error(`Failed to fetch IPMA observations: ${obsRes.status}`);
-  const observations = (await obsRes.json()) as RawObservations;
 
   // Build station lookup
   const stationMap = new Map(stations.map((s) => [s.id, s]));

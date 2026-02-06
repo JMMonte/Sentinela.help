@@ -1,15 +1,9 @@
 /**
  * IPMA Weather Warnings API integration.
  *
- * Fetches active weather warnings from IPMA's public API and groups
- * them by district (idAreaAviso), presenting the highest severity
- * per district for map display.
- *
- * Endpoint: https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json
+ * Fetches via server proxy (/api/warnings) that caches IPMA responses,
+ * then groups by district on the client side.
  */
-
-const WARNINGS_URL =
-  "https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json";
 
 // --- Raw API types ---
 
@@ -84,7 +78,8 @@ const LEVEL_ORDER: Record<AwarenessLevel, number> = {
  * then groups remaining by district.
  */
 export async function fetchWarnings(): Promise<DistrictWarnings[]> {
-  const res = await fetch(WARNINGS_URL);
+  // Fetch via server proxy (caches IPMA responses)
+  const res = await fetch("/api/warnings");
   if (!res.ok) throw new Error(`Failed to fetch IPMA warnings: ${res.status}`);
 
   const raw = (await res.json()) as RawWarning[];

@@ -6,7 +6,7 @@ import { env } from "@/lib/env";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { createContributionFieldsSchema } from "@/lib/reports/validation";
 import { isAllowedImageMimeType, saveImage } from "@/lib/uploads";
-import { fetchWeatherSnapshot } from "@/lib/overlays/weather-api";
+import { fetchWeatherSnapshotServer } from "@/lib/overlays/weather-api";
 
 export const runtime = "nodejs";
 
@@ -106,7 +106,7 @@ export async function POST(
     const [storedImages, weatherSnapshot] = await Promise.all([
       Promise.all(files.map((file) => saveImage(file))),
       env.OPENWEATHERMAP_API_KEY
-        ? fetchWeatherSnapshot(report.latitude, report.longitude, env.OPENWEATHERMAP_API_KEY)
+        ? fetchWeatherSnapshotServer(report.latitude, report.longitude, env.OPENWEATHERMAP_API_KEY)
         : Promise.resolve(null),
     ]);
 

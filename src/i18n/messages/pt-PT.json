@@ -273,6 +273,63 @@
     "ipmaWarnings": {
       "name": "IPMA — Avisos Meteorológicos",
       "description": "Avisos meteorológicos oficiais por distrito (vento, chuva, neve, calor, frio, nevoeiro, trovoadas)"
+    },
+    "noaaGfs": {
+      "name": "NOAA GFS",
+      "description": "Sistema Global de Previsão — previsões de temperatura, humidade, precipitação, cobertura de nuvens e potencial de tempestades"
+    },
+    "nasaFirms": {
+      "name": "NASA FIRMS",
+      "description": "Sistema de Informação de Incêndios — focos de calor detetados por satélite via VIIRS/MODIS"
+    },
+    "openMeteoAirQuality": {
+      "name": "Open-Meteo Air Quality",
+      "description": "Dados de PM2.5, PM10 e aerossóis do modelo de composição atmosférica CAMS/ECMWF"
+    },
+    "pacioosWavewatch": {
+      "name": "PacIOOS WAVEWATCH III",
+      "description": "Modelo global de ondas oceânicas fornecendo altura significativa, período e direção das ondas com resolução de 0.5 graus"
     }
+  },
+  "overlays": {
+    "mapLayers": "Camadas do Mapa",
+    "forecastLayers": "Camadas de Previsão",
+    "weather": "Meteorologia",
+    "weatherDescription": "Dados meteorológicos em tempo real do OpenWeatherMap (precipitação, nuvens, temperatura, vento e pressão).",
+    "windFlow": "Fluxo de Vento",
+    "earthquakes": "Sismos",
+    "earthquakesDescription": "Eventos sísmicos das últimas 24h via USGS Earthquake Hazards Program.",
+    "prociv": "ProCiv",
+    "procivDescription": "Ocorrências de proteção civil ativas em Portugal via Fogos.pt (incêndios, acidentes, eventos meteorológicos).",
+    "rainfall": "Precipitação",
+    "rainfallDescription": "Precipitação acumulada das estações meteorológicas IPMA em Portugal. Atualizada a cada 10 min.",
+    "warnings": "Avisos IPMA",
+    "warningsDescription": "Avisos meteorológicos oficiais do IPMA (vento, chuva, neve, calor, frio, nevoeiro, trovoadas). Atualizados a cada 30 min.",
+    "temperature": "Temperatura",
+    "temperatureDescription": "Previsão de temperatura a 2m do modelo NOAA GFS. Atualizada a cada 6 horas.",
+    "humidity": "Humidade",
+    "humidityDescription": "Previsão de humidade relativa a 2m do modelo NOAA GFS. Atualizada a cada 6 horas.",
+    "precipitation": "Precipitação",
+    "precipitationDescription": "Previsão de precipitação acumulada do modelo NOAA GFS. Atualizada a cada 6 horas.",
+    "cloudCover": "Cobertura de Nuvens",
+    "cloudCoverDescription": "Previsão de cobertura total de nuvens do modelo NOAA GFS. Atualizada a cada 6 horas.",
+    "stormPotential": "Potencial de Tempestade",
+    "stormPotentialDescription": "CAPE (Energia Potencial Convectiva Disponível) do NOAA GFS. Valores mais altos indicam maior potencial de tempestades/trovoadas.",
+    "fireWeather": "Risco de Incêndio",
+    "fireWeatherDescription": "Índice de Risco de Incêndio calculado a partir de dados de temperatura e humidade do NOAA GFS. Mostra níveis de risco de incêndio florestal.",
+    "activeFires": "Incêndios Ativos",
+    "activeFiresDescription": "Focos de calor detetados por satélite da NASA FIRMS (VIIRS/MODIS). Atualizados a cada ~3 horas.",
+    "airQuality": "Qualidade do Ar",
+    "airQualityDescription": "Dados de qualidade do ar PM2.5 do Open-Meteo (CAMS/ECMWF). Mostra níveis de poluição na Europa. Atualizado a cada 30 min.",
+    "airQualityPoints": "{count} pontos",
+    "oceanWaves": "Ondas Oceânicas",
+    "oceanWavesDescription": "Altura significativa das ondas do modelo PacIOOS WAVEWATCH III. Cobertura global com resolução de 0.5 graus. Atualizado de hora em hora.",
+    "events": "{count} eventos",
+    "occurrences": "{count} ocorrências",
+    "stations": "{count} estações",
+    "districtsWithWarnings": "{count} distrito(s) com avisos",
+    "hotspots": "{count} focos de calor",
+    "active": "Ativo",
+    "loading": "A carregar..."
   }
 }

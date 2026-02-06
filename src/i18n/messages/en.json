@@ -273,6 +273,63 @@
     "ipmaWarnings": {
       "name": "IPMA — Weather Warnings",
       "description": "Official meteorological warnings by district (wind, rain, snow, heat, cold, fog, thunderstorms)"
+    },
+    "noaaGfs": {
+      "name": "NOAA GFS",
+      "description": "Global Forecast System — temperature, humidity, precipitation, cloud cover, and storm potential forecasts"
+    },
+    "nasaFirms": {
+      "name": "NASA FIRMS",
+      "description": "Fire Information for Resource Management System — satellite-detected fire hotspots via VIIRS/MODIS"
+    },
+    "openMeteoAirQuality": {
+      "name": "Open-Meteo Air Quality",
+      "description": "PM2.5, PM10, and aerosol data from CAMS/ECMWF atmospheric composition model"
+    },
+    "pacioosWavewatch": {
+      "name": "PacIOOS WAVEWATCH III",
+      "description": "Global ocean wave model providing significant wave height, period, and direction at 0.5 degree resolution"
     }
+  },
+  "overlays": {
+    "mapLayers": "Map Layers",
+    "forecastLayers": "Forecast Layers",
+    "weather": "Weather",
+    "weatherDescription": "Real-time weather tiles from OpenWeatherMap (precipitation, clouds, temperature, wind & pressure).",
+    "windFlow": "Wind Flow",
+    "earthquakes": "Earthquakes",
+    "earthquakesDescription": "Seismic events from the last 24h via USGS Earthquake Hazards Program.",
+    "prociv": "ProCiv",
+    "procivDescription": "Active civil protection incidents in Portugal via Fogos.pt (fires, accidents, weather events).",
+    "rainfall": "Rainfall",
+    "rainfallDescription": "Accumulated rainfall from IPMA weather stations across Portugal. Updated every 10 min.",
+    "warnings": "IPMA Warnings",
+    "warningsDescription": "Official weather warnings from IPMA (wind, rain, snow, heat, cold, fog, thunderstorms). Updated every 30 min.",
+    "temperature": "Temperature",
+    "temperatureDescription": "2m temperature forecast from NOAA GFS model. Updated every 6 hours.",
+    "humidity": "Humidity",
+    "humidityDescription": "2m relative humidity forecast from NOAA GFS model. Updated every 6 hours.",
+    "precipitation": "Precipitation",
+    "precipitationDescription": "Accumulated precipitation forecast from NOAA GFS model. Updated every 6 hours.",
+    "cloudCover": "Cloud Cover",
+    "cloudCoverDescription": "Total cloud cover forecast from NOAA GFS model. Updated every 6 hours.",
+    "stormPotential": "Storm Potential",
+    "stormPotentialDescription": "CAPE (Convective Available Potential Energy) from NOAA GFS. Higher values indicate greater storm/thunderstorm potential.",
+    "fireWeather": "Fire Weather Risk",
+    "fireWeatherDescription": "Fire Weather Index calculated from NOAA GFS temperature and humidity data. Shows wildfire risk levels.",
+    "activeFires": "Active Fires",
+    "activeFiresDescription": "Satellite-detected fire hotspots from NASA FIRMS (VIIRS/MODIS). Updated every ~3 hours.",
+    "airQuality": "Air Quality",
+    "airQualityDescription": "PM2.5 air quality data from Open-Meteo (CAMS/ECMWF). Shows pollution levels across Europe. Updated every 30 min.",
+    "airQualityPoints": "{count} points",
+    "oceanWaves": "Ocean Waves",
+    "oceanWavesDescription": "Significant wave height from PacIOOS WAVEWATCH III model. Global coverage at 0.5 degree resolution. Updated hourly.",
+    "events": "{count} events",
+    "occurrences": "{count} occurrences",
+    "stations": "{count} stations",
+    "districtsWithWarnings": "{count} district(s) with warnings",
+    "hotspots": "{count} hotspots",
+    "active": "Active",
+    "loading": "Loading..."
   }
 }

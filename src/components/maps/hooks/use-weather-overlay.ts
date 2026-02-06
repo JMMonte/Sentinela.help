@@ -9,7 +9,6 @@ import {
 
 export type WeatherOverlayConfig = {
   enabled: boolean;
-  apiKey: string | undefined;
 };
 
 export type WeatherOverlayState = {
@@ -31,12 +30,14 @@ export function useWeatherOverlay(
   const [activeLayer, setActiveLayer] = useState<WeatherLayer>("precipitation_new");
   const [opacity, setOpacity] = useState(0.85);
 
-  const isAvailable = config.enabled && !!config.apiKey;
+  // Weather is available if enabled in config (API key checked server-side)
+  const isAvailable = config.enabled;
 
   const tileUrl = useMemo(() => {
-    if (!enabled || !isAvailable || !config.apiKey) return null;
-    return getWeatherTileUrl(activeLayer, config.apiKey);
-  }, [enabled, isAvailable, activeLayer, config.apiKey]);
+    if (!enabled || !isAvailable) return null;
+    // API key is handled by the server proxy - not needed client-side
+    return getWeatherTileUrl(activeLayer);
+  }, [enabled, isAvailable, activeLayer]);
 
   return {
     isAvailable,

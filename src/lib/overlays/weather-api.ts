@@ -19,11 +19,12 @@ export const WEATHER_LAYERS: WeatherLayerConfig[] = [
   { id: "pressure_new", label: "Pressure", defaultOpacity: 0.4 },
 ];
 
-export function getWeatherTileUrl(
-  layer: WeatherLayer,
-  apiKey: string
-): string {
-  return `https://tile.openweathermap.org/map/${layer}/{z}/{x}/{y}.png?appid=${apiKey}`;
+/**
+ * Get weather tile URL through our secure proxy.
+ * API key is handled server-side - never exposed to client.
+ */
+export function getWeatherTileUrl(layer: WeatherLayer): string {
+  return `/api/weather/tiles/${layer}/{z}/{x}/{y}`;
 }
 
 // ── Current weather data (OWM /data/2.5/weather) ──
@@ -62,16 +63,20 @@ export type CurrentWeatherData = {
   dt: number;
 };
 
-const OWM_CURRENT_URL = "https://api.openweathermap.org/data/2.5/weather";
-
+/**
+ * Fetch current weather through our secure proxy.
+ * API key is handled server-side - never exposed to client.
+ */
 export async function fetchCurrentWeather(
   lat: number,
-  lon: number,
-  apiKey: string
+  lon: number
 ): Promise<CurrentWeatherData> {
-  const url = `${OWM_CURRENT_URL}?lat=${lat}&lon=${lon}&appid=${encodeURIComponent(apiKey)}&units=metric`;
+  const url = `/api/weather/current?lat=${lat}&lon=${lon}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`Weather API error: ${res.status}`);
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || `Weather API error: ${res.status}`);
+  }
   return (await res.json()) as CurrentWeatherData;
 }
 
@@ -93,11 +98,10 @@ export type WeatherSnapshot = {
 
 export async function fetchWeatherSnapshot(
   lat: number,
-  lon: number,
-  apiKey: string,
+  lon: number
 ): Promise<WeatherSnapshot | null> {
   try {
-    const data = await fetchCurrentWeather(lat, lon, apiKey);
+    const data = await fetchCurrentWeather(lat, lon);
     return {
       temp: data.main.temp,
       feels_like: data.main.feels_like,
@@ -129,4 +133,53 @@ export function windDegToDirection(deg: number): string {
 
 export function msToKmh(ms: number): number {
   return Math.round(ms * 3.6);
+}
+
+// ── Server-side functions (for use in API routes) ──
+// These call OWM directly with the API key - DO NOT use in client code
+
+const OWM_CURRENT_URL = "https://api.openweathermap.org/data/2.5/weather";
+
+/**
+ * Server-side only: Fetch current weather directly from OWM.
+ * Use this in API routes that already have access to the API key.
+ */
+export async function fetchCurrentWeatherServer(
+  lat: number,
+  lon: number,
+  apiKey: string
+): Promise<CurrentWeatherData> {
+  const url = `${OWM_CURRENT_URL}?lat=${lat}&lon=${lon}&appid=${encodeURIComponent(apiKey)}&units=metric`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Weather API error: ${res.status}`);
+  return (await res.json()) as CurrentWeatherData;
+}
+
+/**
+ * Server-side only: Fetch weather snapshot directly from OWM.
+ * Use this in API routes that already have access to the API key.
+ */
+export async function fetchWeatherSnapshotServer(
+  lat: number,
+  lon: number,
+  apiKey: string
+): Promise<WeatherSnapshot | null> {
+  try {
+    const data = await fetchCurrentWeatherServer(lat, lon, apiKey);
+    return {
+      temp: data.main.temp,
+      feels_like: data.main.feels_like,
+      humidity: data.main.humidity,
+      pressure: data.main.pressure,
+      wind_speed: data.wind.speed,
+      wind_deg: data.wind.deg,
+      clouds: data.clouds.all,
+      visibility: data.visibility,
+      description: data.weather[0].description,
+      icon: data.weather[0].icon,
+      dt: data.dt,
+    };
+  } catch {
+    return null;
+  }
 }

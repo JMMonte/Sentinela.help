@@ -392,10 +392,13 @@ input[type="checkbox"].accent-primary {
   box-shadow: 0 0 0 2px #1e1e2e, 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Yellow variant (pin marker) */
+/* Yellow variant (pin marker) - smaller dot */
 .sentinela-location--yellow .sentinela-location__dot {
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
   background-color: #eab308;
-  border: 2.5px solid #fff;
+  border: 2px solid #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -405,6 +408,9 @@ input[type="checkbox"].accent-primary {
 }
 
 .sentinela-location--yellow .sentinela-location__pulse {
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
   background-color: rgba(234, 179, 8, 0.2);
 }
 
@@ -481,6 +487,55 @@ input[type="checkbox"].accent-primary {
   top: 50%;
   right: calc(50% + 18px);
   transform: translateY(-50%);
+}
+
+/* Overlay values row (below the dot) */
+.sentinela-location__overlay-row {
+  position: absolute;
+  top: calc(50% + 22px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.sentinela-location__overlay-item {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.92);
+  color: #18181b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.dark .sentinela-location__overlay-item {
+  background-color: rgba(30, 30, 46, 0.92);
+  color: #e4e4e7;
+}
+
+.sentinela-location__overlay-item small {
+  font-size: 9px;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.sentinela-location__overlay-icon {
+  display: flex;
+  align-items: center;
+}
+
+.sentinela-location__overlay-icon svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 
 /* ── IPMA Warning markers ── */
