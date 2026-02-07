@@ -12,6 +12,7 @@ import { COLLECTOR_CONFIGS, type Config } from "../config.js";
 
 const TOKEN_CACHE_TTL = 25 * 60 * 1000; // 25 minutes (tokens expire after 30)
 const FETCH_TIMEOUT = 30000;
+const TOKEN_FETCH_TIMEOUT = 30000; // Increased from 10s - Railway may have slow routes to OpenSky
 
 type OpenSkyState = [
   string,        // 0: icao24
@@ -81,7 +82,7 @@ export class AircraftCollector extends BaseCollector {
 
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
+      const timeout = setTimeout(() => controller.abort(), TOKEN_FETCH_TIMEOUT);
 
       const response = await fetch(
         "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token",
