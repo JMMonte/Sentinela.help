@@ -6,9 +6,9 @@ const envSchema = z.object({
     .min(1)
     .default("postgresql://postgres:postgres@localhost:5433/sentinela?schema=public"),
   APP_BASE_URL: z.string().url().optional(),
-  // Upstash Redis for shared cache
-  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
-  UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
+  // Vercel KV (Upstash Redis) for shared cache
+  KV_REST_API_URL: z.string().url().optional(),
+  KV_REST_API_TOKEN: z.string().min(1).optional(),
   GOV_CONTACT_EMAIL: z.string().email().optional(),
   MAX_UPLOAD_IMAGES: z.coerce.number().int().min(1).max(10).default(3),
   MAX_UPLOAD_BYTES: z.coerce
@@ -71,8 +71,8 @@ const envSchema = z.object({
 export const env = envSchema.parse({
   DATABASE_URL: process.env.DATABASE_URL,
   APP_BASE_URL: process.env.APP_BASE_URL,
-  UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
-  UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+  KV_REST_API_URL: process.env.KV_REST_API_URL,
+  KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
   GOV_CONTACT_EMAIL: process.env.GOV_CONTACT_EMAIL,
   MAX_UPLOAD_IMAGES: process.env.MAX_UPLOAD_IMAGES,
   MAX_UPLOAD_BYTES: process.env.MAX_UPLOAD_BYTES,
