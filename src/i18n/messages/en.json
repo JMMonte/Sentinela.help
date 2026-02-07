@@ -375,5 +375,167 @@
     "gdacsDescription": "GDACS global disaster alerts: earthquakes, floods, cyclones, volcanoes, wildfires, droughts. Updates every 10 minutes.",
     "gdacsCount": "{count} events",
     "gdacsReport": "GDACS Report"
+  },
+  "dataSourcePages": {
+    "categories": {
+      "hazards": "Natural Hazards",
+      "weather": "Weather & Atmosphere",
+      "environment": "Environment",
+      "ocean": "Ocean & Marine",
+      "radio": "Radio & Tracking",
+      "space": "Space Weather"
+    },
+    "earthquakes": {
+      "title": "Earthquakes",
+      "shortDescription": "Global seismic activity monitoring",
+      "description": "The USGS Earthquake Hazards Program provides real-time earthquake data from a global network of seismometers. The program monitors and reports earthquakes worldwide, providing magnitude, location, depth, and other parameters for each event.",
+      "howWeUseIt": "Sentinela fetches earthquake data filtered by time range and minimum magnitude. Events are displayed as markers on the map with size proportional to magnitude. Clicking an earthquake shows detailed information including magnitude, depth, location, and a link to the USGS event page.",
+      "processing": "Data is fetched from the USGS GeoJSON feed every 2 minutes. We filter events based on the user's selected time range (1h, 6h, 24h, 7d) and apply a minimum magnitude threshold to avoid cluttering the map with very small earthquakes.",
+      "limitations": "There may be a 1-5 minute delay between when an earthquake occurs and when it appears in our feed. Very small earthquakes (< M2.5) may not be detected in all regions. Preliminary data may be revised as more seismic stations report."
+    },
+    "fires": {
+      "title": "Active Fires",
+      "shortDescription": "Satellite-detected fire hotspots",
+      "description": "NASA's Fire Information for Resource Management System (FIRMS) provides active fire data from the VIIRS (Visible Infrared Imaging Radiometer Suite) and MODIS (Moderate Resolution Imaging Spectroradiometer) satellite instruments. These sensors detect thermal anomalies that indicate active burning.",
+      "howWeUseIt": "We display fire hotspots as heat markers on the map, with brightness indicating fire intensity (measured in Kelvin). Each marker shows detection time, satellite source, and fire radiative power when available.",
+      "processing": "Fire data is fetched every 10 minutes from the FIRMS API. We filter to show only the last 24 hours of detections. Hotspots are clustered at lower zoom levels to improve map performance when many fires are active.",
+      "limitations": "Satellites pass over each location only a few times per day, so there can be gaps in detection. Cloud cover can obscure fire detection. Small or low-intensity fires may not be detected. False positives can occur from industrial heat sources or sun glint."
+    },
+    "gdacs": {
+      "title": "Global Disasters",
+      "shortDescription": "Multi-hazard disaster alerts",
+      "description": "The Global Disaster Alert and Coordination System (GDACS) is a cooperation framework between the United Nations, the European Commission, and disaster managers worldwide. It provides near real-time alerts about natural disasters and tools to facilitate response coordination.",
+      "howWeUseIt": "Sentinela displays GDACS alerts for earthquakes, floods, tropical cyclones, volcanoes, wildfires, and droughts. Events are color-coded by alert level (Green, Orange, Red) and include severity estimates and affected population data.",
+      "processing": "We fetch the GDACS GeoRSS feed every 10 minutes. Events are parsed and displayed with appropriate icons for each disaster type. For tropical cyclones, we also display forecast tracks and wind radii when available.",
+      "limitations": "GDACS focuses on events with potential humanitarian impact, so minor events may not be included. Alert levels are estimates and may be revised. Some disaster types have longer detection delays than others."
+    },
+    "warnings": {
+      "title": "Weather Warnings",
+      "shortDescription": "Official meteorological alerts for Portugal",
+      "description": "IPMA (Instituto Português do Mar e da Atmosfera) issues official weather warnings for Portugal. Warnings cover severe weather phenomena including strong wind, heavy rain, extreme temperatures, snow, fog, and thunderstorms.",
+      "howWeUseIt": "We display active warnings by district on the map. Districts are colored according to the highest warning level active (yellow, orange, red). Clicking a district shows all active warnings with their validity periods and descriptions.",
+      "processing": "Warning data is fetched every 15 minutes from the IPMA API. We aggregate warnings by district and determine the highest active warning level for map coloring.",
+      "limitations": "Warnings are specific to Portugal mainland and islands. Warning boundaries follow administrative districts, which may not precisely match weather patterns. Updates may take 15-30 minutes to appear."
+    },
+    "weather-tiles": {
+      "title": "Weather Tiles",
+      "shortDescription": "Real-time weather radar and satellite imagery",
+      "description": "OpenWeatherMap provides weather map tiles showing precipitation radar, cloud cover, temperature, wind speed, and atmospheric pressure. These tiles are updated every 10 minutes and provide a visual overview of current weather conditions.",
+      "howWeUseIt": "Users can toggle different weather layers in the Layers panel. Tiles overlay the base map with semi-transparency, allowing you to see weather patterns while maintaining geographic context.",
+      "processing": "Map tiles are fetched directly from OpenWeatherMap's tile servers through our API proxy. We cache tiles briefly to reduce API calls and improve performance.",
+      "limitations": "Precipitation radar coverage varies by region - some areas have denser radar networks than others. Satellite-based layers have inherent delays. Color scales are optimized for global coverage and may not show subtle variations."
+    },
+    "gfs-forecast": {
+      "title": "GFS Weather Forecast",
+      "shortDescription": "NOAA global weather predictions",
+      "description": "The Global Forecast System (GFS) is a weather forecast model produced by the National Centers for Environmental Prediction (NCEP). It provides forecasts for temperature, humidity, precipitation, cloud cover, and atmospheric instability (CAPE) out to 16 days.",
+      "howWeUseIt": "We display GFS forecast data as color-coded overlays on the map. Available layers include 2m temperature, relative humidity, precipitation accumulation, cloud cover, and CAPE (storm potential). Users can see current conditions and near-term forecasts.",
+      "processing": "GFS data is fetched from NOAA NOMADS servers in GRIB2 format. We extract relevant parameters, interpolate to our display grid, and generate map tiles. Data is refreshed every 6 hours when new GFS runs complete.",
+      "limitations": "GFS has a resolution of 0.25° (~25km), so local variations may not be captured. Forecast accuracy decreases with time. Some parameters like precipitation can have significant uncertainty."
+    },
+    "wind-flow": {
+      "title": "Wind Flow Animation",
+      "shortDescription": "Animated global wind patterns",
+      "description": "Wind flow visualization uses U and V wind component data from the GFS model to create an animated particle flow showing wind direction and speed. This provides an intuitive view of atmospheric circulation patterns.",
+      "howWeUseIt": "When enabled, animated particles flow across the map following wind vectors. Particle speed indicates wind strength, and flow patterns reveal features like jet streams, cyclones, and trade winds.",
+      "processing": "We extract 10m U and V wind components from GFS data and create a vector field. The animation uses WebGL to efficiently render thousands of particles that follow the wind field.",
+      "limitations": "The animation shows surface winds (10m height) which may differ from winds at other altitudes. Particle density is balanced between visual clarity and performance. Very light winds may not show obvious movement."
+    },
+    "rainfall": {
+      "title": "Rainfall Observations",
+      "shortDescription": "Weather station precipitation data for Portugal",
+      "description": "IPMA operates a network of over 200 weather stations across Portugal that report accumulated rainfall. This data provides ground-truth precipitation measurements for the country.",
+      "howWeUseIt": "Weather stations are displayed as markers on the map, colored by rainfall amount. Clicking a station shows detailed information including 1-hour, 6-hour, and 24-hour accumulation totals.",
+      "processing": "We fetch station data every 10 minutes from the IPMA API. Rainfall values are color-coded from green (light) through yellow and orange to red (heavy).",
+      "limitations": "Coverage is limited to Portugal. Some remote areas have sparse station coverage. Station data represents point measurements and may not capture localized heavy rain between stations."
+    },
+    "air-quality": {
+      "title": "Air Quality",
+      "shortDescription": "Global PM2.5 pollution monitoring",
+      "description": "The World Air Quality Index (WAQI) project aggregates air quality data from monitoring stations worldwide. We display PM2.5 (fine particulate matter) concentrations, which are the most relevant indicator for health impacts.",
+      "howWeUseIt": "Air quality stations are displayed as markers colored by AQI level. We use inverse distance weighting (IDW) to interpolate between stations and create a continuous pollution map.",
+      "processing": "Data is fetched hourly from the WAQI API. We interpolate PM2.5 values across a grid and render as a semi-transparent overlay. AQI categories follow EPA standards (Good, Moderate, Unhealthy for Sensitive Groups, etc.).",
+      "limitations": "Station density varies greatly by region - urban areas have better coverage. Interpolation between sparse stations may not reflect actual conditions. Indoor air quality may differ significantly from outdoor readings."
+    },
+    "uv-index": {
+      "title": "UV Index",
+      "shortDescription": "Solar ultraviolet radiation levels",
+      "description": "The TEMIS (Tropospheric Emission Monitoring Internet Service) UV index is derived from satellite observations of ozone and cloud cover, combined with solar geometry calculations. It indicates the strength of UV radiation at the Earth's surface.",
+      "howWeUseIt": "UV index values are displayed as a color-coded overlay from green (low) through yellow and orange to purple (extreme). This helps users understand sun protection needs.",
+      "processing": "Daily UV index maps are fetched from TEMIS. Values are interpolated to our display grid and rendered as a semi-transparent overlay.",
+      "limitations": "UV index is a daily average and doesn't reflect real-time cloud variations. Actual UV exposure depends on many factors including altitude, surface reflection, and time of day."
+    },
+    "aurora": {
+      "title": "Aurora Forecast",
+      "shortDescription": "Northern and Southern Lights visibility",
+      "description": "NOAA's Space Weather Prediction Center provides aurora forecasts based on solar wind measurements and geomagnetic models. The forecast shows the probability of visible aurora at different latitudes.",
+      "howWeUseIt": "Aurora probability is displayed as a color overlay for both northern and southern hemispheres. Higher probabilities (shown in brighter colors) indicate better chances of seeing the aurora.",
+      "processing": "We fetch the 30-minute aurora forecast from SWPC every 30 minutes. The forecast data is rendered as an overlay showing aurora oval position and intensity.",
+      "limitations": "Aurora visibility depends heavily on local weather (clear skies required), light pollution, and exact timing. The forecast shows statistical probability, not guaranteed viewing."
+    },
+    "waves": {
+      "title": "Ocean Waves",
+      "shortDescription": "Significant wave height forecasts",
+      "description": "NOAA's WAVEWATCH III is a third-generation spectral wave model that provides forecasts of wave height, period, and direction. The model covers global oceans and is updated every 3 hours.",
+      "howWeUseIt": "Significant wave height is displayed as a color-coded ocean overlay, from calm (blue) to extreme (red). This helps mariners and coastal communities understand sea conditions.",
+      "processing": "Wave data is fetched from NOAA servers in GRIB2 format. We extract significant wave height and render as a semi-transparent overlay over ocean areas.",
+      "limitations": "Model resolution may not capture wave conditions in complex coastal areas. Actual wave heights can vary significantly over short distances due to local bathymetry and wind patterns."
+    },
+    "ocean-currents": {
+      "title": "Ocean Currents",
+      "shortDescription": "Surface current flow visualization",
+      "description": "NOAA's OSCAR (Ocean Surface Current Analysis Real-time) provides estimates of ocean surface currents derived from satellite measurements of sea surface height, wind, and temperature. This reveals major ocean circulation patterns.",
+      "howWeUseIt": "Ocean currents are visualized as animated particle flows, similar to wind animation. Particles follow current vectors, revealing features like the Gulf Stream, Kuroshio, and equatorial currents.",
+      "processing": "Current data is fetched from NOAA ERDDAP servers. We interpolate to our display grid and animate particles following the current vectors.",
+      "limitations": "OSCAR provides near-surface currents which may differ from deeper flows. Resolution is coarse (~1/3°) so coastal and small-scale features may not be captured. Data is updated every 5 days."
+    },
+    "sea-temperature": {
+      "title": "Sea Surface Temperature",
+      "shortDescription": "Ocean surface temperature analysis",
+      "description": "NOAA's Optimum Interpolation Sea Surface Temperature (OISST) combines observations from ships, buoys, and satellites to produce a daily global SST analysis at 0.25° resolution.",
+      "howWeUseIt": "SST is displayed as a color-coded overlay from cold (blue) through warm (green/yellow) to hot (red). Temperature anomalies and patterns like El Niño/La Niña are visible.",
+      "processing": "Daily SST data is fetched from NOAA and rendered as a semi-transparent overlay. The color scale is optimized to show the full range of ocean temperatures.",
+      "limitations": "SST represents skin temperature which may differ from bulk water temperature. Coastal areas and regions with heavy cloud cover may have less accurate estimates."
+    },
+    "aircraft": {
+      "title": "Aircraft Tracking",
+      "shortDescription": "Real-time flight positions via ADS-B",
+      "description": "The OpenSky Network is a community-based receiver network that collects ADS-B (Automatic Dependent Surveillance-Broadcast) data from aircraft. This provides real-time position, altitude, speed, and identification for most commercial and many private aircraft.",
+      "howWeUseIt": "Aircraft are displayed as icons on the map, rotated to show heading. Clicking an aircraft shows flight details including callsign, altitude, speed, and origin/destination when available.",
+      "processing": "Aircraft data is fetched from OpenSky when the user pans or zooms the map. We filter to the visible map area to reduce data volume and improve performance.",
+      "limitations": "Coverage depends on community receiver distribution - some regions have gaps. Not all aircraft transmit ADS-B. Military and some private aircraft may not appear. Data has a 5-10 second delay."
+    },
+    "lightning": {
+      "title": "Lightning Detection",
+      "shortDescription": "Real-time lightning strike locations",
+      "description": "Blitzortung.org operates a community network of lightning detectors that use time-of-arrival methods to locate lightning strikes. The network covers most of Europe, North America, Asia, and Oceania.",
+      "howWeUseIt": "Lightning strikes are displayed as markers that fade over time (last 30 minutes shown). Recent strikes appear brighter. This helps track thunderstorm movement and intensity.",
+      "processing": "We fetch recent strike data from Blitzortung every few minutes. Strikes are displayed with timestamps and fade based on age to show storm progression.",
+      "limitations": "Detection accuracy varies by region based on sensor density. Some strikes may not be detected or may have position errors of several kilometers. Cloud-to-cloud lightning is not reliably detected."
+    },
+    "kiwisdr": {
+      "title": "KiwiSDR Network",
+      "shortDescription": "Web-accessible software-defined radios",
+      "description": "KiwiSDR is a software-defined radio that covers 0-30 MHz and allows remote access via web browser. The network consists of hundreds of receivers worldwide, enabling anyone to listen to shortwave, amateur radio, and other signals.",
+      "howWeUseIt": "KiwiSDR receivers are shown as markers on the map. Clicking a receiver opens its web interface where you can tune to different frequencies and listen live.",
+      "processing": "We fetch the KiwiSDR network status periodically to show active receivers. Each marker links directly to that receiver's web interface.",
+      "limitations": "Receiver availability depends on individual operators. Some receivers may be offline or have user limits. Audio quality and frequency coverage vary by receiver setup."
+    },
+    "aprs": {
+      "title": "APRS Network",
+      "shortDescription": "Amateur radio position reporting",
+      "description": "APRS (Automatic Packet Reporting System) is an amateur radio-based system for real-time digital communications. It's used by ham radio operators to share position, weather data, messages, and telemetry.",
+      "howWeUseIt": "APRS stations are displayed as markers on the map. Different symbols indicate station types (home station, mobile, weather station, digipeater). Clicking shows station details and recent activity.",
+      "processing": "Data is fetched from APRS-IS servers based on the visible map area. We filter and display stations with recent activity.",
+      "limitations": "APRS requires amateur radio license to transmit. Coverage depends on digipeater infrastructure. Position accuracy varies from GPS-precise to approximate."
+    },
+    "ionosphere": {
+      "title": "Ionosphere & Space Weather",
+      "shortDescription": "Solar activity and radio propagation conditions",
+      "description": "NOAA's Space Weather Prediction Center monitors solar activity and its effects on Earth's ionosphere. Key indices include the Kp index (geomagnetic activity), solar flux (solar radio emission), and X-ray flux (solar flares).",
+      "howWeUseIt": "Space weather data is displayed in an info panel showing current conditions. We also display Total Electron Content (TEC) maps that show ionospheric density, which affects GPS accuracy and HF radio propagation.",
+      "processing": "We fetch space weather indices from SWPC and TEC maps from NASA. Data is displayed in real-time to help users understand current radio propagation and GPS conditions.",
+      "limitations": "Space weather can change rapidly during solar events. TEC maps have limited resolution and are interpolated from GPS receiver data. Predictions beyond a few days have high uncertainty."
+    }
   }
 }

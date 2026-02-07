@@ -375,5 +375,167 @@
     "gdacsDescription": "Alertas de desastres globais GDACS: sismos, cheias, ciclones, vulcões, incêndios florestais, secas. Atualizado a cada 10 minutos.",
     "gdacsCount": "{count} eventos",
     "gdacsReport": "Relatório GDACS"
+  },
+  "dataSourcePages": {
+    "categories": {
+      "hazards": "Riscos Naturais",
+      "weather": "Meteorologia",
+      "environment": "Ambiente",
+      "ocean": "Oceano e Mar",
+      "radio": "Rádio e Rastreamento",
+      "space": "Clima Espacial"
+    },
+    "earthquakes": {
+      "title": "Sismos",
+      "shortDescription": "Monitorização global de atividade sísmica",
+      "description": "O Programa de Riscos Sísmicos do USGS fornece dados sísmicos em tempo real de uma rede global de sismómetros. O programa monitoriza e reporta sismos em todo o mundo, fornecendo magnitude, localização, profundidade e outros parâmetros para cada evento.",
+      "howWeUseIt": "O Sentinela obtém dados sísmicos filtrados por intervalo de tempo e magnitude mínima. Os eventos são exibidos como marcadores no mapa com tamanho proporcional à magnitude. Ao clicar num sismo, são mostradas informações detalhadas incluindo magnitude, profundidade, localização e link para a página do evento no USGS.",
+      "processing": "Os dados são obtidos do feed GeoJSON do USGS a cada 2 minutos. Filtramos eventos com base no intervalo de tempo selecionado pelo utilizador (1h, 6h, 24h, 7d) e aplicamos um limiar de magnitude mínima para evitar sobrecarregar o mapa com sismos muito pequenos.",
+      "limitations": "Pode haver um atraso de 1-5 minutos entre a ocorrência de um sismo e a sua aparição no nosso feed. Sismos muito pequenos (< M2.5) podem não ser detetados em todas as regiões. Os dados preliminares podem ser revistos à medida que mais estações sísmicas reportam."
+    },
+    "fires": {
+      "title": "Incêndios Ativos",
+      "shortDescription": "Focos de incêndio detetados por satélite",
+      "description": "O FIRMS (Fire Information for Resource Management System) da NASA fornece dados de incêndios ativos dos instrumentos satelitais VIIRS e MODIS. Estes sensores detetam anomalias térmicas que indicam combustão ativa.",
+      "howWeUseIt": "Exibimos focos de incêndio como marcadores de calor no mapa, com brilho indicando a intensidade do fogo (medida em Kelvin). Cada marcador mostra tempo de deteção, fonte do satélite e potência radiativa do fogo quando disponível.",
+      "processing": "Os dados de incêndios são obtidos a cada 10 minutos da API do FIRMS. Filtramos para mostrar apenas as últimas 24 horas de deteções. Os focos são agrupados em níveis de zoom mais baixos para melhorar o desempenho do mapa quando muitos incêndios estão ativos.",
+      "limitations": "Os satélites passam sobre cada localização apenas algumas vezes por dia, pelo que podem existir lacunas na deteção. A cobertura de nuvens pode obscurecer a deteção de incêndios. Incêndios pequenos ou de baixa intensidade podem não ser detetados. Podem ocorrer falsos positivos de fontes de calor industriais ou reflexo solar."
+    },
+    "gdacs": {
+      "title": "Desastres Globais",
+      "shortDescription": "Alertas de desastres multi-risco",
+      "description": "O Sistema Global de Alerta e Coordenação de Desastres (GDACS) é um quadro de cooperação entre as Nações Unidas, a Comissão Europeia e gestores de desastres em todo o mundo. Fornece alertas quase em tempo real sobre desastres naturais e ferramentas para facilitar a coordenação da resposta.",
+      "howWeUseIt": "O Sentinela exibe alertas GDACS para sismos, cheias, ciclones tropicais, vulcões, incêndios florestais e secas. Os eventos são codificados por cor segundo o nível de alerta (Verde, Laranja, Vermelho) e incluem estimativas de gravidade e dados de população afetada.",
+      "processing": "Obtemos o feed GeoRSS do GDACS a cada 10 minutos. Os eventos são analisados e exibidos com ícones apropriados para cada tipo de desastre. Para ciclones tropicais, também exibimos trajetórias previstas e raios de vento quando disponíveis.",
+      "limitations": "O GDACS foca-se em eventos com potencial impacto humanitário, pelo que eventos menores podem não ser incluídos. Os níveis de alerta são estimativas e podem ser revistos. Alguns tipos de desastre têm atrasos de deteção mais longos do que outros."
+    },
+    "warnings": {
+      "title": "Avisos Meteorológicos",
+      "shortDescription": "Alertas meteorológicos oficiais para Portugal",
+      "description": "O IPMA (Instituto Português do Mar e da Atmosfera) emite avisos meteorológicos oficiais para Portugal. Os avisos cobrem fenómenos meteorológicos severos incluindo vento forte, chuva intensa, temperaturas extremas, neve, nevoeiro e trovoadas.",
+      "howWeUseIt": "Exibimos avisos ativos por distrito no mapa. Os distritos são coloridos de acordo com o nível de aviso mais elevado ativo (amarelo, laranja, vermelho). Ao clicar num distrito, são mostrados todos os avisos ativos com os seus períodos de validade e descrições.",
+      "processing": "Os dados de avisos são obtidos a cada 15 minutos da API do IPMA. Agregamos avisos por distrito e determinamos o nível de aviso ativo mais elevado para coloração do mapa.",
+      "limitations": "Os avisos são específicos para Portugal continental e ilhas. Os limites dos avisos seguem distritos administrativos, que podem não corresponder precisamente aos padrões meteorológicos. As atualizações podem demorar 15-30 minutos a aparecer."
+    },
+    "weather-tiles": {
+      "title": "Camadas Meteorológicas",
+      "shortDescription": "Radar meteorológico e imagens de satélite em tempo real",
+      "description": "O OpenWeatherMap fornece camadas de mapa meteorológico mostrando radar de precipitação, cobertura de nuvens, temperatura, velocidade do vento e pressão atmosférica. Estas camadas são atualizadas a cada 10 minutos e fornecem uma visão geral das condições meteorológicas atuais.",
+      "howWeUseIt": "Os utilizadores podem alternar diferentes camadas meteorológicas no painel de Camadas. As camadas sobrepõem-se ao mapa base com semi-transparência, permitindo ver padrões meteorológicos mantendo o contexto geográfico.",
+      "processing": "As camadas de mapa são obtidas diretamente dos servidores de tiles do OpenWeatherMap através do nosso proxy API. Fazemos cache de tiles brevemente para reduzir chamadas à API e melhorar o desempenho.",
+      "limitations": "A cobertura do radar de precipitação varia por região - algumas áreas têm redes de radar mais densas do que outras. As camadas baseadas em satélite têm atrasos inerentes. As escalas de cor são otimizadas para cobertura global e podem não mostrar variações subtis."
+    },
+    "gfs-forecast": {
+      "title": "Previsão Meteorológica GFS",
+      "shortDescription": "Previsões meteorológicas globais da NOAA",
+      "description": "O Sistema de Previsão Global (GFS) é um modelo de previsão meteorológica produzido pelo NCEP. Fornece previsões de temperatura, humidade, precipitação, cobertura de nuvens e instabilidade atmosférica (CAPE) até 16 dias.",
+      "howWeUseIt": "Exibimos dados de previsão GFS como sobreposições codificadas por cor no mapa. As camadas disponíveis incluem temperatura a 2m, humidade relativa, acumulação de precipitação, cobertura de nuvens e CAPE (potencial de tempestade). Os utilizadores podem ver condições atuais e previsões a curto prazo.",
+      "processing": "Os dados GFS são obtidos dos servidores NOAA NOMADS em formato GRIB2. Extraímos parâmetros relevantes, interpolamos para a nossa grelha de exibição e geramos camadas de mapa. Os dados são atualizados a cada 6 horas quando novas execuções do GFS são concluídas.",
+      "limitations": "O GFS tem uma resolução de 0.25° (~25km), pelo que variações locais podem não ser capturadas. A precisão da previsão diminui com o tempo. Alguns parâmetros como precipitação podem ter incerteza significativa."
+    },
+    "wind-flow": {
+      "title": "Animação de Vento",
+      "shortDescription": "Padrões de vento globais animados",
+      "description": "A visualização de fluxo de vento usa dados de componentes U e V do vento do modelo GFS para criar um fluxo de partículas animado mostrando direção e velocidade do vento. Isto fornece uma visão intuitiva dos padrões de circulação atmosférica.",
+      "howWeUseIt": "Quando ativado, partículas animadas fluem pelo mapa seguindo vetores de vento. A velocidade das partículas indica a força do vento, e os padrões de fluxo revelam características como correntes de jato, ciclones e ventos alísios.",
+      "processing": "Extraímos componentes U e V do vento a 10m dos dados GFS e criamos um campo vetorial. A animação usa WebGL para renderizar eficientemente milhares de partículas que seguem o campo de vento.",
+      "limitations": "A animação mostra ventos de superfície (altura de 10m) que podem diferir dos ventos noutras altitudes. A densidade de partículas é equilibrada entre clareza visual e desempenho. Ventos muito fracos podem não mostrar movimento óbvio."
+    },
+    "rainfall": {
+      "title": "Observações de Precipitação",
+      "shortDescription": "Dados de precipitação de estações meteorológicas para Portugal",
+      "description": "O IPMA opera uma rede de mais de 200 estações meteorológicas em Portugal que reportam precipitação acumulada. Estes dados fornecem medições reais de precipitação para o país.",
+      "howWeUseIt": "As estações meteorológicas são exibidas como marcadores no mapa, coloridos por quantidade de precipitação. Ao clicar numa estação, são mostradas informações detalhadas incluindo totais de acumulação de 1 hora, 6 horas e 24 horas.",
+      "processing": "Obtemos dados de estações a cada 10 minutos da API do IPMA. Os valores de precipitação são codificados por cor de verde (leve) através de amarelo e laranja até vermelho (intensa).",
+      "limitations": "A cobertura é limitada a Portugal. Algumas áreas remotas têm cobertura de estações esparsa. Os dados de estação representam medições pontuais e podem não capturar chuva intensa localizada entre estações."
+    },
+    "air-quality": {
+      "title": "Qualidade do Ar",
+      "shortDescription": "Monitorização global de poluição PM2.5",
+      "description": "O projeto World Air Quality Index (WAQI) agrega dados de qualidade do ar de estações de monitorização em todo o mundo. Exibimos concentrações de PM2.5 (partículas finas), que são o indicador mais relevante para impactos na saúde.",
+      "howWeUseIt": "As estações de qualidade do ar são exibidas como marcadores coloridos por nível AQI. Usamos ponderação por distância inversa (IDW) para interpolar entre estações e criar um mapa de poluição contínuo.",
+      "processing": "Os dados são obtidos de hora em hora da API WAQI. Interpolamos valores de PM2.5 numa grelha e renderizamos como sobreposição semi-transparente. As categorias AQI seguem os padrões da EPA (Bom, Moderado, Insalubre para Grupos Sensíveis, etc.).",
+      "limitations": "A densidade de estações varia muito por região - áreas urbanas têm melhor cobertura. A interpolação entre estações esparsas pode não refletir condições reais. A qualidade do ar interior pode diferir significativamente das leituras exteriores."
+    },
+    "uv-index": {
+      "title": "Índice UV",
+      "shortDescription": "Níveis de radiação ultravioleta solar",
+      "description": "O índice UV do TEMIS é derivado de observações por satélite de ozono e cobertura de nuvens, combinadas com cálculos de geometria solar. Indica a intensidade da radiação UV à superfície da Terra.",
+      "howWeUseIt": "Os valores do índice UV são exibidos como sobreposição codificada por cor de verde (baixo) através de amarelo e laranja até roxo (extremo). Isto ajuda os utilizadores a compreender as necessidades de proteção solar.",
+      "processing": "Mapas diários de índice UV são obtidos do TEMIS. Os valores são interpolados para a nossa grelha de exibição e renderizados como sobreposição semi-transparente.",
+      "limitations": "O índice UV é uma média diária e não reflete variações de nuvens em tempo real. A exposição real aos UV depende de muitos fatores incluindo altitude, reflexão de superfície e hora do dia."
+    },
+    "aurora": {
+      "title": "Previsão de Aurora",
+      "shortDescription": "Visibilidade de Auroras Boreais e Austrais",
+      "description": "O Centro de Previsão do Clima Espacial da NOAA fornece previsões de aurora baseadas em medições do vento solar e modelos geomagnéticos. A previsão mostra a probabilidade de aurora visível em diferentes latitudes.",
+      "howWeUseIt": "A probabilidade de aurora é exibida como sobreposição colorida para os hemisférios norte e sul. Probabilidades mais altas (mostradas em cores mais brilhantes) indicam melhores hipóteses de ver a aurora.",
+      "processing": "Obtemos a previsão de aurora de 30 minutos do SWPC a cada 30 minutos. Os dados de previsão são renderizados como sobreposição mostrando posição e intensidade do oval auroral.",
+      "limitations": "A visibilidade da aurora depende muito do tempo local (céu limpo necessário), poluição luminosa e timing exato. A previsão mostra probabilidade estatística, não visualização garantida."
+    },
+    "waves": {
+      "title": "Ondas Oceânicas",
+      "shortDescription": "Previsões de altura significativa de ondas",
+      "description": "O WAVEWATCH III da NOAA é um modelo espectral de ondas de terceira geração que fornece previsões de altura, período e direção das ondas. O modelo cobre oceanos globais e é atualizado a cada 3 horas.",
+      "howWeUseIt": "A altura significativa das ondas é exibida como sobreposição oceânica codificada por cor, de calmo (azul) a extremo (vermelho). Isto ajuda marinheiros e comunidades costeiras a compreender as condições do mar.",
+      "processing": "Os dados de ondas são obtidos dos servidores da NOAA em formato GRIB2. Extraímos a altura significativa das ondas e renderizamos como sobreposição semi-transparente sobre áreas oceânicas.",
+      "limitations": "A resolução do modelo pode não capturar condições de ondas em áreas costeiras complexas. As alturas reais das ondas podem variar significativamente em distâncias curtas devido a batimetria local e padrões de vento."
+    },
+    "ocean-currents": {
+      "title": "Correntes Oceânicas",
+      "shortDescription": "Visualização de fluxo de correntes de superfície",
+      "description": "O OSCAR da NOAA fornece estimativas de correntes de superfície oceânica derivadas de medições por satélite de altura da superfície do mar, vento e temperatura. Isto revela os principais padrões de circulação oceânica.",
+      "howWeUseIt": "As correntes oceânicas são visualizadas como fluxos de partículas animados, semelhante à animação de vento. As partículas seguem vetores de corrente, revelando características como a Corrente do Golfo, Kuroshio e correntes equatoriais.",
+      "processing": "Os dados de correntes são obtidos dos servidores ERDDAP da NOAA. Interpolamos para a nossa grelha de exibição e animamos partículas seguindo os vetores de corrente.",
+      "limitations": "O OSCAR fornece correntes próximas da superfície que podem diferir de fluxos mais profundos. A resolução é grosseira (~1/3°) pelo que características costeiras e de pequena escala podem não ser capturadas. Os dados são atualizados a cada 5 dias."
+    },
+    "sea-temperature": {
+      "title": "Temperatura da Superfície do Mar",
+      "shortDescription": "Análise de temperatura da superfície oceânica",
+      "description": "O OISST da NOAA combina observações de navios, boias e satélites para produzir uma análise diária global de temperatura da superfície do mar com resolução de 0.25°.",
+      "howWeUseIt": "A temperatura é exibida como sobreposição codificada por cor de frio (azul) através de quente (verde/amarelo) até muito quente (vermelho). Anomalias de temperatura e padrões como El Niño/La Niña são visíveis.",
+      "processing": "Dados diários de temperatura são obtidos da NOAA e renderizados como sobreposição semi-transparente. A escala de cor é otimizada para mostrar a gama completa de temperaturas oceânicas.",
+      "limitations": "A temperatura representa a temperatura da pele que pode diferir da temperatura da massa de água. Áreas costeiras e regiões com cobertura de nuvens pesada podem ter estimativas menos precisas."
+    },
+    "aircraft": {
+      "title": "Rastreamento de Aeronaves",
+      "shortDescription": "Posições de voo em tempo real via ADS-B",
+      "description": "A OpenSky Network é uma rede de recetores baseada na comunidade que recolhe dados ADS-B de aeronaves. Isto fornece posição em tempo real, altitude, velocidade e identificação para a maioria das aeronaves comerciais e muitas privadas.",
+      "howWeUseIt": "As aeronaves são exibidas como ícones no mapa, rodados para mostrar o rumo. Ao clicar numa aeronave, são mostrados detalhes do voo incluindo indicativo de chamada, altitude, velocidade e origem/destino quando disponível.",
+      "processing": "Os dados de aeronaves são obtidos da OpenSky quando o utilizador move ou faz zoom no mapa. Filtramos para a área visível do mapa para reduzir o volume de dados e melhorar o desempenho.",
+      "limitations": "A cobertura depende da distribuição de recetores da comunidade - algumas regiões têm lacunas. Nem todas as aeronaves transmitem ADS-B. Aeronaves militares e algumas privadas podem não aparecer. Os dados têm um atraso de 5-10 segundos."
+    },
+    "lightning": {
+      "title": "Deteção de Relâmpagos",
+      "shortDescription": "Localizações de descargas elétricas em tempo real",
+      "description": "O Blitzortung.org opera uma rede comunitária de detetores de relâmpagos que usam métodos de tempo de chegada para localizar descargas. A rede cobre a maior parte da Europa, América do Norte, Ásia e Oceânia.",
+      "howWeUseIt": "As descargas são exibidas como marcadores que desvanecem ao longo do tempo (últimos 30 minutos mostrados). Descargas recentes aparecem mais brilhantes. Isto ajuda a rastrear o movimento e intensidade de trovoadas.",
+      "processing": "Obtemos dados de descargas recentes do Blitzortung a cada poucos minutos. As descargas são exibidas com carimbos temporais e desvanecem com base na idade para mostrar a progressão da tempestade.",
+      "limitations": "A precisão da deteção varia por região com base na densidade de sensores. Algumas descargas podem não ser detetadas ou podem ter erros de posição de vários quilómetros. Relâmpagos nuvem-a-nuvem não são detetados de forma fiável."
+    },
+    "kiwisdr": {
+      "title": "Rede KiwiSDR",
+      "shortDescription": "Rádios definidos por software acessíveis pela web",
+      "description": "O KiwiSDR é um rádio definido por software que cobre 0-30 MHz e permite acesso remoto via navegador web. A rede consiste em centenas de recetores em todo o mundo, permitindo que qualquer pessoa ouça ondas curtas, rádio amador e outros sinais.",
+      "howWeUseIt": "Os recetores KiwiSDR são mostrados como marcadores no mapa. Ao clicar num recetor, abre a sua interface web onde pode sintonizar diferentes frequências e ouvir em direto.",
+      "processing": "Obtemos o estado da rede KiwiSDR periodicamente para mostrar recetores ativos. Cada marcador liga diretamente à interface web desse recetor.",
+      "limitations": "A disponibilidade do recetor depende de operadores individuais. Alguns recetores podem estar offline ou ter limites de utilizadores. A qualidade de áudio e cobertura de frequência variam conforme a configuração do recetor."
+    },
+    "aprs": {
+      "title": "Rede APRS",
+      "shortDescription": "Reporte de posição por rádio amador",
+      "description": "O APRS (Automatic Packet Reporting System) é um sistema baseado em rádio amador para comunicações digitais em tempo real. É usado por radioamadores para partilhar posição, dados meteorológicos, mensagens e telemetria.",
+      "howWeUseIt": "As estações APRS são exibidas como marcadores no mapa. Símbolos diferentes indicam tipos de estação (estação doméstica, móvel, estação meteorológica, digipeater). Ao clicar, são mostrados detalhes da estação e atividade recente.",
+      "processing": "Os dados são obtidos de servidores APRS-IS com base na área visível do mapa. Filtramos e exibimos estações com atividade recente.",
+      "limitations": "O APRS requer licença de radioamador para transmitir. A cobertura depende da infraestrutura de digipeaters. A precisão da posição varia de GPS preciso a aproximada."
+    },
+    "ionosphere": {
+      "title": "Ionosfera e Clima Espacial",
+      "shortDescription": "Atividade solar e condições de propagação rádio",
+      "description": "O Centro de Previsão do Clima Espacial da NOAA monitoriza a atividade solar e os seus efeitos na ionosfera da Terra. Índices chave incluem o índice Kp (atividade geomagnética), fluxo solar (emissão rádio solar) e fluxo de raios-X (erupções solares).",
+      "howWeUseIt": "Os dados do clima espacial são exibidos num painel de informação mostrando condições atuais. Também exibimos mapas de Conteúdo Total de Eletrões (TEC) que mostram densidade ionosférica, que afeta a precisão do GPS e propagação de rádio HF.",
+      "processing": "Obtemos índices de clima espacial do SWPC e mapas TEC da NASA. Os dados são exibidos em tempo real para ajudar os utilizadores a compreender as condições atuais de propagação rádio e GPS.",
+      "limitations": "O clima espacial pode mudar rapidamente durante eventos solares. Os mapas TEC têm resolução limitada e são interpolados a partir de dados de recetores GPS. Previsões além de alguns dias têm alta incerteza."
+    }
   }
 }

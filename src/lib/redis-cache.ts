@@ -41,13 +41,17 @@ function initRedis(): { mode: RedisMode; upstash: UpstashRedis | null; ioredis: 
     return { mode, upstash: null, ioredis: ioredisClient };
   }
 
-  // Default to Upstash HTTP mode (Vercel KV uses same API)
-  if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
+  // Check for Upstash credentials (preferred)
+  const upstashUrl = env.UPSTASH_REDIS_REST_URL || env.KV_REST_API_URL;
+  const upstashToken = env.UPSTASH_REDIS_REST_TOKEN || env.KV_REST_API_TOKEN;
+
+  if (upstashUrl && upstashToken) {
     mode = "upstash";
     upstashClient = new UpstashRedis({
-      url: env.KV_REST_API_URL,
-      token: env.KV_REST_API_TOKEN,
+      url: upstashUrl,
+      token: upstashToken,
     });
+    console.log("[redis-cache] Using Upstash HTTP mode");
     return { mode, upstash: upstashClient, ioredis: null };
   }
 
