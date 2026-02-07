@@ -39,18 +39,19 @@ type OpenSkyResponse = {
   states: OpenSkyState[] | null;
 };
 
+// Compact aircraft type for Redis storage (~50% smaller)
 export type Aircraft = {
-  icao24: string;
-  callsign: string | null;
-  latitude: number;
-  longitude: number;
-  altitude: number | null;
-  velocity: number | null;
-  heading: number | null;
-  verticalRate: number | null;
-  onGround: boolean;
-  lastContact: number;
-  originCountry: string;
+  i: string;        // icao24
+  c?: string;       // callsign (omitted if null)
+  la: number;       // latitude (3 decimals)
+  lo: number;       // longitude (3 decimals)
+  al?: number;      // altitude (omitted if null, rounded)
+  v?: number;       // velocity (omitted if null, rounded)
+  h?: number;       // heading (omitted if null, rounded)
+  vr?: number;      // verticalRate (omitted if null, rounded)
+  g: boolean;       // onGround
+  t: number;        // lastContact
+  o: string;        // originCountry
 };
 
 export class AircraftCollector extends BaseCollector {
@@ -168,18 +169,23 @@ export class AircraftCollector extends BaseCollector {
 
     return data.states
       .filter((state) => state[5] !== null && state[6] !== null)
-      .map((state) => ({
-        icao24: state[0],
-        callsign: state[1]?.trim() || null,
-        originCountry: state[2],
-        lastContact: state[4],
-        longitude: state[5]!,
-        latitude: state[6]!,
-        altitude: state[7],
-        onGround: state[8],
-        velocity: state[9],
-        heading: state[10],
-        verticalRate: state[11],
-      }));
+      .map((state): Aircraft => {
+        const aircraft: Aircraft = {
+          i: state[0],
+          la: Math.round(state[6]! * 1000) / 1000,
+          lo: Math.round(state[5]! * 1000) / 1000,
+          g: state[8],
+          t: state[4],
+          o: state[2],
+        };
+        // Only include optional fields if they have values
+        const callsign = state[1]?.trim();
+        if (callsign) aircraft.c = callsign;
+        if (state[7] !== null) aircraft.al = Math.round(state[7]);
+        if (state[9] !== null) aircraft.v = Math.round(state[9]);
+        if (state[10] !== null) aircraft.h = Math.round(state[10]);
+        if (state[11] !== null) aircraft.vr = Math.round(state[11]);
+        return aircraft;
+      });
   }
 }

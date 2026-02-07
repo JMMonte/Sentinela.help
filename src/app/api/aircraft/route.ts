@@ -5,9 +5,26 @@ import { getFromRedis } from "@/lib/redis-cache";
  * GET /api/aircraft
  *
  * Returns aircraft positions from Redis cache, filtered by bounding box.
+ * Expands compact format from worker to full format for frontend.
  * Query params: lamin, lamax, lomin, lomax (all optional)
  */
 
+// Compact format from worker
+type AircraftCompact = {
+  i: string;
+  c?: string;
+  la: number;
+  lo: number;
+  al?: number;
+  v?: number;
+  h?: number;
+  vr?: number;
+  g: boolean;
+  t: number;
+  o: string;
+};
+
+// Full format for frontend
 export type Aircraft = {
   icao24: string;
   callsign: string | null;
@@ -22,9 +39,25 @@ export type Aircraft = {
   originCountry: string;
 };
 
+function expandAircraft(compact: AircraftCompact): Aircraft {
+  return {
+    icao24: compact.i,
+    callsign: compact.c ?? null,
+    latitude: compact.la,
+    longitude: compact.lo,
+    altitude: compact.al ?? null,
+    velocity: compact.v ?? null,
+    heading: compact.h ?? null,
+    verticalRate: compact.vr ?? null,
+    onGround: compact.g,
+    lastContact: compact.t,
+    originCountry: compact.o,
+  };
+}
+
 export async function GET(request: Request) {
   try {
-    const data = await getFromRedis<Aircraft[]>("kaos:aircraft:global");
+    const data = await getFromRedis<AircraftCompact[]>("kaos:aircraft:global");
 
     if (!data) {
       return NextResponse.json(
@@ -40,9 +73,8 @@ export async function GET(request: Request) {
     const lomin = url.searchParams.get("lomin");
     const lomax = url.searchParams.get("lomax");
 
+    // Filter by bounding box BEFORE expanding (use compact field names)
     let filtered = data;
-
-    // Filter by bounding box if provided
     if (lamin && lamax && lomin && lomax) {
       const bounds = {
         lamin: parseFloat(lamin),
@@ -53,14 +85,17 @@ export async function GET(request: Request) {
 
       filtered = data.filter(
         (a) =>
-          a.latitude >= bounds.lamin &&
-          a.latitude <= bounds.lamax &&
-          a.longitude >= bounds.lomin &&
-          a.longitude <= bounds.lomax
+          a.la >= bounds.lamin &&
+          a.la <= bounds.lamax &&
+          a.lo >= bounds.lomin &&
+          a.lo <= bounds.lomax
       );
     }
 
-    return NextResponse.json(filtered, {
+    // Expand compact format to full format
+    const aircraft = filtered.map(expandAircraft);
+
+    return NextResponse.json(aircraft, {
       headers: {
         "Cache-Control": "no-cache",
       },

@@ -13,7 +13,8 @@ import { fetchWithRetry } from "../utils/fetch.js";
 // The new endpoint returns HTML with embedded station data in comments
 const KIWISDR_URL = "http://kiwisdr.com/.public/";
 
-export type KiwiStation = {
+// Full station type (used internally during parsing)
+type KiwiStationFull = {
   name: string;
   url: string;
   latitude: number;
@@ -24,6 +25,20 @@ export type KiwiStation = {
   location: string | null;
   snr: number | null;
   offline: boolean;
+};
+
+// Compact station type for Redis storage (~60% smaller)
+export type KiwiStation = {
+  n: string;        // name
+  u: string;        // url
+  la: number;       // latitude (3 decimals)
+  lo: number;       // longitude (3 decimals)
+  us: number;       // users
+  mx: number;       // usersMax
+  an?: string;      // antenna (omitted if null)
+  lc?: string;      // location (omitted if null)
+  sn?: number;      // snr (omitted if null)
+  of: boolean;      // offline
 };
 
 export class KiwiSdrCollector extends BaseCollector {
@@ -50,7 +65,25 @@ export class KiwiSdrCollector extends BaseCollector {
     );
 
     const html = await response.text();
-    const stations = this.parseHtmlStations(html);
+    const fullStations = this.parseHtmlStations(html);
+
+    // Convert to compact format for storage
+    const stations = fullStations.map((s): KiwiStation => {
+      const compact: KiwiStation = {
+        n: s.name,
+        u: s.url,
+        la: Math.round(s.latitude * 1000) / 1000,
+        lo: Math.round(s.longitude * 1000) / 1000,
+        us: s.users,
+        mx: s.usersMax,
+        of: s.offline,
+      };
+      // Only include optional fields if they have values
+      if (s.antenna) compact.an = s.antenna;
+      if (s.location) compact.lc = s.location;
+      if (s.snr !== null) compact.sn = s.snr;
+      return compact;
+    });
 
     this.logger.debug("KiwiSDR stations parsed", {
       total: stations.length,
@@ -63,8 +96,8 @@ export class KiwiSdrCollector extends BaseCollector {
    * Parse station data from HTML with embedded comments.
    * Each station is in a div.cl-entry with data in HTML comments.
    */
-  private parseHtmlStations(html: string): KiwiStation[] {
-    const stations: KiwiStation[] = [];
+  private parseHtmlStations(html: string): KiwiStationFull[] {
+    const stations: KiwiStationFull[] = [];
 
     // Match each cl-entry div block
     const entryRegex = /<div class='cl-entry[^']*'>([\s\S]*?)<\/div>\s*<\/div>/g;
@@ -84,7 +117,7 @@ export class KiwiSdrCollector extends BaseCollector {
   /**
    * Parse a single station entry from its HTML block.
    */
-  private parseStationEntry(html: string): KiwiStation | null {
+  private parseStationEntry(html: string): KiwiStationFull | null {
     // Extract comment values using regex
     const getComment = (key: string): string | null => {
       const regex = new RegExp(`<!-- ${key}=([^>]+) -->`);
