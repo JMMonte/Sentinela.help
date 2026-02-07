@@ -95,6 +95,7 @@ export class GdacsCollector extends BaseCollector {
                     lat: cy,
                     time: timeLabel,
                     isForecast,
+                    index: idx,
                 });
             }
             // Extract forecast cone from Poly_Cones
@@ -103,14 +104,9 @@ export class GdacsCollector extends BaseCollector {
                 cyclone.forecastCone = ring[0].map((p) => [p[0], p[1]]);
             }
         }
-        // Sort track points by index (they should already be in order, but ensure it)
+        // Sort track points by index (GDACS provides Point_Polygon_Point_N indices)
         for (const cyclone of tcData.values()) {
-            // Sort by whether it's forecast first, then we'll need to re-sort by time
-            // Actually, the Point_Polygon_Point_N index should give us the order
-            cyclone.trackPoints.sort((a, b) => {
-                // Sort by time string parsing (rough approximation)
-                return a.time.localeCompare(b.time);
-            });
+            cyclone.trackPoints.sort((a, b) => a.index - b.index);
         }
         // Transform API response to our format
         // GDACS returns multiple features per event (Point centroid + Polygon affected area + LineString tracks)

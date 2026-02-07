@@ -178,6 +178,7 @@
     "builtByParagraph2": "Estamos comprometidos em manter o Sentinela aberto, fiável e em constante melhoria. Se tiver feedback ou quiser entrar em contacto, visite-nos em darkmatter.is.",
     "dataSourcesTitle": "Fontes de dados",
     "dataSourcesDescription": "O Sentinela integra dados em tempo real de várias fontes abertas para lhe dar a imagem mais completa do que está a acontecer na sua área.",
+    "dataSourcesLinkDescription": "Saiba como o Sentinela recolhe e apresenta dados em tempo real de mais de 19 fontes.",
     "communityProjectsTitle": "Projetos da comunidade",
     "communityProjectsDescription": "O Sentinela faz parte de um ecossistema crescente de projetos de tecnologia cívica em Portugal. Aqui estão outras iniciativas que fazem um trabalho importante na resposta a emergências e segurança comunitária.",
     "madeWith": "Feito com carinho por",
@@ -384,6 +385,21 @@
       "ocean": "Oceano e Mar",
       "radio": "Rádio e Rastreamento",
       "space": "Clima Espacial"
+    },
+    "ui": {
+      "coverage": "Cobertura",
+      "updateFrequency": "Frequência de atualização",
+      "format": "Formato",
+      "overview": "Visão geral",
+      "howWeUseItTitle": "Como o Sentinela usa estes dados",
+      "dataProcessing": "Processamento de dados",
+      "limitations": "Limitações e considerações",
+      "resources": "Recursos",
+      "apiEndpoint": "Endpoint da API",
+      "documentation": "Documentação",
+      "attributionTitle": "Atribuição e termos",
+      "attributionText": "O Sentinela agrega dados de múltiplas fontes abertas. Cada fonte de dados tem os seus próprios termos de uso e requisitos de atribuição. Agradecemos a todas as organizações que disponibilizam os seus dados publicamente para sensibilização de emergências e fins de investigação.",
+      "dataProviders": "Fornecedores de dados: USGS, NOAA, NASA, IPMA, OpenWeatherMap, OpenSky Network, Blitzortung, GDACS, WAQI, TEMIS, KiwiSDR e APRS-IS."
     },
     "earthquakes": {
       "title": "Sismos",

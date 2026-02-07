@@ -26,9 +26,42 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "about" });
 
+  const title = t("dataSourcesTitle");
+  const description = t("dataSourcesDescription");
+
   return {
-    title: `${t("dataSourcesTitle")} - Sentinela`,
-    description: t("dataSourcesDescription"),
+    title,
+    description,
+    keywords: [
+      "data sources",
+      "API",
+      "earthquake data",
+      "fire data",
+      "weather data",
+      "USGS",
+      "NASA FIRMS",
+      "NOAA",
+      "IPMA",
+      "real-time monitoring",
+      "open data",
+    ],
+    openGraph: {
+      title: `${title} | Sentinela`,
+      description,
+      type: "website",
+    },
+    twitter: {
+      card: "summary",
+      title: `${title} | Sentinela`,
+      description,
+    },
+    alternates: {
+      canonical: `/${locale}/about/data-sources`,
+      languages: {
+        en: "/en/about/data-sources",
+        "pt-PT": "/pt-PT/about/data-sources",
+      },
+    },
   };
 }
 
@@ -239,10 +272,10 @@ export default async function DataSourcesPage({ params }: Props) {
       <h1 className="mb-3 text-3xl font-bold tracking-tight">{t("dataSourcesTitle")}</h1>
       <p className="mb-8 text-lg text-muted-foreground">{t("dataSourcesDescription")}</p>
 
-      <div className="prose prose-zinc dark:prose-invert max-w-none">
+      <div className="prose prose-zinc dark:prose-invert max-w-none prose-h2:border-b prose-h2:border-border prose-h2:pb-2 prose-h2:text-xl prose-h2:font-semibold">
         {dataSourceCategories.map((category) => (
           <section key={category.id} className="mt-8">
-            <h2>{tSources(`categories.${category.id}`)}</h2>
+            <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{tSources(`categories.${category.id}`)}</h2>
             <ul>
               {category.sources.map((source) => {
                 const Icon = source.icon;
@@ -272,15 +305,9 @@ export default async function DataSourcesPage({ params }: Props) {
 
         {/* Attribution Section */}
         <section className="mt-10">
-          <h2>Attribution & Terms</h2>
-          <p>
-            Sentinela aggregates data from multiple open sources. Each data source has its own terms of use
-            and attribution requirements. We are grateful to all the organizations that make their data
-            publicly available for emergency awareness and research purposes.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Data providers: USGS, NOAA, NASA, IPMA, OpenWeatherMap, OpenSky Network, Blitzortung, GDACS, WAQI, TEMIS, KiwiSDR, and APRS-IS.
-          </p>
+          <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{tSources("ui.attributionTitle")}</h2>
+          <p>{tSources("ui.attributionText")}</p>
+          <p className="text-sm text-muted-foreground">{tSources("ui.dataProviders")}</p>
         </section>
       </div>
     </>

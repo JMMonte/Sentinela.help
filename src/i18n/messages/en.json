@@ -178,6 +178,7 @@
     "builtByParagraph2": "We're committed to keeping Sentinela open, reliable, and always improving. If you have feedback or want to get in touch, visit us at darkmatter.is.",
     "dataSourcesTitle": "Data sources",
     "dataSourcesDescription": "Sentinela integrates real-time data from multiple open sources to give you the most complete picture of what's happening in your area.",
+    "dataSourcesLinkDescription": "Learn how Sentinela collects and displays real-time data from 19+ sources.",
     "communityProjectsTitle": "Community projects",
     "communityProjectsDescription": "Sentinela is part of a growing ecosystem of civic tech projects in Portugal. Here are some other initiatives doing important work in emergency response and community safety.",
     "madeWith": "Made with care by",
@@ -384,6 +385,21 @@
       "ocean": "Ocean & Marine",
       "radio": "Radio & Tracking",
       "space": "Space Weather"
+    },
+    "ui": {
+      "coverage": "Coverage",
+      "updateFrequency": "Update frequency",
+      "format": "Format",
+      "overview": "Overview",
+      "howWeUseItTitle": "How Sentinela Uses This Data",
+      "dataProcessing": "Data Processing",
+      "limitations": "Limitations & Considerations",
+      "resources": "Resources",
+      "apiEndpoint": "API Endpoint",
+      "documentation": "Documentation",
+      "attributionTitle": "Attribution & Terms",
+      "attributionText": "Sentinela aggregates data from multiple open sources. Each data source has its own terms of use and attribution requirements. We are grateful to all the organizations that make their data publicly available for emergency awareness and research purposes.",
+      "dataProviders": "Data providers: USGS, NOAA, NASA, IPMA, OpenWeatherMap, OpenSky Network, Blitzortung, GDACS, WAQI, TEMIS, KiwiSDR, and APRS-IS."
     },
     "earthquakes": {
       "title": "Earthquakes",

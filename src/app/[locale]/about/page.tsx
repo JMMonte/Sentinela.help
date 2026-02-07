@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowUpRight,
   ExternalLink,
   Phone,
   AlertTriangle,
@@ -18,9 +17,38 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "about" });
 
+  const title = t("title");
+  const description = t("intro");
+
   return {
-    title: t("title"),
-    description: t("intro"),
+    title,
+    description,
+    keywords: [
+      "Sentinela",
+      "about",
+      "emergency monitoring",
+      "data sources",
+      "real-time alerts",
+      "Portugal",
+      "disaster awareness",
+    ],
+    openGraph: {
+      title: `${title} | Sentinela`,
+      description,
+      type: "website",
+    },
+    twitter: {
+      card: "summary",
+      title: `${title} | Sentinela`,
+      description,
+    },
+    alternates: {
+      canonical: `/${locale}/about`,
+      languages: {
+        en: "/en/about",
+        "pt-PT": "/pt-PT/about",
+      },
+    },
   };
 }
 
@@ -68,20 +96,20 @@ export default async function AboutPage({ params }: Props) {
 
       <h1 className="mb-6 text-3xl font-bold tracking-tight">{t("title")}</h1>
 
-      <div className="prose prose-zinc dark:prose-invert max-w-none">
+      <div className="prose prose-zinc dark:prose-invert max-w-none prose-h2:border-b prose-h2:border-border prose-h2:pb-2 prose-h2:text-xl prose-h2:font-semibold">
         <p className="text-lg text-muted-foreground">{t("intro")}</p>
 
         {/* Data Sources Link */}
-        <p className="mt-6">
-          <Link
-            href={`/${locale}/about/data-sources`}
-            className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline"
-          >
-            {t("dataSourcesTitle")}
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-          {" "}— Learn how Sentinela collects and displays real-time data from 19+ sources.
-        </p>
+        <Link
+          href={`/${locale}/about/data-sources`}
+          className="not-prose mt-8 flex items-center justify-between gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent"
+        >
+          <div>
+            <h2 className="text-lg font-semibold">{t("dataSourcesTitle")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("dataSourcesLinkDescription")}</p>
+          </div>
+          <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
+        </Link>
 
         {/* Emergency Contacts for Portugal */}
         <section className="mt-10 rounded-lg border-2 border-red-500/50 bg-red-500/5 p-6 not-prose">
@@ -141,7 +169,7 @@ export default async function AboutPage({ params }: Props) {
 
         {/* Useful Links */}
         <section className="mt-10">
-          <h2>{t("usefulLinks")}</h2>
+          <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{t("usefulLinks")}</h2>
           <ul>
             {usefulLinks.map((link) => (
               <li key={link.key}>
@@ -149,8 +177,10 @@ export default async function AboutPage({ params }: Props) {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline"
                 >
                   {tLinks(`${link.key}.name`)}
+                  <ExternalLink className="h-3 w-3" />
                 </a>
                 {" — "}
                 <span className="text-muted-foreground">{tLinks(`${link.key}.description`)}</span>
@@ -160,7 +190,7 @@ export default async function AboutPage({ params }: Props) {
         </section>
 
         <section className="mt-10">
-          <h2>{t("howItWorksTitle")}</h2>
+          <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{t("howItWorksTitle")}</h2>
           <ul>
             <li>{t("howItWorks1")}</li>
             <li>{t("howItWorks2")}</li>
@@ -170,37 +200,38 @@ export default async function AboutPage({ params }: Props) {
         </section>
 
         <section className="mt-10">
-          <h2>{t("freeTitle")}</h2>
+          <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{t("freeTitle")}</h2>
           <p>{t("freeParagraph1")}</p>
           <p>{t("freeParagraph2")}</p>
         </section>
 
         <section className="mt-10">
-          <h2>{t("openSourceTitle")}</h2>
+          <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{t("openSourceTitle")}</h2>
           <p>{t("openSourceParagraph1")}</p>
           <p>{t("openSourceParagraph2")}</p>
-          <p>
+          <p className="not-prose mt-4">
             <a
               href="https://github.com/JMMonte/Sentinela.help"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2"
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
             >
               <Github className="h-4 w-4" />
               {t("viewOnGitHub")}
+              <ExternalLink className="h-3 w-3 text-muted-foreground" />
             </a>
           </p>
         </section>
 
         <section className="mt-10">
-          <h2>{t("builtByTitle")}</h2>
+          <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{t("builtByTitle")}</h2>
           <p>{t("builtByParagraph1")}</p>
           <p>{t("builtByParagraph2")}</p>
         </section>
 
         {/* Community Projects */}
         <section className="mt-10">
-          <h2>{t("communityProjectsTitle")}</h2>
+          <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{t("communityProjectsTitle")}</h2>
           <p>{t("communityProjectsDescription")}</p>
           <ul>
             {communityProjects.map((project) => (
@@ -209,9 +240,10 @@ export default async function AboutPage({ params }: Props) {
                   href={project.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline"
                 >
                   {tCommunity(`${project.key}.name`)}
-                  <ArrowUpRight className="ml-0.5 inline h-3.5 w-3.5" />
+                  <ExternalLink className="h-3 w-3" />
                 </a>
                 {" — "}
                 <span className="text-muted-foreground">{tCommunity(`${project.key}.description`)}</span>

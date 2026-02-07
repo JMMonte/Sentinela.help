@@ -244,10 +244,40 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const t = await getTranslations({ locale, namespace: "dataSourcePages" });
+  const sourceData = dataSources[source];
+
+  const title = t(`${source}.title`);
+  const description = t(`${source}.shortDescription`);
 
   return {
-    title: `${t(`${source}.title`)} - Data Sources - Sentinela`,
-    description: t(`${source}.shortDescription`),
+    title: `${title} - Data Sources`,
+    description,
+    keywords: [
+      title,
+      sourceData.provider,
+      sourceData.dataFormat,
+      "API",
+      "data source",
+      "real-time data",
+      "Sentinela",
+    ],
+    openGraph: {
+      title: `${title} | Sentinela Data Sources`,
+      description,
+      type: "article",
+    },
+    twitter: {
+      card: "summary",
+      title: `${title} | Sentinela`,
+      description,
+    },
+    alternates: {
+      canonical: `/${locale}/about/data-sources/${source}`,
+      languages: {
+        en: `/en/about/data-sources/${source}`,
+        "pt-PT": `/pt-PT/about/data-sources/${source}`,
+      },
+    },
   };
 }
 
@@ -287,49 +317,49 @@ export default async function DataSourcePage({ params }: Props) {
       </div>
 
       {/* Description */}
-      <div className="prose prose-zinc dark:prose-invert max-w-none">
+      <div className="prose prose-zinc dark:prose-invert max-w-none prose-h2:border-b prose-h2:border-border prose-h2:pb-2 prose-h2:text-xl prose-h2:font-semibold">
         {/* Quick Info */}
         <p className="text-muted-foreground">
-          <strong>Coverage:</strong> {sourceData.coverage} · <strong>Update frequency:</strong> {sourceData.updateFrequency} · <strong>Format:</strong> {sourceData.dataFormat}
+          <strong>{t("ui.coverage")}:</strong> {sourceData.coverage} · <strong>{t("ui.updateFrequency")}:</strong> {sourceData.updateFrequency} · <strong>{t("ui.format")}:</strong> {sourceData.dataFormat}
         </p>
 
-        <section>
-          <h2>Overview</h2>
+        <section className="mt-10">
+          <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{t("ui.overview")}</h2>
           <p>{t(`${source}.description`)}</p>
         </section>
 
-        <section>
-          <h2>How Sentinela Uses This Data</h2>
+        <section className="mt-10">
+          <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{t("ui.howWeUseItTitle")}</h2>
           <p>{t(`${source}.howWeUseIt`)}</p>
         </section>
 
-        <section>
-          <h2>Data Processing</h2>
+        <section className="mt-10">
+          <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{t("ui.dataProcessing")}</h2>
           <p>{t(`${source}.processing`)}</p>
         </section>
 
         {/* Limitations */}
-        <section className="not-prose rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
+        <section className="not-prose mt-10 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
           <h3 className="mt-0 flex items-center gap-2 font-semibold text-amber-600 dark:text-amber-400">
             <AlertTriangle className="h-4 w-4" />
-            Limitations & Considerations
+            {t("ui.limitations")}
           </h3>
           <p className="mb-0 mt-2 text-sm">{t(`${source}.limitations`)}</p>
         </section>
 
         {/* Links */}
-        <section>
-          <h2>Resources</h2>
+        <section className="mt-10">
+          <h2 className="!mb-4 !border-b !border-border !pb-2 !text-xl !font-bold">{t("ui.resources")}</h2>
           <ul>
             <li>
-              <a href={sourceData.apiUrl} target="_blank" rel="noopener noreferrer">
-                API Endpoint <ExternalLink className="ml-0.5 inline h-3 w-3" />
+              <a href={sourceData.apiUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline">
+                {t("ui.apiEndpoint")} <ExternalLink className="h-3 w-3" />
               </a>
             </li>
             {sourceData.docsUrl && (
               <li>
-                <a href={sourceData.docsUrl} target="_blank" rel="noopener noreferrer">
-                  Documentation <ExternalLink className="ml-0.5 inline h-3 w-3" />
+                <a href={sourceData.docsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline">
+                  {t("ui.documentation")} <ExternalLink className="h-3 w-3" />
                 </a>
               </li>
             )}

@@ -35,8 +35,8 @@ export function initRedis(config) {
     else {
         mode = "upstash";
         upstashClient = new UpstashRedis({
-            url: config.UPSTASH_REDIS_REST_URL,
-            token: config.UPSTASH_REDIS_REST_TOKEN,
+            url: config.KV_REST_API_URL,
+            token: config.KV_REST_API_TOKEN,
         });
         logger.info("Redis client initialized (Upstash HTTP mode)");
     }

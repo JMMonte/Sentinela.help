@@ -3,8 +3,8 @@
  */
 import { z } from "zod";
 declare const envSchema: z.ZodObject<{
-    UPSTASH_REDIS_REST_URL: z.ZodString;
-    UPSTASH_REDIS_REST_TOKEN: z.ZodString;
+    KV_REST_API_URL: z.ZodString;
+    KV_REST_API_TOKEN: z.ZodString;
     NASA_FIRMS_API_KEY: z.ZodOptional<z.ZodString>;
     WAQI_API_KEY: z.ZodOptional<z.ZodString>;
     APRS_FI_API_KEY: z.ZodOptional<z.ZodString>;
@@ -28,8 +28,8 @@ declare const envSchema: z.ZodObject<{
     DISABLE_PROCIV: z.ZodDefault<z.ZodBoolean>;
     DISABLE_GDACS: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    UPSTASH_REDIS_REST_URL: string;
-    UPSTASH_REDIS_REST_TOKEN: string;
+    KV_REST_API_URL: string;
+    KV_REST_API_TOKEN: string;
     WORKER_LOG_LEVEL: "debug" | "info" | "warn" | "error";
     WORKER_HEALTH_PORT: number;
     DISABLE_LIGHTNING: boolean;
@@ -53,8 +53,8 @@ declare const envSchema: z.ZodObject<{
     OPENSKY_CLIENT_ID?: string | undefined;
     OPENSKY_CLIENT_SECRET?: string | undefined;
 }, {
-    UPSTASH_REDIS_REST_URL: string;
-    UPSTASH_REDIS_REST_TOKEN: string;
+    KV_REST_API_URL: string;
+    KV_REST_API_TOKEN: string;
     NASA_FIRMS_API_KEY?: string | undefined;
     WAQI_API_KEY?: string | undefined;
     APRS_FI_API_KEY?: string | undefined;

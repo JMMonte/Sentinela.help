@@ -12,6 +12,7 @@ export type GdacsTrackPoint = {
     lat: number;
     time: string;
     isForecast: boolean;
+    index: number;
 };
 export type GdacsCycloneData = {
     trackPoints: GdacsTrackPoint[];
