@@ -1,0 +1,99 @@
+# Sentinela
+
+> Crowdsourced emergency reporting platform for community safety
+
+Sentinela is a web application built by Darkmatter AI Labs (https://darkmatter.is) that enables citizens to report emergencies and disasters on an interactive map. Reports are validated by the community and can be sent to local government authorities.
+
+## Purpose
+
+Sentinela helps communities:
+- Report incidents like fires, floods, earthquakes, landslides, storms, and road closures
+- Validate reports through community voting (escalate/de-escalate)
+- Visualize real-time environmental data from multiple sources
+- Coordinate emergency response with local authorities
+
+## How It Works
+
+1. Citizens report incidents by pinning locations on an interactive map
+2. Community members validate reports by voting
+3. Reports reaching validation thresholds are sent to local government
+4. Real-time data layers provide environmental context (weather, fires, earthquakes, etc.)
+
+## Incident Types
+
+- FLOOD - Flooding events
+- FIRE - Fires and wildfires
+- EXPLOSION - Explosions
+- EARTHQUAKE - Seismic events
+- LANDSLIDE - Landslides and mudslides
+- STORM - Severe weather events
+- ROAD_CLOSURE - Road blockages
+- OTHER - Other emergencies
+
+## Data Sources
+
+Sentinela integrates real-time data from 19+ sources:
+
+### Seismic & Disasters
+- USGS Earthquake Hazards Program (global earthquakes)
+- GDACS (Global Disaster Alert and Coordination System)
+
+### Fire & Weather
+- NASA FIRMS (global active fires)
+- NOAA GFS (weather forecasts)
+- IPMA (Portugal weather warnings and rainfall)
+- OpenWeatherMap (weather tiles)
+
+### Environmental
+- WAQI (World Air Quality Index)
+- TEMIS (UV Index data)
+- NOAA SWPC (Aurora and ionosphere)
+
+### Ocean & Marine
+- NOAA WAVEWATCH III (ocean waves)
+- NOAA OSCAR (ocean currents)
+- NOAA OISST (sea surface temperature)
+
+### Aviation & Radio
+- OpenSky Network (aircraft tracking)
+- Blitzortung (lightning detection)
+- KiwiSDR Network (software-defined radio)
+- APRS (amateur radio network)
+
+## Languages
+
+Available in:
+- English (en)
+- Portuguese (pt-PT)
+- Spanish (es)
+
+## Technical Details
+
+- Built with Next.js 15 and React
+- Real-time map visualization with Mapbox
+- PostgreSQL database with Prisma ORM
+- Deployed on Vercel
+
+## URLs
+
+- Website: https://sentinela.help
+- Report an incident: https://sentinela.help/{locale}/report
+- About: https://sentinela.help/{locale}/about
+- Data sources: https://sentinela.help/{locale}/about/data-sources
+
+## API
+
+Public API endpoints:
+- GET /api/reports - List recent reports
+- GET /api/reports/{id} - Get report details
+- POST /api/reports - Create a new report
+
+## Built By
+
+Sentinela is developed by Darkmatter AI Labs.
+- Website: https://darkmatter.is
+- Project: https://sentinela.help
+
+## Contact
+
+For questions about Sentinela, visit https://sentinela.help/about

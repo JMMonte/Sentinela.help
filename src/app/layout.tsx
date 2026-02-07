@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+
+import {
+  OrganizationJsonLd,
+  WebSiteJsonLd,
+} from "@/components/seo/json-ld";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,6 +38,11 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.png",
     apple: "/favicon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Sentinela",
   },
   openGraph: {
     title: "Sentinela",
@@ -66,7 +77,30 @@ export default function RootLayout({
 }>) {
   return (
     <html suppressHydrationWarning>
+      <head>
+        {/* Theme color for browser UI */}
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#09090b" />
+
+        {/* DNS Prefetch for external APIs */}
+        <link rel="dns-prefetch" href="https://earthquake.usgs.gov" />
+        <link rel="dns-prefetch" href="https://firms.modaps.eosdis.nasa.gov" />
+        <link rel="dns-prefetch" href="https://api.ipma.pt" />
+        <link rel="dns-prefetch" href="https://services.swpc.noaa.gov" />
+        <link rel="dns-prefetch" href="https://opensky-network.org" />
+        <link rel="dns-prefetch" href="https://api.openweathermap.org" />
+        <link rel="dns-prefetch" href="https://aqicn.org" />
+        <link rel="dns-prefetch" href="https://api.mapbox.com" />
+
+        {/* Preconnect to critical resources */}
+        <link rel="preconnect" href="https://api.mapbox.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* JSON-LD Structured Data - valid anywhere in document */}
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
         {children}
         <Analytics />
       </body>

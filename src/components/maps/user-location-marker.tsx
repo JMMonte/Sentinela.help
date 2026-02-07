@@ -96,14 +96,15 @@ function buildIcon(
         <div class="sentinela-location__pulse"></div>
       </div>`;
 
-  // Use consistent size - anchor always at center
-  const size = hasContent ? 160 : 24;
+  // Keep icon size small (just the dot) - labels overflow with pointer-events: none
+  // Yellow dot is 14px, blue dot is 20px
+  const dotSize = variant === "yellow" ? 14 : 20;
 
   return L.divIcon({
     className: "sentinela-location-marker",
     html,
-    iconSize: L.point(size, size),
-    iconAnchor: L.point(size / 2, size / 2),
+    iconSize: L.point(dotSize, dotSize),
+    iconAnchor: L.point(dotSize / 2, dotSize / 2),
   });
 }
 

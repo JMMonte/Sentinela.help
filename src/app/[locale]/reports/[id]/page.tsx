@@ -5,6 +5,10 @@ import Link from "next/link";
 
 import { prisma } from "@/lib/db/prisma";
 import { locales } from "@/i18n/config";
+import {
+  IncidentReportJsonLd,
+  BreadcrumbJsonLd,
+} from "@/components/seo/json-ld";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
@@ -133,8 +137,37 @@ export default async function ReportDetailsPage({ params }: Props) {
     timeStyle: "short",
   }).format(report.createdAt);
 
+  const pageUrl = `${BASE_URL}/${locale}/reports/${id}`;
+  const title = report.address
+    ? `${incidentType} - ${report.address}`
+    : `${incidentType} Report`;
+  const description =
+    report.description ||
+    `${incidentType} reported at ${report.address || `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`}`;
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
+      {/* JSON-LD Structured Data */}
+      <IncidentReportJsonLd
+        title={title}
+        description={description}
+        url={pageUrl}
+        imageUrl={report.images[0]?.url}
+        datePublished={report.createdAt.toISOString()}
+        dateModified={report.updatedAt.toISOString()}
+        latitude={report.latitude}
+        longitude={report.longitude}
+        address={report.address || undefined}
+        incidentType={incidentType}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Sentinela", url: BASE_URL },
+          { name: "Reports", url: `${BASE_URL}/${locale}/reports` },
+          { name: title, url: pageUrl },
+        ]}
+      />
+
       {/* SEO-friendly content that search engines can index */}
       <article>
         <header className="mb-6">
