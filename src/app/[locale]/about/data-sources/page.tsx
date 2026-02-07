@@ -229,9 +229,9 @@ export default async function DataSourcesPage({ params }: Props) {
     <>
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-1 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">Sentinela</Link>
+        <Link href="/" className="underline-offset-4 hover:text-foreground hover:underline">Sentinela</Link>
         <ChevronRight className="h-3.5 w-3.5" />
-        <Link href={`/${locale}/about`} className="hover:text-foreground">{t("title")}</Link>
+        <Link href={`/${locale}/about`} className="underline-offset-4 hover:text-foreground hover:underline">{t("title")}</Link>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-foreground">{t("dataSourcesTitle")}</span>
       </nav>
@@ -250,10 +250,11 @@ export default async function DataSourcesPage({ params }: Props) {
                   <li key={source.id}>
                     <Link
                       href={`/${locale}/about/data-sources/${source.id}`}
-                      className="inline-flex items-center gap-1.5"
+                      className="inline-flex items-center gap-1.5 font-medium text-primary underline-offset-4 hover:underline"
                     >
                       <Icon className={`h-4 w-4 ${source.color}`} />
                       {tSources(`${source.id}.title`)}
+                      <ChevronRight className="h-3 w-3" />
                     </Link>
                     {" — "}
                     <span className="text-muted-foreground">

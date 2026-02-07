@@ -61,7 +61,7 @@ export default async function AboutPage({ params }: Props) {
     <>
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-1 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">Sentinela</Link>
+        <Link href="/" className="underline-offset-4 hover:text-foreground hover:underline">Sentinela</Link>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-foreground">{t("title")}</span>
       </nav>
@@ -75,9 +75,10 @@ export default async function AboutPage({ params }: Props) {
         <p className="mt-6">
           <Link
             href={`/${locale}/about/data-sources`}
-            className="font-medium text-primary hover:underline"
+            className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline"
           >
-            {t("dataSourcesTitle")} →
+            {t("dataSourcesTitle")}
+            <ChevronRight className="h-4 w-4" />
           </Link>
           {" "}— Learn how Sentinela collects and displays real-time data from 19+ sources.
         </p>
