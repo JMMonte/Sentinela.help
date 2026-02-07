@@ -6,8 +6,8 @@ import { useTheme } from "next-themes";
 import L from "leaflet";
 
 export type TerminatorOverlayProps = {
-  /** Update interval in milliseconds (default: 60000 = 1 minute) */
-  updateInterval?: number;
+  /** Enable real-time animation (updates every second) */
+  animate?: boolean;
 };
 
 const R2D = 180 / Math.PI;
@@ -140,7 +140,7 @@ function getRequiredOffsets(bounds: L.LatLngBounds): number[] {
   const west = bounds.getWest();
   const east = bounds.getEast();
 
-  // Calculate which 360° world copies are visible
+  // Calculate which 360 world copies are visible
   const minWorldIndex = Math.floor(west / 360);
   const maxWorldIndex = Math.floor(east / 360);
 
@@ -156,7 +156,7 @@ function getRequiredOffsets(bounds: L.LatLngBounds): number[] {
  * Day/Night terminator overlay.
  * Shows the shadow of night on the map.
  */
-export function TerminatorOverlay({ updateInterval = 60000 }: TerminatorOverlayProps) {
+export function TerminatorOverlay({ animate = false }: TerminatorOverlayProps) {
   const map = useMap();
   const { resolvedTheme } = useTheme();
   const layersRef = useRef<Map<number, L.Polygon>>(new Map());
@@ -171,6 +171,14 @@ export function TerminatorOverlay({ updateInterval = 60000 }: TerminatorOverlayP
     stroke: false,
     interactive: false,
   }), [isDark]);
+
+  // Update polygon coordinates without recreating them
+  const updatePolygonCoordinates = useCallback((sunLat: number, sunLng: number) => {
+    layersRef.current.forEach((polygon, offset) => {
+      const newCoords = createNightPolygonByLatitude(sunLat, sunLng, offset, 180);
+      polygon.setLatLngs(newCoords);
+    });
+  }, []);
 
   // Update polygons based on current view
   const updatePolygons = useCallback(() => {
@@ -200,22 +208,30 @@ export function TerminatorOverlay({ updateInterval = 60000 }: TerminatorOverlayP
     }
   }, [map, style]);
 
-  // Update sun position and refresh all polygons
-  const updateSunPosition = useCallback(() => {
+  // Update sun position and refresh polygons
+  const updateSunPosition = useCallback((recreate: boolean = true) => {
     if (!map) return;
 
     const now = new Date();
     sunPositionRef.current = getSubsolarPoint(now);
 
-    // Clear all existing polygons (sun position changed)
-    layersRef.current.forEach((polygon) => {
-      map.removeLayer(polygon);
-    });
-    layersRef.current.clear();
+    if (recreate) {
+      // Clear all existing polygons (full refresh)
+      layersRef.current.forEach((polygon) => {
+        map.removeLayer(polygon);
+      });
+      layersRef.current.clear();
+      updatePolygons();
+    } else {
+      // Just update coordinates (for animation)
+      updatePolygonCoordinates(sunPositionRef.current.lat, sunPositionRef.current.lng);
+    }
+  }, [map, updatePolygons, updatePolygonCoordinates]);
 
-    // Recreate polygons for current view
-    updatePolygons();
-  }, [map, updatePolygons]);
+  // Animation tick for real-time updates (once per second)
+  const animationTick = useCallback(() => {
+    updateSunPosition(false);
+  }, [updateSunPosition]);
 
   // Listen to map move events
   useMapEvents({
@@ -223,12 +239,20 @@ export function TerminatorOverlay({ updateInterval = 60000 }: TerminatorOverlayP
     zoomend: updatePolygons,
   });
 
-  // Initial setup and interval
+  // Initial setup and interval/animation
   useEffect(() => {
     if (!map) return;
 
-    updateSunPosition();
-    intervalRef.current = setInterval(updateSunPosition, updateInterval);
+    // Initial render
+    updateSunPosition(true);
+
+    if (animate) {
+      // Update every second for real-time animation
+      intervalRef.current = setInterval(animationTick, 1000);
+    } else {
+      // Update every minute when not animating
+      intervalRef.current = setInterval(() => updateSunPosition(false), 60000);
+    }
 
     return () => {
       if (intervalRef.current) {
@@ -240,7 +264,7 @@ export function TerminatorOverlay({ updateInterval = 60000 }: TerminatorOverlayP
       });
       layersRef.current.clear();
     };
-  }, [map, updateInterval, updateSunPosition]);
+  }, [map, animate, updateSunPosition, animationTick]);
 
   // Update style when theme changes
   useEffect(() => {

@@ -477,7 +477,7 @@ export function ReportsMapClient({
         {onMapClick && <ClickHandler onPick={onMapClick} />}
 
         {/* Day/Night terminator (shows shadow for night side) */}
-        {terminator.enabled && <TerminatorOverlay />}
+        {terminator.enabled && <TerminatorOverlay animate={terminator.animate} />}
 
         {/* Weather overlay (above base tiles, below markers) */}
         {weather.enabled && weather.tileUrl && (

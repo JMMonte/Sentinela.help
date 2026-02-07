@@ -597,13 +597,25 @@ export function OverlayControls({
                     onToggle={() => toggleSection("utility")}
                   >
                     {terminator.isAvailable && (
-                      <CheckboxItem
-                        checked={terminator.enabled}
-                        onChange={terminator.setEnabled}
-                        icon={<Sunset className="size-3.5 text-orange-400" />}
-                        label="Day/Night"
-                        info="Shows the day/night terminator line - the boundary between sunlit and dark areas on Earth. Updates every minute."
-                      />
+                      <>
+                        <CheckboxItem
+                          checked={terminator.enabled}
+                          onChange={terminator.setEnabled}
+                          icon={<Sunset className="size-3.5 text-orange-400" />}
+                          label="Day/Night"
+                          info="Shows the day/night terminator line - the boundary between sunlit and dark areas on Earth."
+                        />
+                        {terminator.enabled && (
+                          <div className="ml-5">
+                            <CheckboxItem
+                              checked={terminator.animate}
+                              onChange={terminator.setAnimate}
+                              label="Animate"
+                              info="Animate the terminator in real-time. Uses more CPU."
+                            />
+                          </div>
+                        )}
+                      </>
                     )}
                   </CollapsibleSection>
                 )}

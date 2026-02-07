@@ -9,7 +9,9 @@ export type TerminatorOverlayConfig = {
 export type TerminatorOverlayState = {
   isAvailable: boolean;
   enabled: boolean;
+  animate: boolean;
   setEnabled: (enabled: boolean) => void;
+  setAnimate: (animate: boolean) => void;
 };
 
 /**
@@ -18,10 +20,13 @@ export type TerminatorOverlayState = {
  */
 export function useTerminatorOverlay(config: TerminatorOverlayConfig): TerminatorOverlayState {
   const [enabled, setEnabled] = useState(false);
+  const [animate, setAnimate] = useState(false);
 
   return {
     isAvailable: config.enabled,
     enabled: enabled && config.enabled,
+    animate,
     setEnabled,
+    setAnimate,
   };
 }
