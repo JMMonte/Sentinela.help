@@ -15,7 +15,7 @@ export type AuroraRawData = {
 
 export async function GET() {
   try {
-    const data = await getFromRedis<AuroraRawData>("kaos:aurora:latest");
+    const data = await getFromRedis<AuroraRawData | AuroraRawData[]>("kaos:aurora:latest");
 
     if (!data) {
       return NextResponse.json(
@@ -24,7 +24,10 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json(data, {
+    // Generic collector wraps single objects in array - unwrap if needed
+    const result = Array.isArray(data) ? data[0] : data;
+
+    return NextResponse.json(result, {
       headers: { "Cache-Control": "no-cache" },
     });
   } catch (error) {
