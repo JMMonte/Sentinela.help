@@ -25,6 +25,7 @@ import { GfsCollector } from "./collectors/gfs.js";
 import { OceanCurrentsCollector } from "./collectors/ocean-currents.js";
 import { WavesCollector } from "./collectors/waves.js";
 import { SstCollector } from "./collectors/sst.js";
+import { AircraftCollector } from "./collectors/aircraft.js";
 const logger = createLogger("main");
 async function main() {
     logger.info("Starting Kaos Worker...");
@@ -76,8 +77,11 @@ async function main() {
         scheduler.register(new WavesCollector(), COLLECTOR_CONFIGS.waves.intervalMs);
         scheduler.register(new SstCollector(), COLLECTOR_CONFIGS.sst.intervalMs);
     }
+    // Aircraft tracking (OpenSky Network with OAuth)
+    if (!config.DISABLE_AIRCRAFT) {
+        scheduler.register(new AircraftCollector(config), COLLECTOR_CONFIGS.aircraft.intervalMs);
+    }
     // TODO: Add remaining collectors as they are implemented
-    // - AircraftCollector (requires OAuth)
     // - FiresCollector (requires API key)
     // - AirQualityCollector (requires API key)
     // Start health server

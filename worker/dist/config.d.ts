@@ -3,8 +3,8 @@
  */
 import { z } from "zod";
 declare const envSchema: z.ZodObject<{
-    KV_REST_API_URL: z.ZodString;
-    KV_REST_API_TOKEN: z.ZodString;
+    KV_REST_API_URL: z.ZodOptional<z.ZodString>;
+    KV_REST_API_TOKEN: z.ZodOptional<z.ZodString>;
     NASA_FIRMS_API_KEY: z.ZodOptional<z.ZodString>;
     WAQI_API_KEY: z.ZodOptional<z.ZodString>;
     APRS_FI_API_KEY: z.ZodOptional<z.ZodString>;
@@ -28,8 +28,6 @@ declare const envSchema: z.ZodObject<{
     DISABLE_PROCIV: z.ZodDefault<z.ZodBoolean>;
     DISABLE_GDACS: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    KV_REST_API_URL: string;
-    KV_REST_API_TOKEN: string;
     WORKER_LOG_LEVEL: "debug" | "info" | "warn" | "error";
     WORKER_HEALTH_PORT: number;
     DISABLE_LIGHTNING: boolean;
@@ -47,14 +45,16 @@ declare const envSchema: z.ZodObject<{
     DISABLE_WARNINGS: boolean;
     DISABLE_PROCIV: boolean;
     DISABLE_GDACS: boolean;
+    KV_REST_API_URL?: string | undefined;
+    KV_REST_API_TOKEN?: string | undefined;
     NASA_FIRMS_API_KEY?: string | undefined;
     WAQI_API_KEY?: string | undefined;
     APRS_FI_API_KEY?: string | undefined;
     OPENSKY_CLIENT_ID?: string | undefined;
     OPENSKY_CLIENT_SECRET?: string | undefined;
 }, {
-    KV_REST_API_URL: string;
-    KV_REST_API_TOKEN: string;
+    KV_REST_API_URL?: string | undefined;
+    KV_REST_API_TOKEN?: string | undefined;
     NASA_FIRMS_API_KEY?: string | undefined;
     WAQI_API_KEY?: string | undefined;
     APRS_FI_API_KEY?: string | undefined;

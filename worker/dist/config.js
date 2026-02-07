@@ -3,9 +3,9 @@
  */
 import { z } from "zod";
 const envSchema = z.object({
-    // Redis (Upstash or Vercel KV)
-    KV_REST_API_URL: z.string().url(),
-    KV_REST_API_TOKEN: z.string().min(1),
+    // Redis (Upstash or Vercel KV) - optional if using REDIS_MODE=direct
+    KV_REST_API_URL: z.string().url().optional(),
+    KV_REST_API_TOKEN: z.string().min(1).optional(),
     // API Keys
     NASA_FIRMS_API_KEY: z.string().optional(),
     WAQI_API_KEY: z.string().optional(),
