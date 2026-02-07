@@ -10,6 +10,13 @@ import { BaseCollector } from "./base-collector.js";
 import { COLLECTOR_CONFIGS } from "../config.js";
 const TOKEN_CACHE_TTL = 25 * 60 * 1000; // 25 minutes (tokens expire after 30)
 const FETCH_TIMEOUT = 30000;
+// Bounding box for Europe/Atlantic region (reduces data from 10k+ to ~2k aircraft)
+const BOUNDS = {
+    lamin: 25, // South (North Africa)
+    lamax: 72, // North (Scandinavia)
+    lomin: -30, // West (Atlantic/Azores)
+    lomax: 45, // East (Eastern Europe)
+};
 export class AircraftCollector extends BaseCollector {
     appConfig;
     cachedToken = null;
@@ -76,8 +83,13 @@ export class AircraftCollector extends BaseCollector {
         }
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
-        // Fetch all aircraft globally (no bounding box = global)
-        const response = await fetch("https://opensky-network.org/api/states/all", {
+        // Fetch aircraft within bounding box (Europe/Atlantic region)
+        const url = new URL("https://opensky-network.org/api/states/all");
+        url.searchParams.set("lamin", String(BOUNDS.lamin));
+        url.searchParams.set("lamax", String(BOUNDS.lamax));
+        url.searchParams.set("lomin", String(BOUNDS.lomin));
+        url.searchParams.set("lomax", String(BOUNDS.lomax));
+        const response = await fetch(url.toString(), {
             headers,
             signal: controller.signal,
         });
