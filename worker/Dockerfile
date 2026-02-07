@@ -36,6 +36,9 @@ RUN pnpm install --prod
 # Copy built files
 COPY --from=builder /app/dist ./dist
 
+# Fix permissions for sources directory
+RUN chmod -R 755 ./dist/sources 2>/dev/null || true
+
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 worker

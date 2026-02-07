@@ -113,23 +113,46 @@ function extractGfsField(messages: GribMessage[], category: number, parameter: n
 
 /**
  * Build standardized grid data from a GRIB field.
+ * Downsamples from 0.25° to 0.5° resolution to reduce data size.
+ * Rounds values to 2 decimal places to minimize JSON payload.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildGridData(field: any, name: string, unit: string, transform?: (v: number) => number): GfsGridData {
   const gridDef = field.grid?.definition || field.grid;
+  const srcNx = gridDef.ni; // 1440 at 0.25°
+  const srcNy = gridDef.nj; // 721 at 0.25°
+
+  // Downsample to 0.5° (every other point)
+  const dstNx = Math.ceil(srcNx / 2); // 720
+  const dstNy = Math.ceil(srcNy / 2); // 361
 
   const header: GfsGridHeader = {
-    nx: gridDef.ni,
-    ny: gridDef.nj,
+    nx: dstNx,
+    ny: dstNy,
     lo1: gridDef.lo1,
     la1: gridDef.la1,
-    dx: gridDef.di,
-    dy: gridDef.dj,
+    dx: gridDef.di * 2, // 0.5°
+    dy: gridDef.dj * 2, // 0.5°
   };
 
-  const data = transform ? field.data.map((v: number) => transform(v)) : field.data;
+  // Downsample and transform data
+  const dstData: number[] = new Array(dstNx * dstNy);
+  for (let dstY = 0; dstY < dstNy; dstY++) {
+    const srcY = dstY * 2;
+    for (let dstX = 0; dstX < dstNx; dstX++) {
+      const srcX = dstX * 2;
+      const srcIdx = srcY * srcNx + srcX;
+      const dstIdx = dstY * dstNx + dstX;
+      let value = field.data[srcIdx];
+      if (transform) {
+        value = transform(value);
+      }
+      // Round to 2 decimal places to reduce JSON size
+      dstData[dstIdx] = Math.round(value * 100) / 100;
+    }
+  }
 
-  return { header, data, unit, name };
+  return { header, data: dstData, unit, name };
 }
 
 /**
@@ -354,6 +377,28 @@ export class GfsCollector extends MultiKeyCollector {
       if (!uField || !vField) throw new Error("Wind U/V fields not found");
 
       const gridDef = uField.grid?.definition || uField.grid;
+      const srcNx = gridDef.ni; // 1440 at 0.25°
+      const srcNy = gridDef.nj; // 721 at 0.25°
+
+      // Downsample to 0.5° (every other point) to reduce data size
+      const dstNx = Math.ceil(srcNx / 2); // 720
+      const dstNy = Math.ceil(srcNy / 2); // 361
+
+      // Downsample U and V components
+      const downsampleData = (srcData: number[]): number[] => {
+        const dstData: number[] = new Array(dstNx * dstNy);
+        for (let dstY = 0; dstY < dstNy; dstY++) {
+          const srcY = dstY * 2;
+          for (let dstX = 0; dstX < dstNx; dstX++) {
+            const srcX = dstX * 2;
+            const srcIdx = srcY * srcNx + srcX;
+            const dstIdx = dstY * dstNx + dstX;
+            // Round to 2 decimal places
+            dstData[dstIdx] = Math.round(srcData[srcIdx] * 100) / 100;
+          }
+        }
+        return dstData;
+      };
 
       const velocityData: VelocityData = [
         {
@@ -362,14 +407,14 @@ export class GfsCollector extends MultiKeyCollector {
             parameterNumber: 2,
             parameterNumberName: "U-component_of_wind",
             parameterUnit: "m.s-1",
-            nx: gridDef.ni,
-            ny: gridDef.nj,
+            nx: dstNx,
+            ny: dstNy,
             lo1: gridDef.lo1,
             la1: gridDef.la1,
-            dx: gridDef.di,
-            dy: gridDef.dj,
+            dx: gridDef.di * 2,
+            dy: gridDef.dj * 2,
           },
-          data: uField.data,
+          data: downsampleData(uField.data),
         },
         {
           header: {
@@ -377,14 +422,14 @@ export class GfsCollector extends MultiKeyCollector {
             parameterNumber: 3,
             parameterNumberName: "V-component_of_wind",
             parameterUnit: "m.s-1",
-            nx: gridDef.ni,
-            ny: gridDef.nj,
+            nx: dstNx,
+            ny: dstNy,
             lo1: gridDef.lo1,
             la1: gridDef.la1,
-            dx: gridDef.di,
-            dy: gridDef.dj,
+            dx: gridDef.di * 2,
+            dy: gridDef.dj * 2,
           },
-          data: vField.data,
+          data: downsampleData(vField.data),
         },
       ];
 
@@ -412,9 +457,10 @@ export class GfsCollector extends MultiKeyCollector {
 
       if (!ozoneField) throw new Error("Ozone field not found");
 
+      // buildGridData already downsamples to 0.5°
       const { header, data: ozoneData } = buildGridData(ozoneField, "Ozone", "DU");
 
-      // Calculate UV Index for each grid point
+      // Calculate UV Index for each grid point (already downsampled)
       const now = new Date();
       const nx = header.nx;
       const ny = header.ny;
@@ -435,7 +481,8 @@ export class GfsCollector extends MultiKeyCollector {
           }
 
           const solarZenith = calculateSolarZenithAngle(lat, normalizedLon, now);
-          uvData[idx] = calculateUvIndex(ozone, solarZenith);
+          // Round to 2 decimal places
+          uvData[idx] = Math.round(calculateUvIndex(ozone, solarZenith) * 100) / 100;
         }
       }
 

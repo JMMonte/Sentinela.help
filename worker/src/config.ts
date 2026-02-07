@@ -4,6 +4,15 @@
 
 import { z } from "zod";
 
+// Custom boolean parser that handles "false" string correctly
+const booleanEnv = z
+  .union([z.boolean(), z.string()])
+  .transform((val) => {
+    if (typeof val === "boolean") return val;
+    return val.toLowerCase() !== "false" && val !== "0" && val !== "";
+  })
+  .default(false);
+
 const envSchema = z.object({
   // Redis (Upstash or Vercel KV) - optional if using REDIS_MODE=direct
   KV_REST_API_URL: z.string().url().optional(),
@@ -21,21 +30,21 @@ const envSchema = z.object({
   WORKER_HEALTH_PORT: z.coerce.number().int().min(1).max(65535).default(8080),
 
   // Feature flags to disable specific collectors
-  DISABLE_LIGHTNING: z.coerce.boolean().default(false),
-  DISABLE_AIRCRAFT: z.coerce.boolean().default(false),
-  DISABLE_SEISMIC: z.coerce.boolean().default(false),
-  DISABLE_APRS: z.coerce.boolean().default(false),
-  DISABLE_SPACE_WEATHER: z.coerce.boolean().default(false),
-  DISABLE_TEC: z.coerce.boolean().default(false),
-  DISABLE_AURORA: z.coerce.boolean().default(false),
-  DISABLE_FIRES: z.coerce.boolean().default(false),
-  DISABLE_KIWISDR: z.coerce.boolean().default(false),
-  DISABLE_GFS: z.coerce.boolean().default(false),
-  DISABLE_OCEAN: z.coerce.boolean().default(false),
-  DISABLE_AIR_QUALITY: z.coerce.boolean().default(false),
-  DISABLE_WARNINGS: z.coerce.boolean().default(false),
-  DISABLE_PROCIV: z.coerce.boolean().default(false),
-  DISABLE_GDACS: z.coerce.boolean().default(false),
+  DISABLE_LIGHTNING: booleanEnv,
+  DISABLE_AIRCRAFT: booleanEnv,
+  DISABLE_SEISMIC: booleanEnv,
+  DISABLE_APRS: booleanEnv,
+  DISABLE_SPACE_WEATHER: booleanEnv,
+  DISABLE_TEC: booleanEnv,
+  DISABLE_AURORA: booleanEnv,
+  DISABLE_FIRES: booleanEnv,
+  DISABLE_KIWISDR: booleanEnv,
+  DISABLE_GFS: booleanEnv,
+  DISABLE_OCEAN: booleanEnv,
+  DISABLE_AIR_QUALITY: booleanEnv,
+  DISABLE_WARNINGS: booleanEnv,
+  DISABLE_PROCIV: booleanEnv,
+  DISABLE_GDACS: booleanEnv,
 });
 
 export type Config = z.infer<typeof envSchema>;

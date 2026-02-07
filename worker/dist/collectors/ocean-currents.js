@@ -47,20 +47,20 @@ export class OceanCurrentsCollector extends BaseCollector {
         }
         const latArray = Array.from(lats).sort((a, b) => b - a); // North to South
         const lonArray = Array.from(lons).sort((a, b) => a - b); // West to East
-        const nLat = latArray.length;
-        const nLon = lonArray.length;
-        if (nLat < 2 || nLon < 2) {
+        const srcNLat = latArray.length;
+        const srcNLon = lonArray.length;
+        if (srcNLat < 2 || srcNLon < 2) {
             throw new Error("Insufficient grid points in ERDDAP data");
         }
-        const latStep = Math.abs(latArray[0] - latArray[1]);
-        const lonStep = Math.abs(lonArray[1] - lonArray[0]);
+        const srcLatStep = Math.abs(latArray[0] - latArray[1]);
+        const srcLonStep = Math.abs(lonArray[1] - lonArray[0]);
         // Create lookup for grid position
         const latToIdx = new Map(latArray.map((lat, idx) => [lat, idx]));
         const lonToIdx = new Map(lonArray.map((lon, idx) => [lon, idx]));
-        // Initialize data arrays
-        const uData = new Array(nLat * nLon).fill(null);
-        const vData = new Array(nLat * nLon).fill(null);
-        // Fill data arrays
+        // Initialize source data arrays
+        const srcUData = new Array(srcNLat * srcNLon).fill(null);
+        const srcVData = new Array(srcNLat * srcNLon).fill(null);
+        // Fill source data arrays
         for (const row of rows) {
             const lat = row[latIdx];
             const lon = row[lonIdx];
@@ -69,11 +69,33 @@ export class OceanCurrentsCollector extends BaseCollector {
             const latI = latToIdx.get(lat);
             const lonI = lonToIdx.get(lon);
             if (latI !== undefined && lonI !== undefined) {
-                const idx = latI * nLon + lonI;
-                uData[idx] = u !== null && !isNaN(Number(u)) ? Number(u) : 0;
-                vData[idx] = v !== null && !isNaN(Number(v)) ? Number(v) : 0;
+                const idx = latI * srcNLon + lonI;
+                srcUData[idx] = u !== null && !isNaN(Number(u)) ? Number(u) : 0;
+                srcVData[idx] = v !== null && !isNaN(Number(v)) ? Number(v) : 0;
             }
         }
+        // Downsample to 0.5° to reduce data size (skip every other point)
+        const downsampleFactor = 2;
+        const dstNLat = Math.ceil(srcNLat / downsampleFactor);
+        const dstNLon = Math.ceil(srcNLon / downsampleFactor);
+        const dstLatStep = srcLatStep * downsampleFactor;
+        const dstLonStep = srcLonStep * downsampleFactor;
+        const uData = new Array(dstNLat * dstNLon);
+        const vData = new Array(dstNLat * dstNLon);
+        for (let dstLatI = 0; dstLatI < dstNLat; dstLatI++) {
+            const srcLatI = dstLatI * downsampleFactor;
+            for (let dstLonI = 0; dstLonI < dstNLon; dstLonI++) {
+                const srcLonI = dstLonI * downsampleFactor;
+                const srcIdx = srcLatI * srcNLon + srcLonI;
+                const dstIdx = dstLatI * dstNLon + dstLonI;
+                const uVal = srcUData[srcIdx];
+                const vVal = srcVData[srcIdx];
+                // Round to 3 decimal places to reduce JSON size
+                uData[dstIdx] = uVal !== null ? Math.round(uVal * 1000) / 1000 : 0;
+                vData[dstIdx] = vVal !== null ? Math.round(vVal * 1000) / 1000 : 0;
+            }
+        }
+        this.logger.debug(`Downsampled from ${srcNLon}x${srcNLat} to ${dstNLon}x${dstNLat}`);
         return [
             {
                 header: {
@@ -81,12 +103,12 @@ export class OceanCurrentsCollector extends BaseCollector {
                     parameterNumber: 2,
                     parameterNumberName: "Eastward_sea_water_velocity",
                     parameterUnit: "m.s-1",
-                    nx: nLon,
-                    ny: nLat,
+                    nx: dstNLon,
+                    ny: dstNLat,
                     lo1: Math.min(...lonArray),
                     la1: Math.max(...latArray),
-                    dx: lonStep,
-                    dy: latStep,
+                    dx: dstLonStep,
+                    dy: dstLatStep,
                 },
                 data: uData,
             },
@@ -96,12 +118,12 @@ export class OceanCurrentsCollector extends BaseCollector {
                     parameterNumber: 3,
                     parameterNumberName: "Northward_sea_water_velocity",
                     parameterUnit: "m.s-1",
-                    nx: nLon,
-                    ny: nLat,
+                    nx: dstNLon,
+                    ny: dstNLat,
                     lo1: Math.min(...lonArray),
                     la1: Math.max(...latArray),
-                    dx: lonStep,
-                    dy: latStep,
+                    dx: dstLonStep,
+                    dy: dstLatStep,
                 },
                 data: vData,
             },

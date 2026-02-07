@@ -1,136 +1,117 @@
 # Adding a New Data Source
 
-## Quick Start
+## The Easy Way: JSON Config
 
-1. **Create collector** in `worker/src/collectors/your-source.ts`
-2. **Add config** in `worker/src/config.ts`
-3. **Register** in `worker/src/index.ts`
-4. **Create API route** in `src/app/api/your-source/route.ts`
+Just add a JSON file to `worker/src/sources/` - no code needed!
 
-## Step 1: Create Collector
+```json
+{
+  "name": "my-source",
+  "description": "My awesome data source",
+  "enabled": true,
 
-```typescript
-// worker/src/collectors/your-source.ts
-import { BaseCollector } from "./base-collector.js";
-import { COLLECTOR_CONFIGS } from "../config.js";
-
-type YourData = {
-  id: string;
-  value: number;
-  // ... your fields
-};
-
-export class YourSourceCollector extends BaseCollector {
-  constructor() {
-    super({
-      name: COLLECTOR_CONFIGS.yourSource.name,
-      redisKey: COLLECTOR_CONFIGS.yourSource.redisKey,
-      ttlSeconds: COLLECTOR_CONFIGS.yourSource.ttlSeconds,
-    });
-  }
-
-  protected async collect(): Promise<YourData[]> {
-    const response = await fetch("https://api.example.com/data");
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+  "fetch": {
+    "url": "https://api.example.com/data",
+    "method": "GET",
+    "headers": {
+      "Accept": "application/json"
     }
+  },
 
-    const data = await response.json();
+  "schedule": {
+    "intervalMs": 60000,
+    "ttlSeconds": 120
+  },
 
-    // Transform to your format
-    const result = data.map((item: any) => ({
-      id: item.id,
-      value: item.value,
-    }));
+  "redis": {
+    "key": "kaos:my-source:data"
+  },
 
-    this.logger.info(`Collected ${result.length} items`);
-    return result;
+  "transform": {
+    "dataPath": "results",
+    "fields": {
+      "id": "item_id",
+      "latitude": "lat",
+      "longitude": "lon",
+      "value": "reading"
+    }
   }
 }
 ```
 
-## Step 2: Add Config
+That's it! The worker auto-loads all JSON files from `/sources`.
 
-```typescript
-// worker/src/config.ts
+## Config Options
 
-// Add to envSchema:
-DISABLE_YOUR_SOURCE: z.coerce.boolean().default(false),
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Unique identifier |
+| `enabled` | No | Set `false` to disable |
+| `fetch.url` | Yes | API endpoint |
+| `fetch.method` | No | GET, POST, etc. (default: GET) |
+| `fetch.headers` | No | Custom headers |
+| `schedule.intervalMs` | Yes | How often to fetch (ms) |
+| `schedule.ttlSeconds` | Yes | Redis cache TTL |
+| `redis.key` | Yes | Redis key name |
+| `transform.dataPath` | No | Path to data array (e.g., "data.items") |
+| `transform.fields` | No | Map output fields to source fields |
+| `transform.filter` | No | Filter by field values |
 
-// Add to COLLECTOR_CONFIGS:
-yourSource: {
-  name: "your-source",
-  redisKey: "kaos:your-source:data",
-  ttlSeconds: 300,      // Cache for 5 min
-  intervalMs: 60_000,   // Fetch every 1 min
-},
-```
+## Auth Options
 
-## Step 3: Register Collector
-
-```typescript
-// worker/src/index.ts
-
-import { YourSourceCollector } from "./collectors/your-source.js";
-
-// In main():
-if (!config.DISABLE_YOUR_SOURCE) {
-  scheduler.register(new YourSourceCollector(), COLLECTOR_CONFIGS.yourSource.intervalMs);
+```json
+{
+  "auth": {
+    "type": "bearer",
+    "envVar": "MY_API_TOKEN"
+  }
 }
 ```
 
-## Step 4: Create API Route
+Types: `bearer`, `apikey`, `basic`
+
+For `apikey`, add `"header": "X-Custom-Header"` to specify the header name.
+
+## API Route
+
+Create a simple route in `src/app/api/my-source/route.ts`:
 
 ```typescript
-// src/app/api/your-source/route.ts
 import { NextResponse } from "next/server";
 import { getFromRedis } from "@/lib/redis-cache";
 
-type YourData = {
-  id: string;
-  value: number;
-};
-
 export async function GET() {
-  const data = await getFromRedis<YourData[]>("kaos:your-source:data");
-
+  const data = await getFromRedis("kaos:my-source:data");
   if (!data) {
-    return NextResponse.json(
-      { error: "Data unavailable" },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: "Data unavailable" }, { status: 503 });
   }
-
   return NextResponse.json(data);
 }
 ```
 
-## Collector Types
+## Custom Collectors
 
-| Type | Use Case | Base Class |
-|------|----------|------------|
-| Interval | Most APIs (REST, fetch every N seconds) | `BaseCollector` |
-| Multi-key | Multiple Redis keys (e.g., seismic feeds) | `MultiKeyCollector` |
-| WebSocket | Real-time streams (e.g., lightning) | `WebSocketCollector` |
+For complex sources (OAuth, WebSocket, multi-step), create a custom collector:
 
-## Tips
+```typescript
+// worker/src/collectors/my-source.ts
+import { BaseCollector } from "./base-collector.js";
 
-- **Rate limits**: Set `intervalMs` conservatively. Check API docs.
-- **TTL**: Set `ttlSeconds` slightly longer than `intervalMs` to avoid gaps.
-- **Errors**: Just throw - BaseCollector handles retries and status tracking.
-- **Logging**: Use `this.logger.info/warn/error/debug()`.
-- **Auth**: Pass config to constructor if you need API keys.
+export class MySourceCollector extends BaseCollector {
+  constructor() {
+    super({
+      name: "my-source",
+      redisKey: "kaos:my-source:data",
+      ttlSeconds: 120,
+    });
+  }
 
-## Testing Locally
-
-```bash
-# Start local Redis
-docker run -p 6379:6379 redis
-
-# Run worker
-cd worker && pnpm dev
-
-# Check your data
-redis-cli GET kaos:your-source:data
+  protected async collect(): Promise<unknown[]> {
+    // Your custom logic here
+    const response = await fetch("...");
+    return response.json();
+  }
+}
 ```
+
+Then register in `worker/src/index.ts`.

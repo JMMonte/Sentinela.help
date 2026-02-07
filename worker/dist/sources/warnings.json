@@ -1,0 +1,20 @@
+{
+  "$schema": "./schema.json",
+  "name": "warnings",
+  "description": "IPMA Portugal weather warnings",
+  "enabled": true,
+
+  "fetch": {
+    "url": "https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json",
+    "timeout": 15000
+  },
+
+  "schedule": {
+    "intervalMs": 900000,
+    "ttlSeconds": 2700
+  },
+
+  "redis": {
+    "key": "kaos:warnings:ipma"
+  }
+}

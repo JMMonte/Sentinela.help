@@ -13,12 +13,12 @@ import { setLogLevel, createLogger } from "./logger.js";
 // Import collectors
 import { SeismicCollector } from "./collectors/seismic.js";
 import { SpaceWeatherCollector } from "./collectors/space-weather.js";
-import { AuroraCollector } from "./collectors/aurora.js";
+// AuroraCollector migrated to JSON: src/sources/aurora.json
 import { TecCollector } from "./collectors/tec.js";
 import { KiwiSdrCollector } from "./collectors/kiwisdr.js";
 import { ProcivCollector } from "./collectors/prociv.js";
 import { GdacsCollector } from "./collectors/gdacs.js";
-import { WarningsCollector } from "./collectors/warnings.js";
+// WarningsCollector migrated to JSON: src/sources/warnings.json
 import { LightningCollector } from "./collectors/lightning.js";
 import { AprsCollector } from "./collectors/aprs.js";
 import { GfsCollector } from "./collectors/gfs.js";
@@ -26,6 +26,7 @@ import { OceanCurrentsCollector } from "./collectors/ocean-currents.js";
 import { WavesCollector } from "./collectors/waves.js";
 import { SstCollector } from "./collectors/sst.js";
 import { AircraftCollector } from "./collectors/aircraft.js";
+import { GenericSourceCollector, loadSourceConfigs } from "./collectors/generic-source.js";
 const logger = createLogger("main");
 async function main() {
     logger.info("Starting Kaos Worker...");
@@ -43,9 +44,7 @@ async function main() {
     if (!config.DISABLE_SPACE_WEATHER) {
         scheduler.register(new SpaceWeatherCollector(), COLLECTOR_CONFIGS.spaceWeather.intervalMs);
     }
-    if (!config.DISABLE_AURORA) {
-        scheduler.register(new AuroraCollector(), COLLECTOR_CONFIGS.aurora.intervalMs);
-    }
+    // Aurora: migrated to JSON (src/sources/aurora.json)
     if (!config.DISABLE_TEC) {
         scheduler.register(new TecCollector(), COLLECTOR_CONFIGS.tec.intervalMs);
     }
@@ -58,9 +57,7 @@ async function main() {
     if (!config.DISABLE_GDACS) {
         scheduler.register(new GdacsCollector(), COLLECTOR_CONFIGS.gdacs.intervalMs);
     }
-    if (!config.DISABLE_WARNINGS) {
-        scheduler.register(new WarningsCollector(), COLLECTOR_CONFIGS.warnings.intervalMs);
-    }
+    // Warnings: migrated to JSON (src/sources/warnings.json)
     if (!config.DISABLE_LIGHTNING) {
         scheduler.registerWebSocket(new LightningCollector());
     }
@@ -81,9 +78,13 @@ async function main() {
     if (!config.DISABLE_AIRCRAFT) {
         scheduler.register(new AircraftCollector(config), COLLECTOR_CONFIGS.aircraft.intervalMs);
     }
-    // TODO: Add remaining collectors as they are implemented
-    // - FiresCollector (requires API key)
-    // - AirQualityCollector (requires API key)
+    // Auto-register JSON-defined sources from /sources directory
+    const sourceConfigs = loadSourceConfigs();
+    for (const sourceConfig of sourceConfigs) {
+        const collector = new GenericSourceCollector(sourceConfig);
+        scheduler.register(collector, collector.intervalMs);
+        logger.info(`Registered source: ${sourceConfig.name}`);
+    }
     // Start health server
     startHealthServer(config.WORKER_HEALTH_PORT, scheduler);
     // Start scheduler
