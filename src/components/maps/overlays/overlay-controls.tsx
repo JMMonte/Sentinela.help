@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import {
   Layers,
@@ -24,6 +24,12 @@ import {
   ChevronDown,
   ChevronRight,
   X,
+  Plane,
+  Radio,
+  Satellite,
+  Info,
+  Globe,
+  Sunset,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,12 +58,32 @@ import type { UvIndexOverlayState } from "../hooks/use-uv-index-overlay";
 import type { WavesOverlayState } from "../hooks/use-waves-overlay";
 import type { OceanCurrentsOverlayState } from "../hooks/use-ocean-currents-overlay";
 import type { SstOverlayState } from "../hooks/use-sst-overlay";
+import type { AircraftOverlayState } from "../hooks/use-aircraft-overlay";
+import type { LightningOverlayState } from "../hooks/use-lightning-overlay";
+import type { KiwiSdrOverlayState } from "../hooks/use-kiwisdr-overlay";
+import type { AprsOverlayState } from "../hooks/use-aprs-overlay";
+import type { IonosphereOverlayState } from "../hooks/use-ionosphere-overlay";
+import type { GdacsOverlayState } from "../hooks/use-gdacs-overlay";
+import type { TerminatorOverlayState } from "../hooks/use-terminator-overlay";
 import type { WeatherLayer } from "@/lib/overlays/weather-api";
+
+// Info descriptions for OpenWeatherMap real-time layers
+function getWeatherLayerInfo(layerId: string): string {
+  const infoMap: Record<string, string> = {
+    precipitation_new: "OpenWeatherMap real-time precipitation radar. Updates every 10 minutes.",
+    clouds_new: "OpenWeatherMap real-time cloud coverage. Updates every 10 minutes.",
+    temp_new: "OpenWeatherMap real-time temperature. Updates every 10 minutes.",
+    wind_new: "OpenWeatherMap real-time wind speed. Updates every 10 minutes.",
+    pressure_new: "OpenWeatherMap real-time sea level pressure. Updates every 10 minutes.",
+  };
+  return infoMap[layerId] || "OpenWeatherMap real-time weather data.";
+}
 
 export type OverlayControlsProps = {
   weather: WeatherOverlayState;
   seismic: SeismicOverlayState;
   prociv: ProCivOverlayState;
+  gdacs: GdacsOverlayState;
   rainfall: RainfallOverlayState;
   warnings: WarningsOverlayState;
   wind: WindOverlayState;
@@ -74,6 +100,14 @@ export type OverlayControlsProps = {
   waves: WavesOverlayState;
   oceanCurrents: OceanCurrentsOverlayState;
   sst: SstOverlayState;
+  // Radio data overlays
+  aircraft: AircraftOverlayState;
+  lightning: LightningOverlayState;
+  kiwisdr: KiwiSdrOverlayState;
+  aprs: AprsOverlayState;
+  ionosphere: IonosphereOverlayState;
+  // Utility overlays
+  terminator: TerminatorOverlayState;
 };
 
 type ImageOverlay =
@@ -101,6 +135,7 @@ export function OverlayControls({
   weather,
   seismic,
   prociv,
+  gdacs,
   rainfall,
   warnings,
   wind,
@@ -117,25 +152,22 @@ export function OverlayControls({
   waves,
   oceanCurrents,
   sst,
+  aircraft,
+  lightning,
+  kiwisdr,
+  aprs,
+  ionosphere,
+  terminator,
 }: OverlayControlsProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(["image", "flow", "hazards"])
+    new Set(["image", "flow", "hazards", "radio"])
   );
   const [headerPortal, setHeaderPortal] = useState<HTMLElement | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollTopRef = useRef(0);
 
   useEffect(() => {
     setHeaderPortal(document.getElementById("header-actions"));
   }, []);
-
-  // Restore scroll position synchronously before paint
-  useLayoutEffect(() => {
-    if (scrollRef.current && scrollTopRef.current > 0) {
-      scrollRef.current.scrollTop = scrollTopRef.current;
-    }
-  });
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => {
@@ -221,22 +253,26 @@ export function OverlayControls({
   const hasOceanOverlays = waves.isAvailable || sst.isAvailable;
   const hasEnvOverlays = airQuality.isAvailable || uvIndex.isAvailable || aurora.isAvailable;
   const hasFlowOverlays = wind.isAvailable || oceanCurrents.isAvailable;
-  const hasHazards = seismic.isAvailable || prociv.isAvailable || warnings.isAvailable || fires.isAvailable || rainfall.isAvailable;
+  const hasHazards = seismic.isAvailable || prociv.isAvailable || gdacs.isAvailable || warnings.isAvailable || fires.isAvailable || rainfall.isAvailable;
+  const hasRadioOverlays = aircraft.isAvailable || lightning.isAvailable || kiwisdr.isAvailable || aprs.isAvailable || ionosphere.isAvailable;
+  const hasUtilityOverlays = terminator.isAvailable;
   const hasImageOverlays = hasWeatherTiles || hasGfsOverlays || hasOceanOverlays || hasEnvOverlays;
 
-  const anyAvailable = hasImageOverlays || hasFlowOverlays || hasHazards;
+  const anyAvailable = hasImageOverlays || hasFlowOverlays || hasHazards || hasRadioOverlays || hasUtilityOverlays;
 
   if (!anyAvailable) return null;
 
   const hasActiveOverlay = activeImage !== null || activeFlow !== null ||
-    seismic.enabled || prociv.enabled || warnings.enabled || fires.enabled || rainfall.enabled;
+    seismic.enabled || prociv.enabled || warnings.enabled || fires.enabled || rainfall.enabled ||
+    aircraft.enabled || lightning.enabled || kiwisdr.enabled || aprs.enabled || ionosphere.enabled;
 
   const isAnyLoading =
     temperature.isLoading || humidity.isLoading || precipitation.isLoading ||
     cloudCover.isLoading || cape.isLoading || fireWeather.isLoading ||
     waves.isLoading || sst.isLoading || airQuality.isLoading || uvIndex.isLoading ||
     aurora.isLoading || wind.isLoading || oceanCurrents.isLoading ||
-    seismic.isLoading || prociv.isLoading || warnings.isLoading || fires.isLoading || rainfall.isLoading;
+    seismic.isLoading || prociv.isLoading || warnings.isLoading || fires.isLoading || rainfall.isLoading ||
+    aircraft.isLoading || lightning.isLoading || kiwisdr.isLoading || aprs.isLoading || ionosphere.isLoading;
 
   // Header toggle button (portaled to topbar)
   const headerButton = (
@@ -276,7 +312,7 @@ export function OverlayControls({
       {createPortal(
         <div
           className={cn(
-            "fixed left-3 top-16 z-[9999] w-56 max-h-[calc(100vh-6rem)] rounded-xl shadow-sm overflow-hidden",
+            "fixed left-3 right-3 sm:right-auto top-16 z-[9999] sm:w-56 max-h-[50vh] sm:max-h-[calc(100vh-6rem)] rounded-xl shadow-sm overflow-hidden",
             "bg-background/80 backdrop-blur-md supports-backdrop-filter:bg-background/60",
             "border",
             "flex flex-col",
@@ -298,23 +334,24 @@ export function OverlayControls({
           </div>
 
           {/* Scrollable content */}
-          <div
-            ref={scrollRef}
-            onScroll={(e) => { scrollTopRef.current = e.currentTarget.scrollTop; }}
-            className="overflow-y-auto flex-1 p-2 space-y-1 overscroll-contain"
-          >
-            {/* Image Overlays */}
-            {hasImageOverlays && (
-              <CollapsibleSection
-                title="Image Layers"
-                expanded={expandedSections.has("image")}
-                onToggle={() => toggleSection("image")}
-              >
+          <div className="overflow-y-auto flex-1 p-2 overscroll-contain">
+            {/* Mobile: two-column grid with fixed column assignment */}
+            <div className="grid grid-cols-2 gap-1 sm:flex sm:flex-col sm:gap-0 sm:space-y-1">
+              {/* Column 1 on mobile: Image Layers + Hazards */}
+              <div className="space-y-1 sm:contents">
+                {/* Image Overlays */}
+                {hasImageOverlays && (
+                  <CollapsibleSection
+                    title="Image Layers"
+                    expanded={expandedSections.has("image")}
+                    onToggle={() => toggleSection("image")}
+                  >
                 {hasWeatherTiles && (
                   <div className="space-y-0.5">
                     <span className="text-[10px] uppercase tracking-wide text-muted-foreground px-1">Real-time</span>
                     {weather.availableLayers.map((layer) => {
                       const value = `owm-${layer.id.replace("_new", "")}` as ImageOverlay;
+                      const info = getWeatherLayerInfo(layer.id);
                       return (
                         <RadioItem
                           key={layer.id}
@@ -323,6 +360,7 @@ export function OverlayControls({
                           onChange={() => setImageOverlay(value)}
                           icon={<Cloud className="size-3.5" />}
                           label={layer.label}
+                          info={info}
                         />
                       );
                     })}
@@ -333,22 +371,22 @@ export function OverlayControls({
                   <div className="space-y-0.5 mt-2">
                     <span className="text-[10px] uppercase tracking-wide text-muted-foreground px-1">Forecast</span>
                     {temperature.isAvailable && (
-                      <RadioItem name="image" checked={activeImage === "gfs-temperature"} onChange={() => setImageOverlay("gfs-temperature")} icon={<Thermometer className="size-3.5" />} label="Temperature" />
+                      <RadioItem name="image" checked={activeImage === "gfs-temperature"} onChange={() => setImageOverlay("gfs-temperature")} icon={<Thermometer className="size-3.5" />} label="Temperature" info="NOAA GFS 2m temperature forecast. Updates every 6 hours." />
                     )}
                     {humidity.isAvailable && (
-                      <RadioItem name="image" checked={activeImage === "gfs-humidity"} onChange={() => setImageOverlay("gfs-humidity")} icon={<Droplets className="size-3.5" />} label="Humidity" />
+                      <RadioItem name="image" checked={activeImage === "gfs-humidity"} onChange={() => setImageOverlay("gfs-humidity")} icon={<Droplets className="size-3.5" />} label="Humidity" info="NOAA GFS relative humidity forecast. Updates every 6 hours." />
                     )}
                     {precipitation.isAvailable && (
-                      <RadioItem name="image" checked={activeImage === "gfs-precipitation"} onChange={() => setImageOverlay("gfs-precipitation")} icon={<CloudRain className="size-3.5" />} label="Precipitation" />
+                      <RadioItem name="image" checked={activeImage === "gfs-precipitation"} onChange={() => setImageOverlay("gfs-precipitation")} icon={<CloudRain className="size-3.5" />} label="Precipitation" info="NOAA GFS total precipitation forecast. Updates every 6 hours." />
                     )}
                     {cloudCover.isAvailable && (
-                      <RadioItem name="image" checked={activeImage === "gfs-cloudCover"} onChange={() => setImageOverlay("gfs-cloudCover")} icon={<Cloudy className="size-3.5" />} label="Cloud Cover" />
+                      <RadioItem name="image" checked={activeImage === "gfs-cloudCover"} onChange={() => setImageOverlay("gfs-cloudCover")} icon={<Cloudy className="size-3.5" />} label="Cloud Cover" info="NOAA GFS total cloud cover forecast. Updates every 6 hours." />
                     )}
                     {cape.isAvailable && (
-                      <RadioItem name="image" checked={activeImage === "gfs-cape"} onChange={() => setImageOverlay("gfs-cape")} icon={<Zap className="size-3.5" />} label="Storm Potential" />
+                      <RadioItem name="image" checked={activeImage === "gfs-cape"} onChange={() => setImageOverlay("gfs-cape")} icon={<Zap className="size-3.5" />} label="Storm Potential" info="NOAA GFS CAPE (storm energy) forecast. Higher values indicate severe weather potential." />
                     )}
                     {fireWeather.isAvailable && (
-                      <RadioItem name="image" checked={activeImage === "gfs-fireWeather"} onChange={() => setImageOverlay("gfs-fireWeather")} icon={<Flame className="size-3.5 text-orange-500" />} label="Fire Weather" />
+                      <RadioItem name="image" checked={activeImage === "gfs-fireWeather"} onChange={() => setImageOverlay("gfs-fireWeather")} icon={<Flame className="size-3.5 text-orange-500" />} label="Fire Weather" info="Fire Weather Index based on temperature and humidity. Higher values = greater fire risk." />
                     )}
                   </div>
                 )}
@@ -357,10 +395,10 @@ export function OverlayControls({
                   <div className="space-y-0.5 mt-2">
                     <span className="text-[10px] uppercase tracking-wide text-muted-foreground px-1">Ocean</span>
                     {waves.isAvailable && (
-                      <RadioItem name="image" checked={activeImage === "ocean-waves"} onChange={() => setImageOverlay("ocean-waves")} icon={<Waves className="size-3.5 text-blue-500" />} label="Wave Height" />
+                      <RadioItem name="image" checked={activeImage === "ocean-waves"} onChange={() => setImageOverlay("ocean-waves")} icon={<Waves className="size-3.5 text-blue-500" />} label="Wave Height" info="NOAA WaveWatch III significant wave height. Updates every 3 hours." />
                     )}
                     {sst.isAvailable && (
-                      <RadioItem name="image" checked={activeImage === "ocean-sst"} onChange={() => setImageOverlay("ocean-sst")} icon={<Anchor className="size-3.5 text-cyan-500" />} label="Sea Temperature" />
+                      <RadioItem name="image" checked={activeImage === "ocean-sst"} onChange={() => setImageOverlay("ocean-sst")} icon={<Anchor className="size-3.5 text-cyan-500" />} label="Sea Temperature" info="NOAA sea surface temperature analysis. Updates daily." />
                     )}
                   </div>
                 )}
@@ -369,13 +407,13 @@ export function OverlayControls({
                   <div className="space-y-0.5 mt-2">
                     <span className="text-[10px] uppercase tracking-wide text-muted-foreground px-1">Environment</span>
                     {airQuality.isAvailable && (
-                      <RadioItem name="image" checked={activeImage === "env-airQuality"} onChange={() => setImageOverlay("env-airQuality")} icon={<Wind className="size-3.5 text-emerald-500" />} label="Air Quality" />
+                      <RadioItem name="image" checked={activeImage === "env-airQuality"} onChange={() => setImageOverlay("env-airQuality")} icon={<Wind className="size-3.5 text-emerald-500" />} label="Air Quality" info="World Air Quality Index (WAQI) PM2.5 data from monitoring stations." />
                     )}
                     {uvIndex.isAvailable && (
-                      <RadioItem name="image" checked={activeImage === "env-uvIndex"} onChange={() => setImageOverlay("env-uvIndex")} icon={<Sun className="size-3.5 text-yellow-500" />} label="UV Index" />
+                      <RadioItem name="image" checked={activeImage === "env-uvIndex"} onChange={() => setImageOverlay("env-uvIndex")} icon={<Sun className="size-3.5 text-yellow-500" />} label="UV Index" info="TEMIS UV index from satellite observations. Higher values = more sun protection needed." />
                     )}
                     {aurora.isAvailable && (
-                      <RadioItem name="image" checked={activeImage === "env-aurora"} onChange={() => setImageOverlay("env-aurora")} icon={<Sparkles className="size-3.5 text-green-400" />} label="Aurora" />
+                      <RadioItem name="image" checked={activeImage === "env-aurora"} onChange={() => setImageOverlay("env-aurora")} icon={<Sparkles className="size-3.5 text-green-400" />} label="Aurora" info="NOAA aurora forecast showing northern/southern lights visibility probability." />
                     )}
                   </div>
                 )}
@@ -390,25 +428,8 @@ export function OverlayControls({
               </CollapsibleSection>
             )}
 
-            {/* Flow Overlays */}
-            {hasFlowOverlays && (
-              <CollapsibleSection
-                title="Flow Animation"
-                expanded={expandedSections.has("flow")}
-                onToggle={() => toggleSection("flow")}
-              >
-                {wind.isAvailable && (
-                  <RadioItem name="flow" checked={activeFlow === "wind"} onChange={() => setFlowOverlay("wind")} icon={<Wind className="size-3.5" />} label="Wind Flow" />
-                )}
-                {oceanCurrents.isAvailable && (
-                  <RadioItem name="flow" checked={activeFlow === "currents"} onChange={() => setFlowOverlay("currents")} icon={<Navigation className="size-3.5 text-sky-400" />} label="Ocean Currents" />
-                )}
-                <RadioItem name="flow" checked={activeFlow === null} onChange={() => setFlowOverlay(null)} label="None" className="text-muted-foreground" />
-              </CollapsibleSection>
-            )}
-
-            {/* Hazards */}
-            {hasHazards && (
+                {/* Hazards - in column 1 on mobile */}
+                {hasHazards && (
               <CollapsibleSection
                 title="Hazards"
                 expanded={expandedSections.has("hazards")}
@@ -422,6 +443,7 @@ export function OverlayControls({
                     label="Earthquakes"
                     status={seismic.enabled ? `${seismic.earthquakes.length}` : undefined}
                     isLoading={seismic.isLoading}
+                    info="USGS global earthquake data. Filtered by time selector. Updates every minute."
                   />
                 )}
                 {prociv.isAvailable && (
@@ -432,6 +454,18 @@ export function OverlayControls({
                     label="ProCiv"
                     status={prociv.enabled ? `${prociv.incidents.length}` : undefined}
                     isLoading={prociv.isLoading}
+                    info="Portuguese Civil Protection incidents. Filtered by time selector. Updates every 2 minutes."
+                  />
+                )}
+                {gdacs.isAvailable && (
+                  <CheckboxItem
+                    checked={gdacs.enabled}
+                    onChange={gdacs.setEnabled}
+                    icon={<Globe className="size-3.5 text-orange-500" />}
+                    label="Global Disasters"
+                    status={gdacs.enabled ? `${gdacs.events.length}` : undefined}
+                    isLoading={gdacs.isLoading}
+                    info="GDACS global disaster alerts: earthquakes, floods, cyclones, volcanoes, wildfires, droughts. Updates every 10 minutes."
                   />
                 )}
                 {warnings.isAvailable && (
@@ -442,6 +476,7 @@ export function OverlayControls({
                     label="IPMA Warnings"
                     status={warnings.enabled ? `${warnings.districts.length}` : undefined}
                     isLoading={warnings.isLoading}
+                    info="Portuguese weather warnings by district from IPMA. Updates every 15 minutes."
                   />
                 )}
                 {fires.isAvailable && (
@@ -452,6 +487,7 @@ export function OverlayControls({
                     label="Active Fires"
                     status={fires.enabled ? `${fires.hotspots.length}` : undefined}
                     isLoading={fires.isLoading}
+                    info="NASA FIRMS satellite fire detection. Shows last 24h of hotspots. Updates every 10 minutes."
                   />
                 )}
                 {rainfall.isAvailable && (
@@ -462,10 +498,117 @@ export function OverlayControls({
                     label="Rainfall"
                     status={rainfall.enabled ? `${rainfall.stations.length}` : undefined}
                     isLoading={rainfall.isLoading}
+                    info="IPMA weather station rainfall observations. Filtered by time selector. Updates hourly."
                   />
                 )}
               </CollapsibleSection>
             )}
+              </div>
+
+              {/* Column 2 on mobile: Flow Animation + Radio & Tracking */}
+              <div className="space-y-1 sm:contents">
+                {/* Flow Overlays */}
+                {hasFlowOverlays && (
+                  <CollapsibleSection
+                    title="Flow Animation"
+                    expanded={expandedSections.has("flow")}
+                    onToggle={() => toggleSection("flow")}
+                  >
+                    {wind.isAvailable && (
+                      <RadioItem name="flow" checked={activeFlow === "wind"} onChange={() => setFlowOverlay("wind")} icon={<Wind className="size-3.5" />} label="Wind Flow" info="NOAA GFS global wind forecast. Animated particle flow visualization." />
+                    )}
+                    {oceanCurrents.isAvailable && (
+                      <RadioItem name="flow" checked={activeFlow === "currents"} onChange={() => setFlowOverlay("currents")} icon={<Navigation className="size-3.5 text-sky-400" />} label="Ocean Currents" info="NOAA OSCAR ocean surface currents. Animated flow visualization." />
+                    )}
+                    <RadioItem name="flow" checked={activeFlow === null} onChange={() => setFlowOverlay(null)} label="None" className="text-muted-foreground" />
+                  </CollapsibleSection>
+                )}
+
+                {/* Radio Data */}
+                {hasRadioOverlays && (
+              <CollapsibleSection
+                title="Radio & Tracking"
+                expanded={expandedSections.has("radio")}
+                onToggle={() => toggleSection("radio")}
+              >
+                {aircraft.isAvailable && (
+                  <CheckboxItem
+                    checked={aircraft.enabled}
+                    onChange={aircraft.setEnabled}
+                    icon={<Plane className="size-3.5 text-sky-500" />}
+                    label="Aircraft (ADS-B)"
+                    status={aircraft.enabled ? `${aircraft.aircraft.length}` : undefined}
+                    isLoading={aircraft.isLoading}
+                    info="Live ADS-B aircraft positions via OpenSky Network. Updates on map pan/zoom."
+                  />
+                )}
+                {lightning.isAvailable && (
+                  <CheckboxItem
+                    checked={lightning.enabled}
+                    onChange={lightning.setEnabled}
+                    icon={<Zap className="size-3.5 text-yellow-400" />}
+                    label="Lightning"
+                    status={lightning.enabled ? `${lightning.strikes.length}` : undefined}
+                    isLoading={lightning.isLoading}
+                    info="Blitzortung global lightning detection network. Shows last 30 minutes of strikes."
+                  />
+                )}
+                {kiwisdr.isAvailable && (
+                  <CheckboxItem
+                    checked={kiwisdr.enabled}
+                    onChange={kiwisdr.setEnabled}
+                    icon={<Radio className="size-3.5 text-green-500" />}
+                    label="WebSDR Stations"
+                    status={kiwisdr.enabled ? `${kiwisdr.stations.length}` : undefined}
+                    isLoading={kiwisdr.isLoading}
+                    info="KiwiSDR web-based software-defined radio receivers worldwide. Click to listen live."
+                  />
+                )}
+                {aprs.isAvailable && (
+                  <CheckboxItem
+                    checked={aprs.enabled}
+                    onChange={aprs.setEnabled}
+                    icon={<Radio className="size-3.5 text-orange-500" />}
+                    label="APRS Stations"
+                    status={aprs.enabled ? `${aprs.stations.length}` : undefined}
+                    isLoading={aprs.isLoading}
+                    info="Amateur radio APRS network stations. Updates on map pan/zoom."
+                  />
+                )}
+                {ionosphere.isAvailable && (
+                  <CheckboxItem
+                    checked={ionosphere.enabled}
+                    onChange={ionosphere.setEnabled}
+                    icon={<Satellite className="size-3.5 text-indigo-500" />}
+                    label="Ionosphere"
+                    status={ionosphere.enabled && ionosphere.spaceWeather ? `Kp ${ionosphere.spaceWeather.kpIndex.toFixed(1)}` : undefined}
+                    isLoading={ionosphere.isLoading}
+                    info="NOAA space weather data: Kp index, solar flux, X-ray emissions, and TEC map."
+                  />
+                )}
+              </CollapsibleSection>
+            )}
+
+                {/* Utility Overlays */}
+                {hasUtilityOverlays && (
+                  <CollapsibleSection
+                    title="Utility"
+                    expanded={expandedSections.has("utility")}
+                    onToggle={() => toggleSection("utility")}
+                  >
+                    {terminator.isAvailable && (
+                      <CheckboxItem
+                        checked={terminator.enabled}
+                        onChange={terminator.setEnabled}
+                        icon={<Sunset className="size-3.5 text-orange-400" />}
+                        label="Day/Night"
+                        info="Shows the day/night terminator line - the boundary between sunlit and dark areas on Earth. Updates every minute."
+                      />
+                    )}
+                  </CollapsibleSection>
+                )}
+              </div>
+            </div>
           </div>
         </div>,
         document.body
@@ -500,42 +643,60 @@ function CollapsibleSection({
   );
 }
 
-// Radio item for mutually exclusive options
+// Radio item for mutually exclusive options (button-based to avoid scroll issues with hidden inputs)
 function RadioItem({
-  name,
   checked,
   onChange,
   icon,
   label,
   className,
+  info,
 }: {
-  name: string;
+  name?: string; // kept for API compatibility but not used
   checked: boolean;
   onChange: () => void;
   icon?: React.ReactNode;
   label: string;
   className?: string;
+  info?: string;
 }) {
   return (
-    <label
-      className={cn(
-        "flex items-center gap-2 px-2 py-1 text-xs rounded-md cursor-pointer transition-colors",
-        "hover:bg-black/5 dark:hover:bg-white/5",
-        checked && "bg-primary/10 text-primary",
-        className
+    <div className="flex items-center gap-0.5">
+      <button
+        type="button"
+        role="radio"
+        aria-checked={checked}
+        onClick={onChange}
+        className={cn(
+          "flex items-center gap-2 px-2 py-1 text-xs rounded-md cursor-pointer transition-colors flex-1 min-w-0 text-left",
+          "hover:bg-black/5 dark:hover:bg-white/5",
+          checked && "bg-primary/10 text-primary",
+          className
+        )}
+      >
+        <span className={cn("size-2 rounded-full border-2 flex-shrink-0", checked ? "border-primary bg-primary" : "border-muted-foreground/50")} />
+        {icon && <span className="flex-shrink-0">{icon}</span>}
+        <span className="truncate min-w-0">{label}</span>
+      </button>
+      {info && (
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="p-1 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Info className="size-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="z-[10000] max-w-[200px] text-xs">
+              <p>{info}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       )}
-    >
-      <input
-        type="radio"
-        name={name}
-        checked={checked}
-        onChange={onChange}
-        className="sr-only"
-      />
-      <span className={cn("size-2 rounded-full border-2 flex-shrink-0", checked ? "border-primary bg-primary" : "border-muted-foreground/50")} />
-      {icon}
-      <span className="truncate">{label}</span>
-    </label>
+    </div>
   );
 }
 
@@ -547,6 +708,7 @@ function CheckboxItem({
   label,
   status,
   isLoading,
+  info,
 }: {
   checked: boolean;
   onChange: (checked: boolean) => void;
@@ -554,29 +716,50 @@ function CheckboxItem({
   label: string;
   status?: string;
   isLoading?: boolean;
+  info?: string;
 }) {
   return (
-    <button
-      type="button"
-      role="checkbox"
-      aria-checked={checked}
-      onClick={() => onChange(!checked)}
-      className={cn(
-        "flex items-center gap-2 px-2 py-1 text-xs rounded-md cursor-pointer transition-colors w-full text-left",
-        "hover:bg-black/5 dark:hover:bg-white/5",
-        checked && "bg-primary/10"
+    <div className="flex items-center gap-0.5">
+      <button
+        type="button"
+        role="checkbox"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={cn(
+          "flex items-center gap-2 px-2 py-1 text-xs rounded-md cursor-pointer transition-colors flex-1 min-w-0 text-left",
+          "hover:bg-black/5 dark:hover:bg-white/5",
+          checked && "bg-primary/10"
+        )}
+      >
+        <span className={cn(
+          "size-3.5 rounded border flex-shrink-0 flex items-center justify-center transition-colors",
+          checked ? "bg-primary border-primary text-primary-foreground" : "border-muted-foreground/50"
+        )}>
+          {checked && <svg className="size-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+        </span>
+        {icon && <span className="flex-shrink-0">{icon}</span>}
+        <span className="truncate flex-1 min-w-0">{label}</span>
+        {isLoading && <RefreshCw className="size-3 flex-shrink-0 animate-spin text-muted-foreground" />}
+        {!isLoading && status && <span className="text-[10px] flex-shrink-0 text-muted-foreground">{status}</span>}
+      </button>
+      {info && (
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="p-1 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Info className="size-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="z-[10000] max-w-[200px] text-xs">
+              <p>{info}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       )}
-    >
-      <span className={cn(
-        "size-3.5 rounded border flex-shrink-0 flex items-center justify-center transition-colors",
-        checked ? "bg-primary border-primary text-primary-foreground" : "border-muted-foreground/50"
-      )}>
-        {checked && <svg className="size-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-      </span>
-      {icon}
-      <span className="truncate flex-1">{label}</span>
-      {isLoading && <RefreshCw className="size-3 animate-spin text-muted-foreground" />}
-      {!isLoading && status && <span className="text-[10px] text-muted-foreground">{status}</span>}
-    </button>
+    </div>
   );
 }

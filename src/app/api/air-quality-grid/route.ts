@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
-import { cachedFetch } from "@/lib/server-cache";
+import { cacheAside } from "@/lib/redis-cache";
 import { env } from "@/lib/env";
 import type { GfsGridData, GfsGridHeader } from "@/lib/overlays/gfs-utils";
 
 /**
  * Air Quality Grid API route.
  *
- * Fetches station data from WAQI and interpolates it into a grid
- * using Inverse Distance Weighting (IDW) for smooth visualization.
+ * Reads AQI grid from Redis (or generates and caches on-demand).
+ * Uses WAQI station data with IDW interpolation.
  */
 
-const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+const CACHE_TTL_SECONDS = 900; // 15 minutes
 const FETCH_TIMEOUT = 30000;
 
 // Grid configuration - uses 0-359 longitude for proper tiling (like GFS)
@@ -95,6 +95,78 @@ function idwInterpolate(
   return weightedSum / weightSum;
 }
 
+async function generateAqiGrid(apiKey: string): Promise<GfsGridData> {
+  // Fetch global station data
+  const url = `https://api.waqi.info/v2/map/bounds?latlng=-60,-180,70,180&networks=all&token=${apiKey}`;
+  console.log("[air-quality-grid] Generating AQI grid from WAQI");
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+
+  const response = await fetch(url, {
+    signal: controller.signal,
+    cache: "no-store",
+  });
+  clearTimeout(timeout);
+
+  if (!response.ok) {
+    throw new Error(`WAQI API error: ${response.status}`);
+  }
+
+  const result: WaqiBoundsResponse = await response.json();
+  if (result.status !== "ok") {
+    throw new Error("WAQI API returned error status");
+  }
+
+  // Parse stations with valid AQI, convert to 0-360 longitude
+  const stations = result.data
+    .filter((s) => s.aqi !== "-" && !isNaN(parseInt(s.aqi)))
+    .map((s) => ({
+      lat: s.lat,
+      lon: lon180to360(s.lon),
+      aqi: parseInt(s.aqi),
+    }));
+
+  console.log(`[air-quality-grid] Got ${stations.length} stations`);
+
+  // Build interpolated grid
+  const ny = Math.floor((GRID_CONFIG.latMax - GRID_CONFIG.latMin) / GRID_CONFIG.step) + 1;
+  const nx = Math.floor((GRID_CONFIG.lonMax - GRID_CONFIG.lonMin) / GRID_CONFIG.step) + 1;
+  const data = new Array<number>(ny * nx).fill(NaN);
+
+  for (let yi = 0; yi < ny; yi++) {
+    const lat = GRID_CONFIG.latMax - yi * GRID_CONFIG.step;
+    for (let xi = 0; xi < nx; xi++) {
+      const lon = GRID_CONFIG.lonMin + xi * GRID_CONFIG.step;
+      const idx = yi * nx + xi;
+
+      const value = idwInterpolate(lat, lon, stations);
+      if (value !== null) {
+        data[idx] = value;
+      }
+    }
+  }
+
+  const validCount = data.filter((v) => !isNaN(v)).length;
+  console.log(`[air-quality-grid] Interpolated ${validCount}/${data.length} grid points`);
+
+  const header: GfsGridHeader = {
+    nx,
+    ny,
+    lo1: GRID_CONFIG.lonMin,
+    la1: GRID_CONFIG.latMax,
+    dx: GRID_CONFIG.step,
+    dy: GRID_CONFIG.step,
+  };
+
+  return {
+    header,
+    data,
+    unit: "AQI",
+    name: "Air Quality Index",
+  };
+}
+
 export async function GET() {
   const apiKey = env.WAQI_API_KEY;
   if (!apiKey) {
@@ -105,85 +177,16 @@ export async function GET() {
   }
 
   try {
-    const gridData = await cachedFetch<GfsGridData>(
-      "air-quality-grid:v3",
-      CACHE_TTL,
-      async () => {
-        // Fetch global station data
-        const url = `https://api.waqi.info/v2/map/bounds?latlng=-60,-180,70,180&networks=all&token=${apiKey}`;
-        console.log("[air-quality-grid] Fetching stations from WAQI");
-
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
-
-        const response = await fetch(url, {
-          signal: controller.signal,
-          cache: "no-store",
-        });
-        clearTimeout(timeout);
-
-        if (!response.ok) {
-          throw new Error(`WAQI API error: ${response.status}`);
-        }
-
-        const result: WaqiBoundsResponse = await response.json();
-        if (result.status !== "ok") {
-          throw new Error("WAQI API returned error status");
-        }
-
-        // Parse stations with valid AQI, convert to 0-360 longitude
-        const stations = result.data
-          .filter((s) => s.aqi !== "-" && !isNaN(parseInt(s.aqi)))
-          .map((s) => ({
-            lat: s.lat,
-            lon: lon180to360(s.lon),
-            aqi: parseInt(s.aqi),
-          }));
-
-        console.log(`[air-quality-grid] Got ${stations.length} stations`);
-
-        // Build interpolated grid
-        const ny = Math.floor((GRID_CONFIG.latMax - GRID_CONFIG.latMin) / GRID_CONFIG.step) + 1;
-        const nx = Math.floor((GRID_CONFIG.lonMax - GRID_CONFIG.lonMin) / GRID_CONFIG.step) + 1;
-        const data = new Array<number>(ny * nx).fill(NaN);
-
-        for (let yi = 0; yi < ny; yi++) {
-          const lat = GRID_CONFIG.latMax - yi * GRID_CONFIG.step;
-          for (let xi = 0; xi < nx; xi++) {
-            const lon = GRID_CONFIG.lonMin + xi * GRID_CONFIG.step;
-            const idx = yi * nx + xi;
-
-            const value = idwInterpolate(lat, lon, stations);
-            if (value !== null) {
-              data[idx] = value;
-            }
-          }
-        }
-
-        const validCount = data.filter((v) => !isNaN(v)).length;
-        console.log(`[air-quality-grid] Interpolated ${validCount}/${data.length} grid points`);
-
-        const header: GfsGridHeader = {
-          nx,
-          ny,
-          lo1: GRID_CONFIG.lonMin,
-          la1: GRID_CONFIG.latMax,
-          dx: GRID_CONFIG.step,
-          dy: GRID_CONFIG.step,
-        };
-
-        return {
-          header,
-          data,
-          unit: "AQI",
-          name: "Air Quality Index",
-        };
-      }
+    const result = await cacheAside<GfsGridData>(
+      "kaos:air-quality:global",
+      () => generateAqiGrid(apiKey),
+      CACHE_TTL_SECONDS
     );
 
-    return NextResponse.json(gridData, {
+    return NextResponse.json(result.data, {
       headers: {
-        "Cache-Control": "public, max-age=900, stale-while-revalidate=300",
+        "Cache-Control": "no-cache",
+        "X-Data-Source": result.source,
       },
     });
   } catch (error) {

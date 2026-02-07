@@ -1,63 +1,32 @@
 import { NextResponse } from "next/server";
-import { cachedFetch } from "@/lib/server-cache";
-import { parseGribData, extractGfsField, buildGridData } from "@/lib/overlays/gfs-parse";
-import { buildGfsUrl, type GfsGridData } from "@/lib/overlays/gfs-utils";
+import { getFromRedis } from "@/lib/redis-cache";
+import type { GfsGridData } from "@/lib/overlays/gfs-utils";
 
 /**
  * GFS Cloud Cover API route.
  *
- * Fetches total cloud cover from NOAA GFS at 1° resolution.
+ * Reads cloud cover data from Redis (populated by background worker).
  */
-
-const CACHE_TTL = 60 * 60 * 1000; // 1 hour
-
-// GFS Cloud Cover: Category 6 (Cloud), Parameter 1 (Total Cloud Cover)
-const CATEGORY = 6;
-const PARAMETER = 1;
 
 export async function GET() {
   try {
-    const gridData = await cachedFetch<GfsGridData>(
-      "gfs:cloud-cover",
-      CACHE_TTL,
-      async () => {
-        const url = buildGfsUrl([
-          { param: "TCDC", level: "entire_atmosphere" },
-        ]);
-        console.log("[gfs/cloud-cover] Fetching from:", url);
+    const data = await getFromRedis<GfsGridData>("kaos:gfs:cloud-cover");
 
-        const response = await fetch(url, {
-          cache: "no-store",
-          headers: { "Accept-Encoding": "gzip" },
-        });
+    if (!data) {
+      return NextResponse.json(
+        { error: "Cloud cover data unavailable - worker may not be running" },
+        { status: 503 }
+      );
+    }
 
-        if (!response.ok) {
-          throw new Error(`GFS fetch failed: ${response.status}`);
-        }
-
-        const buffer = await response.arrayBuffer();
-        const messages = await parseGribData(Buffer.from(buffer));
-
-        const field = extractGfsField(messages, CATEGORY, PARAMETER);
-        if (!field) {
-          throw new Error("Cloud cover field not found in GRIB data");
-        }
-
-        return buildGridData(field, "Cloud Cover", "%");
-      },
-    );
-
-    return NextResponse.json(gridData, {
-      headers: {
-        "Cache-Control": "public, max-age=3600, stale-while-revalidate=1800",
-      },
+    return NextResponse.json(data, {
+      headers: { "Cache-Control": "no-cache" },
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error("[gfs/cloud-cover] Error:", message);
+    console.error("[gfs/cloud-cover] error:", error);
     return NextResponse.json(
-      { error: `Failed to fetch cloud cover data: ${message}` },
-      { status: 500 },
+      { error: "Failed to fetch cloud cover data" },
+      { status: 500 }
     );
   }
 }

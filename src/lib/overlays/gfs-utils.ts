@@ -83,19 +83,28 @@ export const HUMIDITY_COLORS: ColorStop[] = [
 ];
 
 /**
- * Precipitation color scale: White → Blue → Purple
- * Range: 0mm to 50mm+
+ * Precipitation rate color scale: Transparent → Blue → Purple
+ * Range: 0 to 5 mm/h (focused on common precipitation rates)
+ *
+ * With LUT of 256 entries and range 0-5, each entry = 0.02 mm/h
+ * This makes values >= 0.01 mm/h visible as light drizzle.
+ *
+ * Light drizzle: 0.01 - 0.1 mm/h
+ * Light rain: 0.1 - 0.5 mm/h
+ * Moderate rain: 0.5 - 2.5 mm/h
+ * Heavy rain: 2.5+ mm/h (saturates to purple)
  */
 export const PRECIPITATION_COLORS: ColorStop[] = [
   { value: 0, color: "rgba(255,255,255,0)" }, // Transparent (no rain)
-  { value: 0.1, color: "#c6dbef" }, // Very light blue
-  { value: 1, color: "#9ecae1" }, // Light blue
-  { value: 2.5, color: "#6baed6" }, // Blue
-  { value: 5, color: "#4292c6" }, // Medium blue
-  { value: 10, color: "#2171b5" }, // Dark blue
-  { value: 20, color: "#084594" }, // Very dark blue
-  { value: 35, color: "#6a51a3" }, // Purple
-  { value: 50, color: "#54278f" }, // Dark purple
+  { value: 0.01, color: "rgba(198,219,239,0.3)" }, // Very faint blue (trace)
+  { value: 0.05, color: "rgba(158,202,225,0.5)" }, // Faint blue (drizzle)
+  { value: 0.1, color: "#9ecae1" }, // Light blue (light rain)
+  { value: 0.25, color: "#6baed6" }, // Blue
+  { value: 0.5, color: "#4292c6" }, // Medium blue
+  { value: 1, color: "#2171b5" }, // Dark blue (moderate)
+  { value: 2, color: "#084594" }, // Very dark blue
+  { value: 3, color: "#6a51a3" }, // Purple (heavy)
+  { value: 5, color: "#54278f" }, // Dark purple (very heavy)
 ];
 
 /**

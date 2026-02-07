@@ -289,6 +289,30 @@
     "pacioosWavewatch": {
       "name": "PacIOOS WAVEWATCH III",
       "description": "Modelo global de ondas oceânicas fornecendo altura significativa, período e direção das ondas com resolução de 0.5 graus"
+    },
+    "opensky": {
+      "name": "OpenSky Network",
+      "description": "Rastreamento de aeronaves em tempo real via recetores ADS-B em todo o mundo"
+    },
+    "blitzortung": {
+      "name": "Blitzortung",
+      "description": "Rede comunitária de deteção de relâmpagos com dados de descargas em tempo real"
+    },
+    "kiwisdr": {
+      "name": "Rede KiwiSDR",
+      "description": "Rede global de rádios definidos por software cobrindo 0-30 MHz"
+    },
+    "aprsfi": {
+      "name": "APRS.fi",
+      "description": "Posições e telemetria da rede de radioamadores APRS"
+    },
+    "noaaSwpc": {
+      "name": "NOAA SWPC",
+      "description": "Centro de Previsão de Clima Espacial — atividade solar, tempestades geomagnéticas e propagação rádio"
+    },
+    "gdacs": {
+      "name": "GDACS",
+      "description": "Sistema Global de Alerta e Coordenação de Desastres — alertas em tempo real para sismos, cheias, ciclones, vulcões, incêndios florestais e secas"
     }
   },
   "overlays": {
@@ -330,6 +354,26 @@
     "districtsWithWarnings": "{count} distrito(s) com avisos",
     "hotspots": "{count} focos de calor",
     "active": "Ativo",
-    "loading": "A carregar..."
+    "loading": "A carregar...",
+    "aircraft": "Aeronaves (ADS-B)",
+    "aircraftDescription": "Posições de aeronaves em tempo real da Rede OpenSky. Inclui informação de voo, altitude e velocidade.",
+    "aircraftCount": "{count} aeronaves",
+    "lightning": "Relâmpagos",
+    "lightningDescription": "Relâmpagos em tempo real da rede Blitzortung. Mostra descargas dos últimos 30 minutos.",
+    "lightningCount": "{count} descargas",
+    "kiwisdr": "Estações WebSDR",
+    "kiwisdrDescription": "Recetores de rádio definidos por software KiwiSDR. Clique para ouvir frequências de rádio 0-30 MHz.",
+    "kiwisdrCount": "{count} estações",
+    "aprs": "Estações APRS",
+    "aprsDescription": "Posições da rede de radioamadores APRS. Mostra operadores HAM, estações meteorológicas e digipeaters.",
+    "aprsCount": "{count} estações",
+    "spaceWeather": "Clima Espacial",
+    "spaceWeatherDescription": "Condições atuais do clima espacial do NOAA SWPC. Mostra índice Kp e propagação rádio HF.",
+    "tec": "TEC Ionosférico",
+    "tecDescription": "Conteúdo Total de Eletrões mostrando condições ionosféricas. Afeta precisão GPS e propagação rádio.",
+    "gdacs": "Desastres Globais",
+    "gdacsDescription": "Alertas de desastres globais GDACS: sismos, cheias, ciclones, vulcões, incêndios florestais, secas. Atualizado a cada 10 minutos.",
+    "gdacsCount": "{count} eventos",
+    "gdacsReport": "Relatório GDACS"
   }
 }

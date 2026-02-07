@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { fetchWindData, type VelocityData } from "@/lib/overlays/wind-api";
 
 export type WindOverlayConfig = {
@@ -18,8 +18,6 @@ export type WindOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 60 * 60 * 1000; // 1 hour (GFS updates every 6h)
-
 export function useWindOverlay(
   config: WindOverlayConfig,
 ): WindOverlayState {
@@ -28,7 +26,6 @@ export function useWindOverlay(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const hasFetched = useRef(false);
 
   const isAvailable = config.enabled;
 
@@ -39,7 +36,6 @@ export function useWindOverlay(
     setError(null);
 
     try {
-      // GFS data is global — no bounds needed
       const wind = await fetchWindData();
       setData(wind);
       setLastUpdated(new Date());
@@ -50,33 +46,10 @@ export function useWindOverlay(
     }
   }, [isAvailable]);
 
-  // Fetch when enabled (global data, no bounds dependency)
+  // Fetch when enabled
   useEffect(() => {
     if (!enabled || !isAvailable) return;
-
-    // Only fetch once initially
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      void refresh();
-    }
-  }, [enabled, isAvailable, refresh]);
-
-  // Reset fetch flag when disabled
-  useEffect(() => {
-    if (!enabled) {
-      hasFetched.current = false;
-    }
-  }, [enabled]);
-
-  // Periodic refresh (every hour)
-  useEffect(() => {
-    if (!enabled || !isAvailable) return;
-
-    const interval = setInterval(() => {
-      void refresh();
-    }, REFRESH_INTERVAL);
-
-    return () => clearInterval(interval);
+    void refresh();
   }, [enabled, isAvailable, refresh]);
 
   return {

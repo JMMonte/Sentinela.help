@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { fetchHumidityData } from "@/lib/overlays/humidity-api";
 import type { GfsGridData } from "@/lib/overlays/gfs-utils";
 
@@ -19,8 +19,6 @@ export type HumidityOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 60 * 60 * 1000; // 1 hour
-
 export function useHumidityOverlay(
   config: HumidityOverlayConfig,
 ): HumidityOverlayState {
@@ -29,7 +27,6 @@ export function useHumidityOverlay(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const hasFetched = useRef(false);
 
   const isAvailable = config.enabled;
 
@@ -50,22 +47,10 @@ export function useHumidityOverlay(
     }
   }, [isAvailable]);
 
+  // Fetch when enabled
   useEffect(() => {
     if (!enabled || !isAvailable) return;
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      void refresh();
-    }
-  }, [enabled, isAvailable, refresh]);
-
-  useEffect(() => {
-    if (!enabled) hasFetched.current = false;
-  }, [enabled]);
-
-  useEffect(() => {
-    if (!enabled || !isAvailable) return;
-    const interval = setInterval(() => void refresh(), REFRESH_INTERVAL);
-    return () => clearInterval(interval);
+    void refresh();
   }, [enabled, isAvailable, refresh]);
 
   return {

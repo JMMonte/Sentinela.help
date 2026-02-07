@@ -565,3 +565,262 @@ input[type="checkbox"].accent-primary {
   0%, 100% { filter: drop-shadow(0 1px 3px rgba(220, 38, 38, 0.3)); }
   50% { filter: drop-shadow(0 2px 8px rgba(220, 38, 38, 0.6)); }
 }
+
+/* ── Aircraft markers ── */
+.aircraft-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* ── Ionosphere overlay styles ── */
+
+/* Unified Ionosphere panel (matches layers panel style) */
+.ionosphere-panel {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  min-width: 160px;
+  max-width: 200px;
+  font-size: 11px;
+  color: #18181b;
+  overflow: hidden;
+}
+
+@supports (backdrop-filter: blur(12px)) {
+  .ionosphere-panel {
+    background: rgba(255, 255, 255, 0.6);
+  }
+}
+
+.ionosphere-panel.dark {
+  background: rgba(30, 30, 46, 0.8);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: #e4e4e7;
+}
+
+@supports (backdrop-filter: blur(12px)) {
+  .ionosphere-panel.dark {
+    background: rgba(30, 30, 46, 0.6);
+  }
+}
+
+.ionosphere-panel__header {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.ionosphere-panel.dark .ionosphere-panel__header {
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+.ionosphere-panel__body {
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ionosphere-panel__section {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.ionosphere-panel.dark .ionosphere-panel__section {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ionosphere-panel__section-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #71717a;
+  margin-bottom: 6px;
+}
+
+.ionosphere-panel.dark .ionosphere-panel__section-header {
+  color: #a1a1aa;
+}
+
+.ionosphere-panel__section-header svg {
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+.ionosphere-panel__section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ionosphere-panel__kp-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.ionosphere-panel__kp-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ionosphere-panel__kp-label {
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.ionosphere-panel__kp-desc {
+  font-size: 10px;
+  color: #71717a;
+}
+
+.ionosphere-panel.dark .ionosphere-panel__kp-desc {
+  color: #a1a1aa;
+}
+
+.ionosphere-panel__metric {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #52525b;
+}
+
+.ionosphere-panel.dark .ionosphere-panel__metric {
+  color: #a1a1aa;
+}
+
+.ionosphere-panel__metric svg {
+  flex-shrink: 0;
+  color: #71717a;
+}
+
+.ionosphere-panel.dark .ionosphere-panel__metric svg {
+  color: #a1a1aa;
+}
+
+.ionosphere-panel__hf {
+  font-size: 10px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.03);
+  margin-top: 2px;
+}
+
+.ionosphere-panel.dark .ionosphere-panel__hf {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ionosphere-panel__hf--good strong {
+  color: #22c55e;
+}
+
+.ionosphere-panel__hf--degraded strong {
+  color: #f59e0b;
+}
+
+.ionosphere-panel__hf--poor strong {
+  color: #ef4444;
+}
+
+/* TEC Legend */
+.ionosphere-panel__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.ionosphere-panel__legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.ionosphere-panel__legend-color {
+  width: 12px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* TEC Popup */
+.ionosphere-popup {
+  font-size: 12px;
+  min-width: 150px;
+}
+
+.ionosphere-popup__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 6px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: #18181b;
+}
+
+.ionosphere-popup.dark .ionosphere-popup__header {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+  color: #e4e4e7;
+}
+
+.ionosphere-popup__header svg {
+  color: #6366f1;
+  flex-shrink: 0;
+}
+
+.ionosphere-popup__content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ionosphere-popup__row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+}
+
+.ionosphere-popup__label {
+  font-weight: 500;
+  color: #71717a;
+}
+
+.ionosphere-popup.dark .ionosphere-popup__label {
+  color: #a1a1aa;
+}
+
+.ionosphere-popup__value {
+  font-weight: 600;
+  color: #18181b;
+}
+
+.ionosphere-popup.dark .ionosphere-popup__value {
+  color: #e4e4e7;
+}
+
+.ionosphere-popup__description {
+  font-size: 10px;
+  color: #71717a;
+  margin-top: 3px;
+}
+
+.ionosphere-popup.dark .ionosphere-popup__description {
+  color: #a1a1aa;
+}

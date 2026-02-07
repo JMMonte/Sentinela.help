@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { cachedFetch } from "@/lib/server-cache";
+import { cacheAside } from "@/lib/redis-cache";
 import { parseGribData, extractGfsField } from "@/lib/overlays/gfs-parse";
 import {
   buildGfsUrl,
@@ -11,7 +11,7 @@ import {
  * Fire Weather Index API route.
  *
  * Combines temperature and humidity from GFS to calculate fire risk.
- * Higher temperatures and lower humidity increase fire danger.
+ * Uses cache-aside pattern for Redis caching.
  *
  * Simplified FWI calculation:
  * - Base: temperature contribution (higher = more risk)
@@ -19,7 +19,7 @@ import {
  * - Scale: 0-100+ where higher = more dangerous
  */
 
-const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+const CACHE_TTL_SECONDS = 3600; // 1 hour
 
 // GFS Parameters
 const TEMP_CATEGORY = 0;
@@ -51,69 +51,72 @@ function calculateFWI(tempC: number, humidity: number): number {
   return Math.max(0, Math.min(fwi, 100));
 }
 
+async function fetchFireWeatherData(): Promise<GfsGridData> {
+  // Fetch both temperature and humidity in one request
+  const url = buildGfsUrl([
+    { param: "TMP", level: "2_m_above_ground" },
+    { param: "RH", level: "2_m_above_ground" },
+  ]);
+  console.log("[gfs/fire-weather] Fetching from GFS");
+
+  const response = await fetch(url, {
+    cache: "no-store",
+    headers: { "Accept-Encoding": "gzip" },
+  });
+
+  if (!response.ok) {
+    throw new Error(`GFS fetch failed: ${response.status}`);
+  }
+
+  const buffer = await response.arrayBuffer();
+  const messages = await parseGribData(Buffer.from(buffer));
+
+  const tempField = extractGfsField(messages, TEMP_CATEGORY, TEMP_PARAMETER);
+  const rhField = extractGfsField(messages, RH_CATEGORY, RH_PARAMETER);
+
+  if (!tempField || !rhField) {
+    throw new Error("Temperature or humidity field not found");
+  }
+
+  // Get grid definition from temperature field
+  const gridDef = tempField.grid?.definition || tempField.grid;
+
+  // Calculate FWI for each grid point
+  const fwiData: number[] = [];
+  for (let i = 0; i < tempField.data.length; i++) {
+    const tempK = tempField.data[i];
+    const rh = rhField.data[i];
+    const tempC = kelvinToCelsius(tempK);
+    fwiData.push(calculateFWI(tempC, rh));
+  }
+
+  return {
+    header: {
+      nx: gridDef.ni,
+      ny: gridDef.nj,
+      lo1: gridDef.lo1,
+      la1: gridDef.la1,
+      dx: gridDef.di,
+      dy: gridDef.dj,
+    },
+    data: fwiData,
+    unit: "index",
+    name: "Fire Weather Index",
+  };
+}
+
 export async function GET() {
   try {
-    const gridData = await cachedFetch<GfsGridData>(
-      "gfs:fire-weather",
-      CACHE_TTL,
-      async () => {
-        // Fetch both temperature and humidity in one request
-        const url = buildGfsUrl([
-          { param: "TMP", level: "2_m_above_ground" },
-          { param: "RH", level: "2_m_above_ground" },
-        ]);
-        console.log("[gfs/fire-weather] Fetching from:", url);
-
-        const response = await fetch(url, {
-          cache: "no-store",
-          headers: { "Accept-Encoding": "gzip" },
-        });
-
-        if (!response.ok) {
-          throw new Error(`GFS fetch failed: ${response.status}`);
-        }
-
-        const buffer = await response.arrayBuffer();
-        const messages = await parseGribData(Buffer.from(buffer));
-
-        const tempField = extractGfsField(messages, TEMP_CATEGORY, TEMP_PARAMETER);
-        const rhField = extractGfsField(messages, RH_CATEGORY, RH_PARAMETER);
-
-        if (!tempField || !rhField) {
-          throw new Error("Temperature or humidity field not found");
-        }
-
-        // Get grid definition from temperature field
-        const gridDef = tempField.grid?.definition || tempField.grid;
-
-        // Calculate FWI for each grid point
-        const fwiData: number[] = [];
-        for (let i = 0; i < tempField.data.length; i++) {
-          const tempK = tempField.data[i];
-          const rh = rhField.data[i];
-          const tempC = kelvinToCelsius(tempK);
-          fwiData.push(calculateFWI(tempC, rh));
-        }
-
-        return {
-          header: {
-            nx: gridDef.ni,
-            ny: gridDef.nj,
-            lo1: gridDef.lo1,
-            la1: gridDef.la1,
-            dx: gridDef.di,
-            dy: gridDef.dj,
-          },
-          data: fwiData,
-          unit: "index",
-          name: "Fire Weather Index",
-        };
-      },
+    const result = await cacheAside<GfsGridData>(
+      "kaos:gfs:fire-weather",
+      fetchFireWeatherData,
+      CACHE_TTL_SECONDS
     );
 
-    return NextResponse.json(gridData, {
+    return NextResponse.json(result.data, {
       headers: {
-        "Cache-Control": "public, max-age=3600, stale-while-revalidate=1800",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "X-Data-Source": result.source,
       },
     });
   } catch (error) {

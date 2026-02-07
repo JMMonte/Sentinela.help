@@ -22,8 +22,6 @@ export type SeismicOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
-
 export function useSeismicOverlay(
   config: SeismicOverlayConfig,
   timeFilterHours: number = 24,
@@ -53,13 +51,10 @@ export function useSeismicOverlay(
     }
   }, [isAvailable, config.minMagnitude, timeFilterHours]);
 
-  // Fetch on enable and auto-refresh
+  // Fetch when enabled
   useEffect(() => {
     if (!enabled || !isAvailable) return;
-
     void refresh();
-    const interval = setInterval(() => void refresh(), REFRESH_INTERVAL);
-    return () => clearInterval(interval);
   }, [enabled, isAvailable, refresh]);
 
   return {

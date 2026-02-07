@@ -9,8 +9,8 @@ export type PrecipitationGfsOverlayProps = {
 };
 
 /**
- * Precipitation forecast overlay - renders GFS accumulated precipitation.
- * White (none) → Blue → Purple (heavy)
+ * Precipitation forecast overlay - renders GFS precipitation rate.
+ * Transparent (none) → Blue → Purple (heavy)
  */
 export function PrecipitationGfsOverlay({ data, opacity = 0.7 }: PrecipitationGfsOverlayProps) {
   return (

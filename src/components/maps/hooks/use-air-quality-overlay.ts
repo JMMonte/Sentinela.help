@@ -19,8 +19,6 @@ export type AirQualityOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
-
 export function useAirQualityOverlay(
   config: AirQualityOverlayConfig
 ): AirQualityOverlayState {
@@ -49,13 +47,10 @@ export function useAirQualityOverlay(
     }
   }, [isAvailable]);
 
-  // Fetch on enable and auto-refresh
+  // Fetch when enabled
   useEffect(() => {
     if (!enabled || !isAvailable) return;
-
     void refresh();
-    const interval = setInterval(() => void refresh(), REFRESH_INTERVAL);
-    return () => clearInterval(interval);
   }, [enabled, isAvailable, refresh]);
 
   return {

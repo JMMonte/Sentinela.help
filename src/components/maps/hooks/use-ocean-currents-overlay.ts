@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   fetchOceanCurrentsData,
   type OceanCurrentsVelocityData,
@@ -21,8 +21,6 @@ export type OceanCurrentsOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 60 * 60 * 1000; // 1 hour (data updates daily)
-
 export function useOceanCurrentsOverlay(
   config: OceanCurrentsOverlayConfig,
 ): OceanCurrentsOverlayState {
@@ -31,7 +29,6 @@ export function useOceanCurrentsOverlay(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const hasFetched = useRef(false);
 
   const isAvailable = config.enabled;
 
@@ -42,7 +39,6 @@ export function useOceanCurrentsOverlay(
     setError(null);
 
     try {
-      // Ocean currents data is global - no bounds needed
       const currents = await fetchOceanCurrentsData();
       setData(currents);
       setLastUpdated(new Date());
@@ -55,33 +51,10 @@ export function useOceanCurrentsOverlay(
     }
   }, [isAvailable]);
 
-  // Fetch when enabled (global data, no bounds dependency)
+  // Fetch when enabled
   useEffect(() => {
     if (!enabled || !isAvailable) return;
-
-    // Only fetch once initially
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      void refresh();
-    }
-  }, [enabled, isAvailable, refresh]);
-
-  // Reset fetch flag when disabled
-  useEffect(() => {
-    if (!enabled) {
-      hasFetched.current = false;
-    }
-  }, [enabled]);
-
-  // Periodic refresh (every hour)
-  useEffect(() => {
-    if (!enabled || !isAvailable) return;
-
-    const interval = setInterval(() => {
-      void refresh();
-    }, REFRESH_INTERVAL);
-
-    return () => clearInterval(interval);
+    void refresh();
   }, [enabled, isAvailable, refresh]);
 
   return {

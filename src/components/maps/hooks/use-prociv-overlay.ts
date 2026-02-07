@@ -21,8 +21,6 @@ export type ProCivOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 2 * 60 * 1000; // 2 minutes
-
 export function useProCivOverlay(
   config: ProCivOverlayConfig,
   timeFilterHours: number = 8
@@ -52,13 +50,10 @@ export function useProCivOverlay(
     }
   }, [isAvailable, timeFilterHours]);
 
-  // Fetch on enable and auto-refresh
+  // Fetch when enabled
   useEffect(() => {
     if (!enabled || !isAvailable) return;
-
     void refresh();
-    const interval = setInterval(() => void refresh(), REFRESH_INTERVAL);
-    return () => clearInterval(interval);
   }, [enabled, isAvailable, refresh]);
 
   return {

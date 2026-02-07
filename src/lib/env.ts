@@ -6,6 +6,9 @@ const envSchema = z.object({
     .min(1)
     .default("postgresql://postgres:postgres@localhost:5433/sentinela?schema=public"),
   APP_BASE_URL: z.string().url().optional(),
+  // Upstash Redis for shared cache
+  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
   GOV_CONTACT_EMAIL: z.string().email().optional(),
   MAX_UPLOAD_IMAGES: z.coerce.number().int().min(1).max(10).default(3),
   MAX_UPLOAD_BYTES: z.coerce
@@ -22,8 +25,10 @@ const envSchema = z.object({
   // Seismic overlay (USGS)
   ENABLE_SEISMIC_OVERLAY: z.coerce.boolean().default(false),
   SEISMIC_MIN_MAGNITUDE: z.coerce.number().min(0).max(10).default(2.5),
-  // ProCiv / Fogos.pt overlay
+  // ProCiv / Fogos.pt overlay (disabled - API broken)
   ENABLE_PROCIV_OVERLAY: z.coerce.boolean().default(false),
+  // GDACS global disasters overlay (earthquakes, floods, cyclones, etc.)
+  ENABLE_GDACS_OVERLAY: z.coerce.boolean().default(true),
   // Rainfall overlay (IPMA)
   ENABLE_RAINFALL_OVERLAY: z.coerce.boolean().default(false),
   // IPMA weather warnings overlay
@@ -50,11 +55,24 @@ const envSchema = z.object({
   ENABLE_WAVES_OVERLAY: z.coerce.boolean().default(false),
   // Sea Surface Temperature overlay (NOAA OISST, no key required)
   ENABLE_SST_OVERLAY: z.coerce.boolean().default(false),
+  // Radio data overlays
+  // Aircraft overlay (OpenSky Network - OAuth2 credentials for 4000 credits/day vs 400 anonymous)
+  ENABLE_AIRCRAFT_OVERLAY: z.coerce.boolean().default(false),
+  OPENSKY_CLIENT_ID: z.string().optional(),
+  OPENSKY_CLIENT_SECRET: z.string().optional(),
+  ENABLE_LIGHTNING_OVERLAY: z.coerce.boolean().default(false),
+  ENABLE_KIWISDR_OVERLAY: z.coerce.boolean().default(false),
+  ENABLE_APRS_OVERLAY: z.coerce.boolean().default(false),
+  APRS_FI_API_KEY: z.string().optional(),
+  ENABLE_SPACE_WEATHER_OVERLAY: z.coerce.boolean().default(false),
+  ENABLE_TEC_OVERLAY: z.coerce.boolean().default(false),
 });
 
 export const env = envSchema.parse({
   DATABASE_URL: process.env.DATABASE_URL,
   APP_BASE_URL: process.env.APP_BASE_URL,
+  UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+  UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
   GOV_CONTACT_EMAIL: process.env.GOV_CONTACT_EMAIL,
   MAX_UPLOAD_IMAGES: process.env.MAX_UPLOAD_IMAGES,
   MAX_UPLOAD_BYTES: process.env.MAX_UPLOAD_BYTES,
@@ -65,6 +83,7 @@ export const env = envSchema.parse({
   ENABLE_SEISMIC_OVERLAY: process.env.ENABLE_SEISMIC_OVERLAY,
   SEISMIC_MIN_MAGNITUDE: process.env.SEISMIC_MIN_MAGNITUDE,
   ENABLE_PROCIV_OVERLAY: process.env.ENABLE_PROCIV_OVERLAY,
+  ENABLE_GDACS_OVERLAY: process.env.ENABLE_GDACS_OVERLAY,
   ENABLE_RAINFALL_OVERLAY: process.env.ENABLE_RAINFALL_OVERLAY,
   ENABLE_WARNINGS_OVERLAY: process.env.ENABLE_WARNINGS_OVERLAY,
   ENABLE_WIND_OVERLAY: process.env.ENABLE_WIND_OVERLAY,
@@ -79,4 +98,14 @@ export const env = envSchema.parse({
   ENABLE_UV_INDEX_OVERLAY: process.env.ENABLE_UV_INDEX_OVERLAY,
   ENABLE_WAVES_OVERLAY: process.env.ENABLE_WAVES_OVERLAY,
   ENABLE_SST_OVERLAY: process.env.ENABLE_SST_OVERLAY,
+  // Radio data overlays
+  ENABLE_AIRCRAFT_OVERLAY: process.env.ENABLE_AIRCRAFT_OVERLAY,
+  OPENSKY_CLIENT_ID: process.env.OPENSKY_CLIENT_ID,
+  OPENSKY_CLIENT_SECRET: process.env.OPENSKY_CLIENT_SECRET,
+  ENABLE_LIGHTNING_OVERLAY: process.env.ENABLE_LIGHTNING_OVERLAY,
+  ENABLE_KIWISDR_OVERLAY: process.env.ENABLE_KIWISDR_OVERLAY,
+  ENABLE_APRS_OVERLAY: process.env.ENABLE_APRS_OVERLAY,
+  APRS_FI_API_KEY: process.env.APRS_FI_API_KEY,
+  ENABLE_SPACE_WEATHER_OVERLAY: process.env.ENABLE_SPACE_WEATHER_OVERLAY,
+  ENABLE_TEC_OVERLAY: process.env.ENABLE_TEC_OVERLAY,
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { fetchCapeData } from "@/lib/overlays/cape-api";
 import type { GfsGridData } from "@/lib/overlays/gfs-utils";
 
@@ -19,15 +19,12 @@ export type CapeOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 60 * 60 * 1000; // 1 hour
-
 export function useCapeOverlay(config: CapeOverlayConfig): CapeOverlayState {
   const [enabled, setEnabled] = useState(false);
   const [data, setData] = useState<GfsGridData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const hasFetched = useRef(false);
 
   const isAvailable = config.enabled;
 
@@ -48,22 +45,10 @@ export function useCapeOverlay(config: CapeOverlayConfig): CapeOverlayState {
     }
   }, [isAvailable]);
 
+  // Fetch when enabled
   useEffect(() => {
     if (!enabled || !isAvailable) return;
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      void refresh();
-    }
-  }, [enabled, isAvailable, refresh]);
-
-  useEffect(() => {
-    if (!enabled) hasFetched.current = false;
-  }, [enabled]);
-
-  useEffect(() => {
-    if (!enabled || !isAvailable) return;
-    const interval = setInterval(() => void refresh(), REFRESH_INTERVAL);
-    return () => clearInterval(interval);
+    void refresh();
   }, [enabled, isAvailable, refresh]);
 
   return {

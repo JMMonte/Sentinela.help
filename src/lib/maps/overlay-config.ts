@@ -19,7 +19,11 @@ export function getOverlayConfig(): OverlayConfig {
       minMagnitude: env.SEISMIC_MIN_MAGNITUDE,
     },
     prociv: {
-      enabled: env.ENABLE_PROCIV_OVERLAY,
+      // Disabled: Fogos.pt API can't access ANEPC data source anymore
+      enabled: false,
+    },
+    gdacs: {
+      enabled: env.ENABLE_GDACS_OVERLAY,
     },
     rainfall: {
       enabled: env.ENABLE_RAINFALL_OVERLAY,
@@ -69,6 +73,29 @@ export function getOverlayConfig(): OverlayConfig {
     },
     sst: {
       enabled: env.ENABLE_SST_OVERLAY,
+    },
+    // Radio data overlays
+    aircraft: {
+      enabled: env.ENABLE_AIRCRAFT_OVERLAY,
+    },
+    lightning: {
+      enabled: env.ENABLE_LIGHTNING_OVERLAY,
+    },
+    kiwisdr: {
+      enabled: env.ENABLE_KIWISDR_OVERLAY,
+    },
+    aprs: {
+      // APRS-IS direct connection - no API key required
+      enabled: env.ENABLE_APRS_OVERLAY,
+    },
+    ionosphere: {
+      // Enable if either space weather or TEC is enabled
+      enabled: env.ENABLE_SPACE_WEATHER_OVERLAY || env.ENABLE_TEC_OVERLAY,
+    },
+    // Utility overlays
+    terminator: {
+      // Day/night terminator is always available (no API key required)
+      enabled: true,
     },
   };
 }

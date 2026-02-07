@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import { cachedFetch } from "@/lib/server-cache";
+import { cacheAside } from "@/lib/redis-cache";
 import { env } from "@/lib/env";
 import {
   fetchWithTimeout,
   validateInt,
   validateEnum,
-  getErrorMessage,
-  getErrorStatus,
 } from "@/lib/api-utils";
 
 /**
@@ -18,7 +16,7 @@ import {
  * API Documentation: https://firms.modaps.eosdis.nasa.gov/api/
  */
 
-const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+const CACHE_TTL_SECONDS = 900; // 15 minutes
 const FETCH_TIMEOUT = 30000; // 30 seconds
 
 // Valid FIRMS data sources
@@ -113,10 +111,11 @@ export async function GET(request: Request) {
     );
   }
 
+  const cacheKey = `kaos:fires:${source}:${days}`;
+
   try {
-    const hotspots = await cachedFetch<FirmsResponse>(
-      `fires:${source}:${days}`,
-      CACHE_TTL,
+    const result = await cacheAside<FirmsResponse>(
+      cacheKey,
       async () => {
         // World coverage - FIRMS supports "world" for global data
         // For Portugal specifically, we could use area coordinates
@@ -146,20 +145,21 @@ export async function GET(request: Request) {
         const csv = await response.text();
         return parseFirmsCsv(csv);
       },
+      CACHE_TTL_SECONDS
     );
 
-    return NextResponse.json(hotspots, {
+    return NextResponse.json(result.data, {
       headers: {
-        "Cache-Control": "public, max-age=900, stale-while-revalidate=300",
+        "Cache-Control": "no-cache",
+        "X-Data-Source": result.source,
       },
     });
   } catch (error) {
-    const message = getErrorMessage(error);
-    const status = getErrorStatus(error);
+    const message = error instanceof Error ? error.message : String(error);
     console.error("[fires] Error:", message);
     return NextResponse.json(
       { error: `Failed to fetch fire data: ${message}` },
-      { status },
+      { status: 500 },
     );
   }
 }

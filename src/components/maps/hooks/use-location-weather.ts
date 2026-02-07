@@ -13,8 +13,6 @@ export type LocationWeatherState = {
   lastUpdated: Date | null;
 };
 
-const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
-
 /**
  * Hook to fetch current weather for a location.
  * Uses server-side proxy - API key is not needed client-side.
@@ -39,7 +37,6 @@ export function useLocationWeather(
     setError(null);
 
     try {
-      // API key handled by server proxy
       const result = await fetchCurrentWeather(lat, lon);
       setData(result);
       setLastUpdated(new Date());
@@ -50,6 +47,7 @@ export function useLocationWeather(
     }
   }, [lat, lon, enabled]);
 
+  // Fetch when location changes
   useEffect(() => {
     if (lat == null || lon == null || !enabled) {
       setData(null);
@@ -61,9 +59,6 @@ export function useLocationWeather(
       prevLocationRef.current = locationKey;
       void fetchWeather();
     }
-
-    const interval = setInterval(() => void fetchWeather(), REFRESH_INTERVAL);
-    return () => clearInterval(interval);
   }, [lat, lon, enabled, fetchWeather]);
 
   return { data, isLoading, error, lastUpdated };

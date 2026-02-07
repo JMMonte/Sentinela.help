@@ -21,8 +21,6 @@ export type WarningsOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 30 * 60 * 1000; // 30 minutes
-
 export function useWarningsOverlay(
   config: WarningsOverlayConfig,
 ): WarningsOverlayState {
@@ -53,12 +51,10 @@ export function useWarningsOverlay(
     }
   }, [isAvailable]);
 
+  // Fetch when enabled
   useEffect(() => {
     if (!enabled || !isAvailable) return;
-
     void refresh();
-    const interval = setInterval(() => void refresh(), REFRESH_INTERVAL);
-    return () => clearInterval(interval);
   }, [enabled, isAvailable, refresh]);
 
   return {

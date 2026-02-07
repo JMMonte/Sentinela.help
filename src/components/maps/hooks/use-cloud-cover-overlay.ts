@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { fetchCloudCoverData } from "@/lib/overlays/cloud-cover-api";
 import type { GfsGridData } from "@/lib/overlays/gfs-utils";
 
@@ -19,8 +19,6 @@ export type CloudCoverOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 60 * 60 * 1000; // 1 hour
-
 export function useCloudCoverOverlay(
   config: CloudCoverOverlayConfig,
 ): CloudCoverOverlayState {
@@ -29,7 +27,6 @@ export function useCloudCoverOverlay(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const hasFetched = useRef(false);
 
   const isAvailable = config.enabled;
 
@@ -50,22 +47,10 @@ export function useCloudCoverOverlay(
     }
   }, [isAvailable]);
 
+  // Fetch when enabled
   useEffect(() => {
     if (!enabled || !isAvailable) return;
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      void refresh();
-    }
-  }, [enabled, isAvailable, refresh]);
-
-  useEffect(() => {
-    if (!enabled) hasFetched.current = false;
-  }, [enabled]);
-
-  useEffect(() => {
-    if (!enabled || !isAvailable) return;
-    const interval = setInterval(() => void refresh(), REFRESH_INTERVAL);
-    return () => clearInterval(interval);
+    void refresh();
   }, [enabled, isAvailable, refresh]);
 
   return {

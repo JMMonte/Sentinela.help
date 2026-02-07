@@ -21,8 +21,6 @@ export type RainfallOverlayState = {
   refresh: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes (IPMA updates hourly)
-
 export function useRainfallOverlay(
   config: RainfallOverlayConfig,
   timeFilterHours: number = 24,
@@ -55,12 +53,10 @@ export function useRainfallOverlay(
     }
   }, [isAvailable, effectiveHours]);
 
+  // Fetch when enabled
   useEffect(() => {
     if (!enabled || !isAvailable) return;
-
     void refresh();
-    const interval = setInterval(() => void refresh(), REFRESH_INTERVAL);
-    return () => clearInterval(interval);
   }, [enabled, isAvailable, refresh]);
 
   return {

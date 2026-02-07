@@ -289,6 +289,30 @@
     "pacioosWavewatch": {
       "name": "PacIOOS WAVEWATCH III",
       "description": "Global ocean wave model providing significant wave height, period, and direction at 0.5 degree resolution"
+    },
+    "opensky": {
+      "name": "OpenSky Network",
+      "description": "Real-time aircraft tracking via ADS-B receivers worldwide"
+    },
+    "blitzortung": {
+      "name": "Blitzortung",
+      "description": "Community-driven lightning detection network with real-time strike data"
+    },
+    "kiwisdr": {
+      "name": "KiwiSDR Network",
+      "description": "Global network of software-defined radios covering 0-30 MHz"
+    },
+    "aprsfi": {
+      "name": "APRS.fi",
+      "description": "Amateur radio APRS network positions and telemetry"
+    },
+    "noaaSwpc": {
+      "name": "NOAA SWPC",
+      "description": "Space Weather Prediction Center — solar activity, geomagnetic storms, and radio propagation"
+    },
+    "gdacs": {
+      "name": "GDACS",
+      "description": "Global Disaster Alert and Coordination System — real-time alerts for earthquakes, floods, cyclones, volcanoes, wildfires, and droughts"
     }
   },
   "overlays": {
@@ -330,6 +354,26 @@
     "districtsWithWarnings": "{count} district(s) with warnings",
     "hotspots": "{count} hotspots",
     "active": "Active",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "aircraft": "Aircraft (ADS-B)",
+    "aircraftDescription": "Real-time aircraft positions from the OpenSky Network. Includes flight info, altitude, and speed.",
+    "aircraftCount": "{count} aircraft",
+    "lightning": "Lightning",
+    "lightningDescription": "Real-time lightning strikes from the Blitzortung network. Shows strikes from the last 30 minutes.",
+    "lightningCount": "{count} strikes",
+    "kiwisdr": "WebSDR Stations",
+    "kiwisdrDescription": "KiwiSDR software-defined radio receivers. Click to listen to radio frequencies 0-30 MHz.",
+    "kiwisdrCount": "{count} stations",
+    "aprs": "APRS Stations",
+    "aprsDescription": "Amateur radio APRS network positions. Shows HAM operators, weather stations, and digipeaters.",
+    "aprsCount": "{count} stations",
+    "spaceWeather": "Space Weather",
+    "spaceWeatherDescription": "Current space weather conditions from NOAA SWPC. Shows Kp index and HF radio propagation.",
+    "tec": "Ionosphere TEC",
+    "tecDescription": "Total Electron Content showing ionospheric conditions. Affects GPS accuracy and radio propagation.",
+    "gdacs": "Global Disasters",
+    "gdacsDescription": "GDACS global disaster alerts: earthquakes, floods, cyclones, volcanoes, wildfires, droughts. Updates every 10 minutes.",
+    "gdacsCount": "{count} events",
+    "gdacsReport": "GDACS Report"
   }
 }

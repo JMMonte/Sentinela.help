@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
-import { cachedFetch } from "@/lib/server-cache";
+import { cacheAside } from "@/lib/redis-cache";
 
-// Cache current weather for 5 minutes
-const CACHE_TTL = 5 * 60 * 1000;
+/**
+ * GET /api/weather/current
+ *
+ * Fetches current weather from OpenWeatherMap with Redis caching.
+ * Uses cache-aside pattern: checks Redis first, falls back to OWM API.
+ * Coordinates are rounded to ~11km precision to improve cache hit rate.
+ *
+ * Cache TTL: 5 minutes in Redis
+ */
 
-// Rate limiting: max 60 requests per minute (OWM free tier)
-// Using server-side cache reduces actual API calls significantly
+const CACHE_TTL_SECONDS = 300; // 5 minutes
 
 export async function GET(request: Request): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
@@ -52,30 +58,39 @@ export async function GET(request: Request): Promise<NextResponse> {
     // Round coordinates to reduce cache key variations (1 decimal = ~11km precision)
     const roundedLat = Math.round(lat * 10) / 10;
     const roundedLon = Math.round(lon * 10) / 10;
-    const cacheKey = `weather:current:${roundedLat}:${roundedLon}`;
+    const cacheKey = `kaos:weather:current:${roundedLat}:${roundedLon}`;
 
-    const data = await cachedFetch(cacheKey, CACHE_TTL, async () => {
-      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+    const result = await cacheAside(
+      cacheKey,
+      async () => {
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
 
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
 
-      const response = await fetch(url, {
-        signal: controller.signal,
-      });
+        try {
+          const response = await fetch(url, {
+            signal: controller.signal,
+          });
 
-      clearTimeout(timeout);
+          clearTimeout(timeout);
 
-      if (!response.ok) {
-        throw new Error(`OWM API error: ${response.status}`);
-      }
+          if (!response.ok) {
+            throw new Error(`OWM API error: ${response.status}`);
+          }
 
-      return response.json();
-    });
+          return response.json();
+        } finally {
+          clearTimeout(timeout);
+        }
+      },
+      CACHE_TTL_SECONDS
+    );
 
-    return NextResponse.json(data, {
+    return NextResponse.json(result.data, {
       headers: {
         "Cache-Control": "public, max-age=300, stale-while-revalidate=120",
+        "X-Data-Source": result.source,
       },
     });
   } catch (error) {

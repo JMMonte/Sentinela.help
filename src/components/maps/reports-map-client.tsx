@@ -49,6 +49,13 @@ import { UvIndexOverlay } from "./overlays/uv-index-overlay";
 import { WavesOverlay } from "./overlays/waves-overlay";
 import { OceanCurrentsOverlay } from "./overlays/ocean-currents-overlay";
 import { SstOverlay } from "./overlays/sst-overlay";
+import { AircraftOverlay } from "./overlays/aircraft-overlay";
+import { LightningOverlay } from "./overlays/lightning-overlay";
+import { KiwiSdrOverlay } from "./overlays/kiwisdr-overlay";
+import { AprsOverlay } from "./overlays/aprs-overlay";
+import { IonosphereOverlay } from "./overlays/ionosphere-overlay";
+import { GdacsOverlay } from "./overlays/gdacs-overlay";
+import { TerminatorOverlay } from "./overlays/terminator-overlay";
 import { OverlayControls } from "./overlays/overlay-controls";
 import { useWeatherOverlay, type WeatherOverlayConfig } from "./hooks/use-weather-overlay";
 import { useSeismicOverlay, type SeismicOverlayConfig } from "./hooks/use-seismic-overlay";
@@ -69,6 +76,13 @@ import { useUvIndexOverlay, type UvIndexOverlayConfig } from "./hooks/use-uv-ind
 import { useWavesOverlay, type WavesOverlayConfig } from "./hooks/use-waves-overlay";
 import { useOceanCurrentsOverlay, type OceanCurrentsOverlayConfig } from "./hooks/use-ocean-currents-overlay";
 import { useSstOverlay, type SstOverlayConfig } from "./hooks/use-sst-overlay";
+import { useAircraftOverlay, type AircraftOverlayConfig } from "./hooks/use-aircraft-overlay";
+import { useLightningOverlay, type LightningOverlayConfig } from "./hooks/use-lightning-overlay";
+import { useKiwiSdrOverlay, type KiwiSdrOverlayConfig } from "./hooks/use-kiwisdr-overlay";
+import { useAprsOverlay, type AprsOverlayConfig } from "./hooks/use-aprs-overlay";
+import { useIonosphereOverlay, type IonosphereOverlayConfig } from "./hooks/use-ionosphere-overlay";
+import { useGdacsOverlay, type GdacsOverlayConfig } from "./hooks/use-gdacs-overlay";
+import { useTerminatorOverlay, type TerminatorOverlayConfig } from "./hooks/use-terminator-overlay";
 import { useLocationWeather } from "./hooks/use-location-weather";
 import { useOverlayValues, type OverlayValueConfig } from "./hooks/use-overlay-values";
 import { UserLocationMarker, PinLocationMarker } from "./user-location-marker";
@@ -98,6 +112,7 @@ export type OverlayConfig = {
   weather: WeatherOverlayConfig;
   seismic: SeismicOverlayConfig;
   prociv: ProCivOverlayConfig;
+  gdacs: GdacsOverlayConfig;
   rainfall: RainfallOverlayConfig;
   warnings: WarningsOverlayConfig;
   wind: WindOverlayConfig;
@@ -115,6 +130,14 @@ export type OverlayConfig = {
   waves: WavesOverlayConfig;
   oceanCurrents: OceanCurrentsOverlayConfig;
   sst: SstOverlayConfig;
+  // Radio data overlays
+  aircraft: AircraftOverlayConfig;
+  lightning: LightningOverlayConfig;
+  kiwisdr: KiwiSdrOverlayConfig;
+  aprs: AprsOverlayConfig;
+  ionosphere: IonosphereOverlayConfig;
+  // Utility overlays
+  terminator: TerminatorOverlayConfig;
 };
 
 export type ReportsMapProps = {
@@ -230,6 +253,7 @@ const DEFAULT_OVERLAY_CONFIG: OverlayConfig = {
   weather: { enabled: false },
   seismic: { enabled: false, minMagnitude: 2.5 },
   prociv: { enabled: false },
+  gdacs: { enabled: false },
   rainfall: { enabled: false },
   warnings: { enabled: false },
   wind: { enabled: false },
@@ -247,6 +271,14 @@ const DEFAULT_OVERLAY_CONFIG: OverlayConfig = {
   waves: { enabled: false },
   oceanCurrents: { enabled: false },
   sst: { enabled: false },
+  // Radio data overlays
+  aircraft: { enabled: false },
+  lightning: { enabled: false },
+  kiwisdr: { enabled: false },
+  aprs: { enabled: false },
+  ionosphere: { enabled: false },
+  // Utility overlays
+  terminator: { enabled: false },
 };
 
 export function ReportsMapClient({
@@ -273,6 +305,7 @@ export function ReportsMapClient({
   const weather = useWeatherOverlay(overlayConfig.weather);
   const seismic = useSeismicOverlay(overlayConfig.seismic, timeFilterHours);
   const prociv = useProCivOverlay(overlayConfig.prociv, timeFilterHours);
+  const gdacs = useGdacsOverlay(overlayConfig.gdacs);
   const rainfall = useRainfallOverlay(overlayConfig.rainfall, timeFilterHours);
   const warnings = useWarningsOverlay(overlayConfig.warnings);
   const wind = useWindOverlay(overlayConfig.wind);
@@ -291,6 +324,16 @@ export function ReportsMapClient({
   const waves = useWavesOverlay(overlayConfig.waves);
   const oceanCurrents = useOceanCurrentsOverlay(overlayConfig.oceanCurrents);
   const sst = useSstOverlay(overlayConfig.sst);
+
+  // Radio data overlays
+  const aircraft = useAircraftOverlay(overlayConfig.aircraft);
+  const lightning = useLightningOverlay(overlayConfig.lightning);
+  const kiwisdr = useKiwiSdrOverlay(overlayConfig.kiwisdr);
+  const aprs = useAprsOverlay(overlayConfig.aprs);
+  const ionosphere = useIonosphereOverlay(overlayConfig.ionosphere);
+
+  // Utility overlays
+  const terminator = useTerminatorOverlay(overlayConfig.terminator);
 
   // Location weather (current weather at user position)
   // API key handled server-side via proxy
@@ -407,6 +450,9 @@ export function ReportsMapClient({
         <FlyToCenter center={flyTo} />
         {onMapClick && <ClickHandler onPick={onMapClick} />}
 
+        {/* Day/Night terminator (shows shadow for night side) */}
+        {terminator.enabled && <TerminatorOverlay />}
+
         {/* Weather overlay (above base tiles, below markers) */}
         {weather.enabled && weather.tileUrl && (
           <WeatherOverlay tileUrl={weather.tileUrl} opacity={weather.opacity} />
@@ -425,6 +471,11 @@ export function ReportsMapClient({
         {/* ProCiv overlay (civil protection occurrences) */}
         {prociv.enabled && prociv.incidents.length > 0 && (
           <ProCivOverlay incidents={prociv.incidents} />
+        )}
+
+        {/* GDACS Global Disasters overlay */}
+        {gdacs.enabled && gdacs.events.length > 0 && (
+          <GdacsOverlay events={gdacs.events} />
         )}
 
         {/* Rainfall overlay (IPMA station observations) */}
@@ -498,6 +549,41 @@ export function ReportsMapClient({
           <OceanCurrentsOverlay data={oceanCurrents.data} />
         )}
 
+        {/* Radio Data overlays */}
+        {/* Aircraft (ADS-B) overlay */}
+        {aircraft.enabled && (
+          <AircraftOverlay
+            aircraft={aircraft.aircraft}
+            onBoundsChange={aircraft.updateBounds}
+          />
+        )}
+
+        {/* Lightning overlay (Blitzortung) */}
+        {lightning.enabled && lightning.strikes.length > 0 && (
+          <LightningOverlay strikes={lightning.strikes} />
+        )}
+
+        {/* KiwiSDR WebSDR stations overlay */}
+        {kiwisdr.enabled && kiwisdr.stations.length > 0 && (
+          <KiwiSdrOverlay stations={kiwisdr.stations} />
+        )}
+
+        {/* APRS amateur radio stations overlay */}
+        {aprs.enabled && (
+          <AprsOverlay
+            stations={aprs.stations}
+            onBoundsChange={aprs.updateBounds}
+          />
+        )}
+
+        {/* Combined Ionosphere overlay (Space Weather + TEC) */}
+        {ionosphere.enabled && (
+          <IonosphereOverlay
+            spaceWeather={ionosphere.spaceWeather}
+            tecData={ionosphere.tecData}
+          />
+        )}
+
         {/* Route polyline (navigation route) */}
         {routeGeometry && routeGeometry.length >= 2 && (
           <RouteOverlay geometry={routeGeometry} />
@@ -543,6 +629,7 @@ export function ReportsMapClient({
         weather={weather}
         seismic={seismic}
         prociv={prociv}
+        gdacs={gdacs}
         rainfall={rainfall}
         warnings={warnings}
         wind={wind}
@@ -559,6 +646,12 @@ export function ReportsMapClient({
         waves={waves}
         oceanCurrents={oceanCurrents}
         sst={sst}
+        aircraft={aircraft}
+        lightning={lightning}
+        kiwisdr={kiwisdr}
+        aprs={aprs}
+        ionosphere={ionosphere}
+        terminator={terminator}
       />
     </div>
   );
