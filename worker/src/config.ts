@@ -65,8 +65,8 @@ export const COLLECTOR_CONFIGS = {
   aircraft: {
     name: "aircraft",
     redisKey: "kaos:aircraft:global",
-    ttlSeconds: 90,
-    intervalMs: 15_000, // 15 seconds
+    ttlSeconds: 120,
+    intervalMs: 60_000, // 60 seconds - OpenSky has strict rate limits
   },
   seismic: {
     name: "seismic",

@@ -92,8 +92,8 @@ export declare const COLLECTOR_CONFIGS: {
     readonly aircraft: {
         readonly name: "aircraft";
         readonly redisKey: "kaos:aircraft:global";
-        readonly ttlSeconds: 90;
-        readonly intervalMs: 15000;
+        readonly ttlSeconds: 120;
+        readonly intervalMs: 60000;
     };
     readonly seismic: {
         readonly name: "seismic";
