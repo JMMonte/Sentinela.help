@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter, usePathname } from "next/navigation";
 import { Check, ChevronDown, Globe } from "lucide-react";
@@ -19,6 +19,11 @@ export function LanguageSelector() {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   function handleLocaleChange(newLocale: Locale) {
     if (newLocale === locale) {
@@ -39,6 +44,23 @@ export function LanguageSelector() {
     router.push(segments.join("/") || "/");
     router.refresh();
     setOpen(false);
+  }
+
+  // Render a static button during SSR to avoid hydration mismatch from Radix IDs
+  if (!mounted) {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="h-10 sm:h-7 gap-1 px-2"
+        aria-label={t("language")}
+      >
+        <Globe className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+        <span className="text-sm sm:text-xs font-medium uppercase">{locale === "pt-PT" ? "PT" : locale}</span>
+        <ChevronDown className="h-3 w-3 opacity-50" />
+      </Button>
+    );
   }
 
   return (
