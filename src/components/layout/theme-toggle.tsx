@@ -4,6 +4,7 @@ import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 
+import { trackThemeChanged } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -26,7 +27,11 @@ export function ThemeToggle() {
             size="icon"
             className="h-10 w-10 sm:h-7 sm:w-7"
             aria-label={t("toggleTheme")}
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            onClick={() => {
+              const newTheme = theme === "dark" ? "light" : "dark";
+              trackThemeChanged(newTheme);
+              setTheme(newTheme);
+            }}
           >
             <SunIcon className="h-5 w-5 sm:h-4 sm:w-4 dark:hidden" />
             <MoonIcon className="hidden h-5 w-5 sm:h-4 sm:w-4 dark:block" />

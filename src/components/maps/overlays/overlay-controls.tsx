@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { trackOverlayEnabled, trackOverlayDisabled } from "@/lib/analytics";
 import {
   Layers,
   Cloud,
@@ -198,7 +199,8 @@ export function OverlayControls({
     return null;
   };
 
-  const setImageOverlay = (overlay: ImageOverlay) => {
+  const setImageOverlay = useCallback((overlay: ImageOverlay) => {
+    // Disable all image overlays first
     weather.setEnabled(false);
     temperature.setEnabled(false);
     humidity.setEnabled(false);
@@ -214,21 +216,46 @@ export function OverlayControls({
 
     if (!overlay) return;
 
+    // Track and enable the selected overlay
     if (overlay.startsWith("owm-")) {
+      trackOverlayEnabled("weather", "image");
       weather.setEnabled(true);
       weather.setActiveLayer((overlay.replace("owm-", "") + "_new") as WeatherLayer);
-    } else if (overlay === "gfs-temperature") temperature.setEnabled(true);
-    else if (overlay === "gfs-humidity") humidity.setEnabled(true);
-    else if (overlay === "gfs-precipitation") precipitation.setEnabled(true);
-    else if (overlay === "gfs-cloudCover") cloudCover.setEnabled(true);
-    else if (overlay === "gfs-cape") cape.setEnabled(true);
-    else if (overlay === "gfs-fireWeather") fireWeather.setEnabled(true);
-    else if (overlay === "ocean-waves") waves.setEnabled(true);
-    else if (overlay === "ocean-sst") sst.setEnabled(true);
-    else if (overlay === "env-airQuality") airQuality.setEnabled(true);
-    else if (overlay === "env-uvIndex") uvIndex.setEnabled(true);
-    else if (overlay === "env-aurora") aurora.setEnabled(true);
-  };
+    } else if (overlay === "gfs-temperature") {
+      trackOverlayEnabled("temperature", "image");
+      temperature.setEnabled(true);
+    } else if (overlay === "gfs-humidity") {
+      trackOverlayEnabled("humidity", "image");
+      humidity.setEnabled(true);
+    } else if (overlay === "gfs-precipitation") {
+      trackOverlayEnabled("precipitation", "image");
+      precipitation.setEnabled(true);
+    } else if (overlay === "gfs-cloudCover") {
+      trackOverlayEnabled("cloudCover", "image");
+      cloudCover.setEnabled(true);
+    } else if (overlay === "gfs-cape") {
+      trackOverlayEnabled("cape", "image");
+      cape.setEnabled(true);
+    } else if (overlay === "gfs-fireWeather") {
+      trackOverlayEnabled("fireWeather", "image");
+      fireWeather.setEnabled(true);
+    } else if (overlay === "ocean-waves") {
+      trackOverlayEnabled("waves", "image");
+      waves.setEnabled(true);
+    } else if (overlay === "ocean-sst") {
+      trackOverlayEnabled("sst", "image");
+      sst.setEnabled(true);
+    } else if (overlay === "env-airQuality") {
+      trackOverlayEnabled("airQuality", "image");
+      airQuality.setEnabled(true);
+    } else if (overlay === "env-uvIndex") {
+      trackOverlayEnabled("uvIndex", "image");
+      uvIndex.setEnabled(true);
+    } else if (overlay === "env-aurora") {
+      trackOverlayEnabled("aurora", "image");
+      aurora.setEnabled(true);
+    }
+  }, [weather, temperature, humidity, precipitation, cloudCover, cape, fireWeather, waves, sst, airQuality, uvIndex, aurora]);
 
   // Flow overlay management
   const getActiveFlowOverlay = (): FlowOverlay => {
@@ -237,12 +264,37 @@ export function OverlayControls({
     return null;
   };
 
-  const setFlowOverlay = (flow: FlowOverlay) => {
+  const setFlowOverlay = useCallback((flow: FlowOverlay) => {
     wind.setEnabled(false);
     oceanCurrents.setEnabled(false);
-    if (flow === "wind") wind.setEnabled(true);
-    if (flow === "currents") oceanCurrents.setEnabled(true);
-  };
+    if (flow === "wind") {
+      trackOverlayEnabled("wind", "flow");
+      wind.setEnabled(true);
+    }
+    if (flow === "currents") {
+      trackOverlayEnabled("oceanCurrents", "flow");
+      oceanCurrents.setEnabled(true);
+    }
+  }, [wind, oceanCurrents]);
+
+  // Tracked toggle handlers for checkbox overlays
+  const createTrackedToggle = useCallback(
+    (
+      name: Parameters<typeof trackOverlayEnabled>[0],
+      category: string,
+      setEnabled: (enabled: boolean) => void
+    ) => {
+      return (enabled: boolean) => {
+        if (enabled) {
+          trackOverlayEnabled(name, category);
+        } else {
+          trackOverlayDisabled(name, category);
+        }
+        setEnabled(enabled);
+      };
+    },
+    []
+  );
 
   const activeImage = getActiveImageOverlay();
   const activeFlow = getActiveFlowOverlay();
@@ -438,7 +490,7 @@ export function OverlayControls({
                 {seismic.isAvailable && (
                   <CheckboxItem
                     checked={seismic.enabled}
-                    onChange={seismic.setEnabled}
+                    onChange={createTrackedToggle("seismic", "hazards", seismic.setEnabled)}
                     icon={<Activity className="size-3.5" />}
                     label="Earthquakes"
                     status={seismic.enabled ? `${seismic.earthquakes.length}` : undefined}
@@ -449,7 +501,7 @@ export function OverlayControls({
                 {prociv.isAvailable && (
                   <CheckboxItem
                     checked={prociv.enabled}
-                    onChange={prociv.setEnabled}
+                    onChange={createTrackedToggle("prociv", "hazards", prociv.setEnabled)}
                     icon={<Shield className="size-3.5" />}
                     label="ProCiv"
                     status={prociv.enabled ? `${prociv.incidents.length}` : undefined}
@@ -460,7 +512,7 @@ export function OverlayControls({
                 {gdacs.isAvailable && (
                   <CheckboxItem
                     checked={gdacs.enabled}
-                    onChange={gdacs.setEnabled}
+                    onChange={createTrackedToggle("gdacs", "hazards", gdacs.setEnabled)}
                     icon={<Globe className="size-3.5 text-orange-500" />}
                     label="Global Disasters"
                     status={gdacs.enabled ? `${gdacs.events.length}` : undefined}
@@ -471,7 +523,7 @@ export function OverlayControls({
                 {warnings.isAvailable && (
                   <CheckboxItem
                     checked={warnings.enabled}
-                    onChange={warnings.setEnabled}
+                    onChange={createTrackedToggle("warnings", "hazards", warnings.setEnabled)}
                     icon={<AlertTriangle className="size-3.5 text-amber-500" />}
                     label="IPMA Warnings"
                     status={warnings.enabled ? `${warnings.districts.length}` : undefined}
@@ -482,7 +534,7 @@ export function OverlayControls({
                 {fires.isAvailable && (
                   <CheckboxItem
                     checked={fires.enabled}
-                    onChange={fires.setEnabled}
+                    onChange={createTrackedToggle("fires", "hazards", fires.setEnabled)}
                     icon={<Flame className="size-3.5 text-red-500" />}
                     label="Active Fires"
                     status={fires.enabled ? `${fires.hotspots.length}` : undefined}
@@ -493,7 +545,7 @@ export function OverlayControls({
                 {rainfall.isAvailable && (
                   <CheckboxItem
                     checked={rainfall.enabled}
-                    onChange={rainfall.setEnabled}
+                    onChange={createTrackedToggle("rainfall", "hazards", rainfall.setEnabled)}
                     icon={<Droplets className="size-3.5 text-blue-400" />}
                     label="Rainfall"
                     status={rainfall.enabled ? `${rainfall.stations.length}` : undefined}
@@ -534,7 +586,7 @@ export function OverlayControls({
                 {aircraft.isAvailable && (
                   <CheckboxItem
                     checked={aircraft.enabled}
-                    onChange={aircraft.setEnabled}
+                    onChange={createTrackedToggle("aircraft", "radio", aircraft.setEnabled)}
                     icon={<Plane className="size-3.5 text-sky-500" />}
                     label="Aircraft (ADS-B)"
                     status={aircraft.enabled ? `${aircraft.aircraft.length}` : undefined}
@@ -545,7 +597,7 @@ export function OverlayControls({
                 {lightning.isAvailable && (
                   <CheckboxItem
                     checked={lightning.enabled}
-                    onChange={lightning.setEnabled}
+                    onChange={createTrackedToggle("lightning", "radio", lightning.setEnabled)}
                     icon={<Zap className="size-3.5 text-yellow-400" />}
                     label="Lightning"
                     status={lightning.enabled ? `${lightning.strikes.length}` : undefined}
@@ -556,7 +608,7 @@ export function OverlayControls({
                 {kiwisdr.isAvailable && (
                   <CheckboxItem
                     checked={kiwisdr.enabled}
-                    onChange={kiwisdr.setEnabled}
+                    onChange={createTrackedToggle("kiwisdr", "radio", kiwisdr.setEnabled)}
                     icon={<Radio className="size-3.5 text-green-500" />}
                     label="WebSDR Stations"
                     status={kiwisdr.enabled ? `${kiwisdr.stations.length}` : undefined}
@@ -567,7 +619,7 @@ export function OverlayControls({
                 {aprs.isAvailable && (
                   <CheckboxItem
                     checked={aprs.enabled}
-                    onChange={aprs.setEnabled}
+                    onChange={createTrackedToggle("aprs", "radio", aprs.setEnabled)}
                     icon={<Radio className="size-3.5 text-orange-500" />}
                     label="APRS Stations"
                     status={aprs.enabled ? `${aprs.stations.length}` : undefined}
@@ -578,7 +630,7 @@ export function OverlayControls({
                 {ionosphere.isAvailable && (
                   <CheckboxItem
                     checked={ionosphere.enabled}
-                    onChange={ionosphere.setEnabled}
+                    onChange={createTrackedToggle("ionosphere", "radio", ionosphere.setEnabled)}
                     icon={<Satellite className="size-3.5 text-indigo-500" />}
                     label="Ionosphere"
                     status={ionosphere.enabled && ionosphere.spaceWeather ? `Kp ${ionosphere.spaceWeather.kpIndex.toFixed(1)}` : undefined}
@@ -600,7 +652,7 @@ export function OverlayControls({
                       <>
                         <CheckboxItem
                           checked={terminator.enabled}
-                          onChange={terminator.setEnabled}
+                          onChange={createTrackedToggle("terminator", "utility", terminator.setEnabled)}
                           icon={<Sunset className="size-3.5 text-orange-400" />}
                           label="Day/Night"
                           info="Shows the day/night terminator line - the boundary between sunlit and dark areas on Earth."

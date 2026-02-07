@@ -311,6 +311,14 @@
 .sentinela-cluster {
   background: transparent !important;
   border: none !important;
+  pointer-events: none !important;
+}
+
+/* Only the actual pin element should be clickable */
+.sentinela-pin,
+.sentinela-cluster__inner {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 /* ── Cluster icons ── */

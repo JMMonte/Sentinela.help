@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter, usePathname } from "next/navigation";
 import { Check, ChevronDown, Globe } from "lucide-react";
 
+import { trackLanguageChanged } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -30,6 +31,9 @@ export function LanguageSelector() {
       setOpen(false);
       return;
     }
+
+    // Track the language change
+    trackLanguageChanged(newLocale, locale);
 
     // Store preference as cookie (accessible by middleware)
     document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=${60 * 60 * 24 * 365}`;
