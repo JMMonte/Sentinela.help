@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -34,6 +35,7 @@ const dataSources: Record<string, {
   updateFrequency: string;
   coverage: string;
   dataFormat: string;
+  screenshot?: string;
 }> = {
   earthquakes: {
     icon: Activity,
@@ -44,6 +46,7 @@ const dataSources: Record<string, {
     updateFrequency: "Real-time (1-2 min delay)",
     coverage: "Global",
     dataFormat: "GeoJSON",
+    screenshot: "earthquakes.png",
   },
   fires: {
     icon: Flame,
@@ -54,6 +57,7 @@ const dataSources: Record<string, {
     updateFrequency: "Every 3 hours",
     coverage: "Global",
     dataFormat: "CSV/JSON",
+    screenshot: "fires.png",
   },
   gdacs: {
     icon: Globe,
@@ -64,6 +68,7 @@ const dataSources: Record<string, {
     updateFrequency: "Real-time",
     coverage: "Global",
     dataFormat: "GeoRSS/XML",
+    screenshot: "gdacs.png",
   },
   warnings: {
     icon: AlertTriangle,
@@ -74,6 +79,7 @@ const dataSources: Record<string, {
     updateFrequency: "Every 15-30 minutes",
     coverage: "Portugal",
     dataFormat: "JSON",
+    screenshot: "warnings.png",
   },
   "weather-tiles": {
     icon: Cloud,
@@ -94,6 +100,7 @@ const dataSources: Record<string, {
     updateFrequency: "Every 6 hours",
     coverage: "Global (0.25° resolution)",
     dataFormat: "GRIB2",
+    screenshot: "gfs-temperature.png",
   },
   "wind-flow": {
     icon: Wind,
@@ -104,6 +111,7 @@ const dataSources: Record<string, {
     updateFrequency: "Every 6 hours",
     coverage: "Global",
     dataFormat: "GRIB2 (U/V components)",
+    screenshot: "wind-flow.png",
   },
   rainfall: {
     icon: Cloud,
@@ -114,6 +122,7 @@ const dataSources: Record<string, {
     updateFrequency: "Every 10 minutes",
     coverage: "Portugal (200+ stations)",
     dataFormat: "JSON",
+    screenshot: "rainfall.png",
   },
   "air-quality": {
     icon: Wind,
@@ -124,6 +133,7 @@ const dataSources: Record<string, {
     updateFrequency: "Hourly",
     coverage: "Global (station-based)",
     dataFormat: "JSON",
+    screenshot: "air-quality.png",
   },
   "uv-index": {
     icon: Sun,
@@ -134,6 +144,7 @@ const dataSources: Record<string, {
     updateFrequency: "Daily",
     coverage: "Global",
     dataFormat: "NetCDF/ASCII",
+    screenshot: "uv-index.png",
   },
   aurora: {
     icon: Satellite,
@@ -144,6 +155,7 @@ const dataSources: Record<string, {
     updateFrequency: "Every 30 minutes",
     coverage: "Northern & Southern Hemisphere",
     dataFormat: "JSON/Text",
+    screenshot: "aurora.png",
   },
   waves: {
     icon: Waves,
@@ -154,6 +166,7 @@ const dataSources: Record<string, {
     updateFrequency: "Every 3 hours",
     coverage: "Global oceans",
     dataFormat: "GRIB2",
+    screenshot: "ocean-waves.png",
   },
   "ocean-currents": {
     icon: Waves,
@@ -164,6 +177,7 @@ const dataSources: Record<string, {
     updateFrequency: "Every 5 days",
     coverage: "Global oceans",
     dataFormat: "NetCDF",
+    screenshot: "ocean-currents.png",
   },
   "sea-temperature": {
     icon: Thermometer,
@@ -174,6 +188,7 @@ const dataSources: Record<string, {
     updateFrequency: "Daily",
     coverage: "Global oceans",
     dataFormat: "NetCDF",
+    screenshot: "ocean-sst.png",
   },
   aircraft: {
     icon: Plane,
@@ -184,6 +199,7 @@ const dataSources: Record<string, {
     updateFrequency: "Real-time (5-10 sec)",
     coverage: "Global (ADS-B coverage)",
     dataFormat: "JSON",
+    screenshot: "aircraft.png",
   },
   lightning: {
     icon: Zap,
@@ -194,6 +210,7 @@ const dataSources: Record<string, {
     updateFrequency: "Real-time",
     coverage: "Global (community sensors)",
     dataFormat: "JSON/WebSocket",
+    screenshot: "lightning.png",
   },
   kiwisdr: {
     icon: Radio,
@@ -204,6 +221,7 @@ const dataSources: Record<string, {
     updateFrequency: "Real-time",
     coverage: "Global (community receivers)",
     dataFormat: "JSON",
+    screenshot: "kiwisdr.png",
   },
   aprs: {
     icon: Radio,
@@ -214,6 +232,7 @@ const dataSources: Record<string, {
     updateFrequency: "Real-time",
     coverage: "Global (amateur radio network)",
     dataFormat: "APRS Protocol",
+    screenshot: "aprs.png",
   },
   ionosphere: {
     icon: Satellite,
@@ -224,13 +243,14 @@ const dataSources: Record<string, {
     updateFrequency: "Every 1-3 hours",
     coverage: "Global",
     dataFormat: "JSON/Text",
+    screenshot: "ionosphere.png",
   },
 };
 
 const validSources = Object.keys(dataSources);
 
 export async function generateStaticParams() {
-  const locales = ["en", "pt-PT"];
+  const locales = ["en", "pt-PT", "es"];
   return locales.flatMap((locale) =>
     validSources.map((source) => ({ locale, source }))
   );
@@ -276,6 +296,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       languages: {
         en: `/en/about/data-sources/${source}`,
         "pt-PT": `/pt-PT/about/data-sources/${source}`,
+        es: `/es/about/data-sources/${source}`,
       },
     },
   };
@@ -315,6 +336,20 @@ export default async function DataSourcePage({ params }: Props) {
           <p className="text-sm text-muted-foreground">{sourceData.provider}</p>
         </div>
       </div>
+
+      {/* Screenshot Preview */}
+      {sourceData.screenshot && (
+        <div className="mb-8 overflow-hidden rounded-lg border">
+          <Image
+            src={`/images/data-sources/${sourceData.screenshot}`}
+            alt={t(`${source}.title`)}
+            width={1920}
+            height={1080}
+            className="w-full"
+            priority
+          />
+        </div>
+      )}
 
       {/* Description */}
       <div className="prose prose-zinc dark:prose-invert max-w-none prose-h2:border-b prose-h2:border-border prose-h2:pb-2 prose-h2:text-xl prose-h2:font-semibold">

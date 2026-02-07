@@ -60,6 +60,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       languages: {
         en: "/en/about/data-sources",
         "pt-PT": "/pt-PT/about/data-sources",
+        es: "/es/about/data-sources",
       },
     },
   };

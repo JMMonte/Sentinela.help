@@ -185,6 +185,31 @@ function ResizeInvalidator() {
   return null;
 }
 
+/** Exposes the Leaflet map instance on window for screenshot automation */
+function MapExposer() {
+  const map = useMap();
+  useEffect(() => {
+    // Expose map to window for external control (screenshots, testing)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).__LEAFLET_MAP__ = map;
+
+    // Listen for custom events to control the map
+    const handleSetView = (e: CustomEvent<{ lat: number; lng: number; zoom: number }>) => {
+      const { lat, lng, zoom } = e.detail;
+      map.setView([lat, lng], zoom, { animate: false });
+    };
+
+    window.addEventListener("setMapView", handleSetView as EventListener);
+
+    return () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).__LEAFLET_MAP__;
+      window.removeEventListener("setMapView", handleSetView as EventListener);
+    };
+  }, [map]);
+  return null;
+}
+
 function ClickHandler({
   onPick,
 }: {
@@ -447,6 +472,7 @@ export function ReportsMapClient({
       >
         <TileLayer key={tileUrl} attribution={TILE_ATTR} url={tileUrl} />
         <ResizeInvalidator />
+        <MapExposer />
         <FlyToCenter center={flyTo} />
         {onMapClick && <ClickHandler onPick={onMapClick} />}
 

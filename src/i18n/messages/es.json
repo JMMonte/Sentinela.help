@@ -1,0 +1,557 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "back": "Volver",
+    "cancel": "Cancelar",
+    "submit": "Enviar",
+    "close": "Cerrar"
+  },
+  "header": {
+    "brandName": "Sentinela",
+    "toggleTheme": "Cambiar tema",
+    "aboutSentinela": "Sobre Sentinela",
+    "language": "Idioma"
+  },
+  "map": {
+    "yourLocation": "Tu ubicación",
+    "weatherFeelsLike": "Sensación térmica",
+    "weatherHumidity": "Humedad",
+    "weatherMinMax": "Mín/Máx",
+    "weatherPressure": "Presión",
+    "weatherWind": "Viento",
+    "weatherClouds": "Nubes",
+    "weatherGusts": "Ráfagas",
+    "weatherVisibility": "Visibilidad",
+    "weatherSunrise": "Amanecer",
+    "weatherSunset": "Atardecer"
+  },
+  "reports": {
+    "title": "Informes",
+    "nearby": "{count} cercanos",
+    "noMatching": "No hay informes coincidentes.",
+    "filterPlaceholder": "Filtrar {count} informes...",
+    "reportIncident": "Reportar incidente",
+    "report": "Informe",
+    "newReport": "Nuevo informe",
+    "viewReport": "Ver informe"
+  },
+  "reportForm": {
+    "title": "Nuevo informe",
+    "tapMapInstruction": "Toca el mapa para marcar una ubicación, luego completa los detalles.",
+    "locationNotSelected": "Ubicación: aún no seleccionada",
+    "locationSelected": "Ubicación: {lat}, {lng}",
+    "tapMapToPin": "Toca el mapa para marcar ubicación",
+    "useMyLocation": "Usar mi ubicación",
+    "incidentType": "Tipo de incidente",
+    "selectIncidentType": "Selecciona un tipo de incidente",
+    "description": "Descripción",
+    "descriptionPlaceholder": "¿Qué está pasando? ¿Hay peligros inmediatos?",
+    "descriptionPlaceholderShort": "¿Qué está pasando?",
+    "descriptionMax": "Máximo 2000 caracteres.",
+    "yourEmail": "Tu email (opcional)",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "emailDescription": "Si lo proporcionas, el gobierno local puede contactarte para más detalles.",
+    "images": "Imágenes",
+    "noImagesSelected": "Sin imágenes seleccionadas",
+    "oneImageSelected": "1 imagen seleccionada",
+    "imagesSelected": "{count} imágenes seleccionadas",
+    "imagesLimit": "(hasta {max})",
+    "submitting": "Enviando...",
+    "submitReport": "Enviar informe"
+  },
+  "reportDetail": {
+    "goTo": "Ir a",
+    "addUpdate": "Añadir actualización",
+    "addComment": "Añadir un comentario... (opcional para acciones)",
+    "addImages": "+ Añadir imágenes",
+    "imagesCount": "{count} imagen(es)",
+    "addYourEmail": "+ Añadir tu email",
+    "yourEmailOptional": "Tu email (opcional)",
+    "submitUpdate": "Enviar actualización",
+    "updateDialogTitle": "Añadir actualización",
+    "updateDialogDescription": "Añade un comentario, cambia el estado o adjunta imágenes a este informe.",
+    "escalate": "Escalar",
+    "deescalate": "Desescalar",
+    "markSolved": "Resuelto",
+    "reopen": "Reabrir",
+    "escalateTooltip": "Marcar como más urgente",
+    "deescalateTooltip": "Marcar como menos urgente",
+    "alreadyVotedEscalate": "Ya votaste para escalar",
+    "alreadyVotedDeescalate": "Ya votaste para desescalar",
+    "solvedTooltip": "Marcar incidente como resuelto",
+    "reopenTooltip": "El informe no está realmente resuelto",
+    "osmLink": "OSM",
+    "navigate": "Navegar",
+    "clearRoute": "Borrar ruta",
+    "modeDriving": "Coche",
+    "modeCycling": "Bici",
+    "modeFoot": "A pie"
+  },
+  "status": {
+    "active": "Activo",
+    "escalated": "Escalado",
+    "solved": "Resuelto",
+    "deescalated": "Desescalado",
+    "reopened": "Reabierto",
+    "markedSolved": "Marcado como resuelto"
+  },
+  "incidentTypes": {
+    "FLOOD": "Inundación",
+    "FIRE": "Incendio",
+    "EXPLOSION": "Explosión",
+    "EARTHQUAKE": "Terremoto",
+    "LANDSLIDE": "Deslizamiento",
+    "STORM": "Tormenta",
+    "ROAD_CLOSURE": "Corte de carretera",
+    "OTHER": "Otro"
+  },
+  "relativeTime": {
+    "justNow": "ahora mismo",
+    "minutesAgo": "hace {count} min",
+    "hoursAgo": "hace {count}h",
+    "daysAgo": "hace {count}d"
+  },
+  "tooltips": {
+    "centerLocation": "Centrar en mi ubicación",
+    "openPanel": "Abrir panel",
+    "closePanel": "Cerrar panel",
+    "escalationsMore": "{count} escalamiento más que desescalamientos",
+    "escalationsMorePlural": "{count} escalamientos más que desescalamientos",
+    "deescalationsMore": "{count} desescalamiento más que escalamientos",
+    "deescalationsMorePlural": "{count} desescalamientos más que escalamientos"
+  },
+  "toast": {
+    "reportSubmitted": "Informe enviado.",
+    "commentAdded": "Comentario añadido",
+    "escalatedWithComment": "Escalado con comentario",
+    "escalated": "Escalado",
+    "deescalatedWithComment": "Desescalado con comentario",
+    "deescalated": "Desescalado",
+    "markedSolvedWithComment": "Marcado como resuelto con comentario",
+    "markedSolved": "Marcado como resuelto",
+    "reopenedWithComment": "Reabierto con comentario",
+    "reopened": "Reabierto",
+    "copiedToClipboard": "Copiado al portapapeles.",
+    "failedToSubmit": "Error al enviar",
+    "failedToLoad": "Error al cargar informes",
+    "addCommentFirst": "Añade un comentario o imagen primero.",
+    "tapMapFirst": "Toca el mapa para poner un pin primero.",
+    "locationRequired": "Se requiere ubicación. Activa los servicios de ubicación o toca el mapa para poner un pin.",
+    "attachImage": "Por favor adjunta al menos una imagen.",
+    "attachMaxImages": "Por favor adjunta hasta {max} imágenes.",
+    "geolocationUnavailable": "La geolocalización no está disponible en este navegador.",
+    "locationPermissionDenied": "No se puede leer tu ubicación. Verifica los permisos del navegador.",
+    "routeFailed": "No se pudo calcular la ruta. Inténtalo de nuevo."
+  },
+  "submitDialog": {
+    "title": "Informe enviado",
+    "description": "Notifica a tu gobierno local usando las acciones de abajo.",
+    "to": "Para:",
+    "notConfigured": "no configurado",
+    "copyMessage": "Copiar mensaje",
+    "sendEmail": "Enviar email",
+    "sendEmailDisabled": "Configura GOV_CONTACT_EMAIL para habilitar mailto."
+  },
+  "about": {
+    "backToMap": "Volver al mapa",
+    "title": "Sobre Sentinela",
+    "intro": "Sentinela es una plataforma colaborativa de reporte de emergencias que permite a las comunidades reportar desastres, incendios, inundaciones y otras emergencias en tiempo real.",
+    "emergencyContactsTitle": "Contactos de emergencia - Portugal",
+    "emergencyContactsDescription": "Si enfrentas una emergencia relacionada con tormentas o inundaciones, contacta a los servicios de emergencia inmediatamente.",
+    "visitSite": "Visitar sitio",
+    "usefulLinks": "Enlaces útiles",
+    "howItWorksTitle": "Cómo funciona",
+    "howItWorks1": "Los ciudadanos reportan incidentes marcando ubicaciones en el mapa",
+    "howItWorks2": "La comunidad valida los informes mediante votos y comentarios",
+    "howItWorks3": "Los informes escalados pueden enviarse directamente al gobierno local",
+    "howItWorks4": "Todos se mantienen informados con actualizaciones en tiempo real",
+    "freeTitle": "Gratis para todos",
+    "freeHighlight": "completamente gratis",
+    "freeParagraph1": "Sentinela se proporciona de forma completamente gratuita a comunidades en Portugal y en toda Europa. Creemos que la infraestructura de reporte de emergencias debe ser accesible para todos, en todas partes - sin suscripciones, sin costos ocultos, sin barreras.",
+    "freeParagraph2": "Ya sea que estés en Lisboa, Oporto o en cualquier otro lugar del mundo, Sentinela está aquí para ayudar a tu comunidad a mantenerse segura e informada.",
+    "openSourceTitle": "Código abierto",
+    "openSourceParagraph1": "Sentinela es completamente de código abierto bajo la licencia MIT. Puedes inspeccionar el código, sugerir mejoras, reportar errores o adaptarlo para tu propia comunidad.",
+    "openSourceParagraph2": "Las contribuciones son bienvenidas — ya sea código, traducciones o ideas.",
+    "viewOnGitHub": "Ver en GitHub",
+    "builtByTitle": "Desarrollado por Darkmatter AI Labs",
+    "builtByParagraph1": "Sentinela es desarrollado y mantenido por Darkmatter AI Labs, un equipo enfocado en construir herramientas basadas en IA que hacen una verdadera diferencia en la vida de las personas.",
+    "builtByParagraph2": "Estamos comprometidos a mantener Sentinela abierto, confiable y en constante mejora. Si tienes comentarios o quieres ponerte en contacto, visítanos en darkmatter.is.",
+    "dataSourcesTitle": "Fuentes de datos",
+    "dataSourcesDescription": "Sentinela integra datos en tiempo real de múltiples fuentes abiertas para darte la imagen más completa de lo que está sucediendo en tu área.",
+    "dataSourcesLinkDescription": "Descubre cómo Sentinela recopila y muestra datos en tiempo real de más de 19 fuentes.",
+    "communityProjectsTitle": "Proyectos de la comunidad",
+    "communityProjectsDescription": "Sentinela forma parte de un ecosistema creciente de proyectos de tecnología cívica en Portugal. Aquí hay otras iniciativas que realizan un trabajo importante en respuesta a emergencias y seguridad comunitaria.",
+    "madeWith": "Hecho con cariño por",
+    "backToSentinela": "Volver a Sentinela"
+  },
+  "emergencyContacts": {
+    "112": {
+      "name": "112",
+      "description": "Número de Emergencias Europeo"
+    },
+    "anepc": {
+      "name": "ANEPC",
+      "description": "Protección Civil"
+    },
+    "ipma": {
+      "name": "IPMA",
+      "description": "Alertas Meteorológicas"
+    },
+    "sns24": {
+      "name": "SNS 24",
+      "description": "Línea de Salud"
+    },
+    "cruzVermelha": {
+      "name": "Cruz Vermelha",
+      "description": "Asistencia Humanitaria"
+    },
+    "117": {
+      "name": "117",
+      "description": "Incendios Forestales"
+    }
+  },
+  "usefulLinks": {
+    "avisosIpma": {
+      "name": "Alertas IPMA",
+      "description": "Alertas meteorológicas en tiempo real"
+    },
+    "fogos": {
+      "name": "Fogos.pt",
+      "description": "Mapa de incendios de Portugal"
+    },
+    "prociv": {
+      "name": "Ocurrencias Prociv",
+      "description": "Ocurrencias en tiempo real"
+    },
+    "snirh": {
+      "name": "SNIRH",
+      "description": "Niveles de ríos y embalses"
+    },
+    "infraestruturas": {
+      "name": "Infraestruturas de Portugal",
+      "description": "Estado de las carreteras"
+    }
+  },
+  "communityProjects": {
+    "vostpt": {
+      "name": "VOST Portugal",
+      "description": "Voluntarios Digitales en Situaciones de Emergencia — asociación sin fines de lucro que monitorea y comunica información de emergencia en tiempo real"
+    },
+    "fogos": {
+      "name": "Fogos.pt",
+      "description": "Monitoreo de incendios y protección civil en tiempo real usando datos oficiales de ANEPC"
+    },
+    "sosleiria": {
+      "name": "SOS Leiria",
+      "description": "Plataforma comunitaria de reporte de emergencias para la región de Leiria, con soporte offline"
+    },
+    "safecommunities": {
+      "name": "Safe Communities Portugal",
+      "description": "Asociación sin fines de lucro que promueve la seguridad y prevención del crimen para residentes y visitantes"
+    }
+  },
+  "dataSources": {
+    "openstreetmap": {
+      "name": "OpenStreetMap",
+      "description": "Tiles de mapa base y datos geográficos"
+    },
+    "openweathermap": {
+      "name": "OpenWeatherMap",
+      "description": "Capas meteorológicas — precipitación, nubes, temperatura, viento y presión"
+    },
+    "usgs": {
+      "name": "Programa de Riesgos Sísmicos USGS",
+      "description": "Actividad sísmica global de las últimas 24 horas"
+    },
+    "fogos": {
+      "name": "Fogos.pt",
+      "description": "Incidentes activos de protección civil en Portugal (incendios, accidentes, eventos meteorológicos)"
+    },
+    "ipmaRainfall": {
+      "name": "IPMA — Estaciones Meteorológicas",
+      "description": "Precipitación acumulada de más de 200 estaciones en Portugal, actualizada cada 10 minutos"
+    },
+    "ipmaWarnings": {
+      "name": "IPMA — Avisos Meteorológicos",
+      "description": "Avisos meteorológicos oficiales por distrito (viento, lluvia, nieve, calor, frío, niebla, tormentas)"
+    },
+    "noaaGfs": {
+      "name": "NOAA GFS",
+      "description": "Sistema de Pronóstico Global — pronósticos de temperatura, humedad, precipitación, cobertura de nubes y potencial de tormentas"
+    },
+    "nasaFirms": {
+      "name": "NASA FIRMS",
+      "description": "Sistema de Información de Incendios para Gestión de Recursos — puntos calientes de incendios detectados por satélite via VIIRS/MODIS"
+    },
+    "openMeteoAirQuality": {
+      "name": "Calidad del Aire Open-Meteo",
+      "description": "Datos de PM2.5, PM10 y aerosoles del modelo de composición atmosférica CAMS/ECMWF"
+    },
+    "pacioosWavewatch": {
+      "name": "PacIOOS WAVEWATCH III",
+      "description": "Modelo global de olas oceánicas que proporciona altura, período y dirección de olas significativas a resolución de 0.5 grados"
+    },
+    "opensky": {
+      "name": "Red OpenSky",
+      "description": "Seguimiento de aeronaves en tiempo real via receptores ADS-B en todo el mundo"
+    },
+    "blitzortung": {
+      "name": "Blitzortung",
+      "description": "Red de detección de rayos impulsada por la comunidad con datos de impactos en tiempo real"
+    },
+    "kiwisdr": {
+      "name": "Red KiwiSDR",
+      "description": "Red global de radios definidas por software que cubren 0-30 MHz"
+    },
+    "aprsfi": {
+      "name": "APRS.fi",
+      "description": "Posiciones y telemetría de la red APRS de radioaficionados"
+    },
+    "noaaSwpc": {
+      "name": "NOAA SWPC",
+      "description": "Centro de Predicción del Clima Espacial — actividad solar, tormentas geomagnéticas y propagación de radio"
+    },
+    "gdacs": {
+      "name": "GDACS",
+      "description": "Sistema Global de Alerta y Coordinación de Desastres — alertas en tiempo real de terremotos, inundaciones, ciclones, volcanes, incendios forestales y sequías"
+    }
+  },
+  "overlays": {
+    "mapLayers": "Capas del mapa",
+    "forecastLayers": "Capas de pronóstico",
+    "weather": "Clima",
+    "weatherDescription": "Tiles meteorológicos en tiempo real de OpenWeatherMap (precipitación, nubes, temperatura, viento y presión).",
+    "windFlow": "Flujo de viento",
+    "earthquakes": "Terremotos",
+    "earthquakesDescription": "Eventos sísmicos de las últimas 24h via Programa de Riesgos Sísmicos USGS.",
+    "prociv": "ProCiv",
+    "procivDescription": "Incidentes activos de protección civil en Portugal via Fogos.pt (incendios, accidentes, eventos meteorológicos).",
+    "rainfall": "Precipitación",
+    "rainfallDescription": "Precipitación acumulada de estaciones meteorológicas IPMA en Portugal. Actualizado cada 10 min.",
+    "warnings": "Avisos IPMA",
+    "warningsDescription": "Avisos meteorológicos oficiales de IPMA (viento, lluvia, nieve, calor, frío, niebla, tormentas). Actualizado cada 30 min.",
+    "temperature": "Temperatura",
+    "temperatureDescription": "Pronóstico de temperatura a 2m del modelo NOAA GFS. Actualizado cada 6 horas.",
+    "humidity": "Humedad",
+    "humidityDescription": "Pronóstico de humedad relativa a 2m del modelo NOAA GFS. Actualizado cada 6 horas.",
+    "precipitation": "Precipitación",
+    "precipitationDescription": "Pronóstico de precipitación acumulada del modelo NOAA GFS. Actualizado cada 6 horas.",
+    "cloudCover": "Cobertura de nubes",
+    "cloudCoverDescription": "Pronóstico de cobertura total de nubes del modelo NOAA GFS. Actualizado cada 6 horas.",
+    "stormPotential": "Potencial de tormentas",
+    "stormPotentialDescription": "CAPE (Energía Potencial Convectiva Disponible) de NOAA GFS. Valores más altos indican mayor potencial de tormentas.",
+    "fireWeather": "Riesgo de incendio",
+    "fireWeatherDescription": "Índice de Clima de Incendios calculado a partir de datos de temperatura y humedad de NOAA GFS. Muestra niveles de riesgo de incendio forestal.",
+    "activeFires": "Incendios activos",
+    "activeFiresDescription": "Puntos calientes de incendios detectados por satélite de NASA FIRMS (VIIRS/MODIS). Actualizado cada ~3 horas.",
+    "airQuality": "Calidad del aire",
+    "airQualityDescription": "Datos de calidad del aire PM2.5 de Open-Meteo (CAMS/ECMWF). Muestra niveles de contaminación en Europa. Actualizado cada 30 min.",
+    "airQualityPoints": "{count} puntos",
+    "oceanWaves": "Olas oceánicas",
+    "oceanWavesDescription": "Altura significativa de olas del modelo PacIOOS WAVEWATCH III. Cobertura global a resolución de 0.5 grados. Actualizado cada hora.",
+    "events": "{count} eventos",
+    "occurrences": "{count} ocurrencias",
+    "stations": "{count} estaciones",
+    "districtsWithWarnings": "{count} distrito(s) con avisos",
+    "hotspots": "{count} puntos calientes",
+    "active": "Activo",
+    "loading": "Cargando...",
+    "aircraft": "Aeronaves (ADS-B)",
+    "aircraftDescription": "Posiciones de aeronaves en tiempo real de la Red OpenSky. Incluye información de vuelo, altitud y velocidad.",
+    "aircraftCount": "{count} aeronaves",
+    "lightning": "Rayos",
+    "lightningDescription": "Impactos de rayos en tiempo real de la red Blitzortung. Muestra impactos de los últimos 30 minutos.",
+    "lightningCount": "{count} impactos",
+    "kiwisdr": "Estaciones WebSDR",
+    "kiwisdrDescription": "Receptores de radio definida por software KiwiSDR. Haz clic para escuchar frecuencias de radio 0-30 MHz.",
+    "kiwisdrCount": "{count} estaciones",
+    "aprs": "Estaciones APRS",
+    "aprsDescription": "Posiciones de la red de radioaficionados APRS. Muestra operadores HAM, estaciones meteorológicas y digipeaters.",
+    "aprsCount": "{count} estaciones",
+    "spaceWeather": "Clima espacial",
+    "spaceWeatherDescription": "Condiciones actuales del clima espacial de NOAA SWPC. Muestra índice Kp y propagación de radio HF.",
+    "tec": "TEC Ionosférico",
+    "tecDescription": "Contenido Total de Electrones mostrando condiciones ionosféricas. Afecta la precisión del GPS y la propagación de radio.",
+    "gdacs": "Desastres globales",
+    "gdacsDescription": "Alertas de desastres globales GDACS: terremotos, inundaciones, ciclones, volcanes, incendios forestales, sequías. Actualizado cada 10 minutos.",
+    "gdacsCount": "{count} eventos",
+    "gdacsReport": "Informe GDACS"
+  },
+  "dataSourcePages": {
+    "categories": {
+      "hazards": "Riesgos naturales",
+      "weather": "Clima y atmósfera",
+      "environment": "Medio ambiente",
+      "ocean": "Océano y marino",
+      "radio": "Radio y seguimiento",
+      "space": "Clima espacial"
+    },
+    "ui": {
+      "coverage": "Cobertura",
+      "updateFrequency": "Frecuencia de actualización",
+      "format": "Formato",
+      "overview": "Visión general",
+      "howWeUseItTitle": "Cómo usa Sentinela estos datos",
+      "dataProcessing": "Procesamiento de datos",
+      "limitations": "Limitaciones y consideraciones",
+      "resources": "Recursos",
+      "apiEndpoint": "Endpoint de API",
+      "documentation": "Documentación",
+      "attributionTitle": "Atribución y términos",
+      "attributionText": "Sentinela agrega datos de múltiples fuentes abiertas. Cada fuente de datos tiene sus propios términos de uso y requisitos de atribución. Agradecemos a todas las organizaciones que hacen sus datos públicamente disponibles para la concienciación sobre emergencias y propósitos de investigación.",
+      "dataProviders": "Proveedores de datos: USGS, NOAA, NASA, IPMA, OpenWeatherMap, OpenSky Network, Blitzortung, GDACS, WAQI, TEMIS, KiwiSDR y APRS-IS."
+    },
+    "earthquakes": {
+      "title": "Terremotos",
+      "shortDescription": "Monitoreo global de actividad sísmica",
+      "description": "El Programa de Riesgos Sísmicos del USGS proporciona datos de terremotos en tiempo real de una red global de sismómetros. El programa monitorea y reporta terremotos en todo el mundo, proporcionando magnitud, ubicación, profundidad y otros parámetros para cada evento.",
+      "howWeUseIt": "Sentinela obtiene datos de terremotos filtrados por rango de tiempo y magnitud mínima. Los eventos se muestran como marcadores en el mapa con tamaño proporcional a la magnitud. Al hacer clic en un terremoto se muestra información detallada incluyendo magnitud, profundidad, ubicación y un enlace a la página del evento en USGS.",
+      "processing": "Los datos se obtienen del feed GeoJSON del USGS cada 2 minutos. Filtramos eventos basados en el rango de tiempo seleccionado por el usuario (1h, 6h, 24h, 7d) y aplicamos un umbral de magnitud mínima para evitar saturar el mapa con terremotos muy pequeños.",
+      "limitations": "Puede haber un retraso de 1-5 minutos entre cuando ocurre un terremoto y cuando aparece en nuestro feed. Terremotos muy pequeños (< M2.5) pueden no ser detectados en todas las regiones. Los datos preliminares pueden ser revisados a medida que más estaciones sísmicas reportan."
+    },
+    "fires": {
+      "title": "Incendios activos",
+      "shortDescription": "Puntos calientes de incendios detectados por satélite",
+      "description": "El Sistema de Información de Incendios para Gestión de Recursos (FIRMS) de NASA proporciona datos de incendios activos de los instrumentos satelitales VIIRS (Suite de Radiómetro de Imágenes Infrarrojas Visibles) y MODIS (Espectrorradiómetro de Imágenes de Resolución Moderada). Estos sensores detectan anomalías térmicas que indican combustión activa.",
+      "howWeUseIt": "Mostramos puntos calientes de incendios como marcadores de calor en el mapa, con brillo indicando la intensidad del fuego (medida en Kelvin). Cada marcador muestra tiempo de detección, fuente satelital y potencia radiativa del fuego cuando está disponible.",
+      "processing": "Los datos de incendios se obtienen cada 10 minutos de la API de FIRMS. Filtramos para mostrar solo las últimas 24 horas de detecciones. Los puntos calientes se agrupan en niveles de zoom bajos para mejorar el rendimiento del mapa cuando hay muchos incendios activos.",
+      "limitations": "Los satélites pasan sobre cada ubicación solo unas pocas veces al día, por lo que puede haber brechas en la detección. La cobertura de nubes puede oscurecer la detección de incendios. Incendios pequeños o de baja intensidad pueden no ser detectados. Pueden ocurrir falsos positivos por fuentes de calor industriales o reflejos del sol."
+    },
+    "gdacs": {
+      "title": "Desastres globales",
+      "shortDescription": "Alertas de desastres multi-riesgo",
+      "description": "El Sistema Global de Alerta y Coordinación de Desastres (GDACS) es un marco de cooperación entre las Naciones Unidas, la Comisión Europea y gestores de desastres en todo el mundo. Proporciona alertas casi en tiempo real sobre desastres naturales y herramientas para facilitar la coordinación de respuesta.",
+      "howWeUseIt": "Sentinela muestra alertas GDACS para terremotos, inundaciones, ciclones tropicales, volcanes, incendios forestales y sequías. Los eventos están codificados por color según el nivel de alerta (Verde, Naranja, Rojo) e incluyen estimaciones de severidad y datos de población afectada.",
+      "processing": "Obtenemos el feed GeoRSS de GDACS cada 10 minutos. Los eventos se analizan y muestran con iconos apropiados para cada tipo de desastre. Para ciclones tropicales, también mostramos trayectorias previstas y radios de viento cuando están disponibles.",
+      "limitations": "GDACS se enfoca en eventos con potencial impacto humanitario, por lo que eventos menores pueden no estar incluidos. Los niveles de alerta son estimaciones y pueden ser revisados. Algunos tipos de desastres tienen retrasos de detección más largos que otros."
+    },
+    "warnings": {
+      "title": "Avisos meteorológicos",
+      "shortDescription": "Alertas meteorológicas oficiales para Portugal",
+      "description": "IPMA (Instituto Portugués del Mar y de la Atmósfera) emite avisos meteorológicos oficiales para Portugal. Los avisos cubren fenómenos meteorológicos severos incluyendo viento fuerte, lluvia intensa, temperaturas extremas, nieve, niebla y tormentas.",
+      "howWeUseIt": "Mostramos avisos activos por distrito en el mapa. Los distritos están coloreados según el nivel de aviso más alto activo (amarillo, naranja, rojo). Al hacer clic en un distrito se muestran todos los avisos activos con sus períodos de validez y descripciones.",
+      "processing": "Los datos de avisos se obtienen cada 15 minutos de la API de IPMA. Agregamos avisos por distrito y determinamos el nivel de aviso más alto activo para el color del mapa.",
+      "limitations": "Los avisos son específicos para Portugal continental e islas. Los límites de avisos siguen distritos administrativos, que pueden no coincidir precisamente con los patrones meteorológicos. Las actualizaciones pueden tardar 15-30 minutos en aparecer."
+    },
+    "weather-tiles": {
+      "title": "Tiles meteorológicos",
+      "shortDescription": "Radar e imágenes satelitales en tiempo real",
+      "description": "OpenWeatherMap proporciona tiles de mapas meteorológicos que muestran radar de precipitación, cobertura de nubes, temperatura, velocidad del viento y presión atmosférica. Estos tiles se actualizan cada 10 minutos y proporcionan una visión general visual de las condiciones meteorológicas actuales.",
+      "howWeUseIt": "Los usuarios pueden alternar diferentes capas meteorológicas en el panel de Capas. Los tiles se superponen al mapa base con semi-transparencia, permitiendo ver patrones meteorológicos mientras se mantiene el contexto geográfico.",
+      "processing": "Los tiles de mapa se obtienen directamente de los servidores de tiles de OpenWeatherMap a través de nuestro proxy de API. Almacenamos en caché los tiles brevemente para reducir las llamadas a la API y mejorar el rendimiento.",
+      "limitations": "La cobertura del radar de precipitación varía según la región - algunas áreas tienen redes de radar más densas que otras. Las capas basadas en satélite tienen retrasos inherentes. Las escalas de color están optimizadas para cobertura global y pueden no mostrar variaciones sutiles."
+    },
+    "gfs-forecast": {
+      "title": "Pronóstico meteorológico GFS",
+      "shortDescription": "Predicciones meteorológicas globales de NOAA",
+      "description": "El Sistema de Pronóstico Global (GFS) es un modelo de pronóstico meteorológico producido por los Centros Nacionales de Predicción Ambiental (NCEP). Proporciona pronósticos de temperatura, humedad, precipitación, cobertura de nubes e inestabilidad atmosférica (CAPE) hasta 16 días.",
+      "howWeUseIt": "Mostramos datos de pronóstico GFS como superposiciones codificadas por color en el mapa. Las capas disponibles incluyen temperatura a 2m, humedad relativa, acumulación de precipitación, cobertura de nubes y CAPE (potencial de tormentas). Los usuarios pueden ver condiciones actuales y pronósticos a corto plazo.",
+      "processing": "Los datos GFS se obtienen de los servidores NOAA NOMADS en formato GRIB2. Extraemos parámetros relevantes, interpolamos a nuestra cuadrícula de visualización y generamos tiles de mapa. Los datos se actualizan cada 6 horas cuando se completan nuevas ejecuciones de GFS.",
+      "limitations": "GFS tiene una resolución de 0.25° (~25km), por lo que las variaciones locales pueden no ser capturadas. La precisión del pronóstico disminuye con el tiempo. Algunos parámetros como la precipitación pueden tener incertidumbre significativa."
+    },
+    "wind-flow": {
+      "title": "Animación de flujo de viento",
+      "shortDescription": "Patrones de viento globales animados",
+      "description": "La visualización de flujo de viento usa datos de componentes de viento U y V del modelo GFS para crear un flujo de partículas animado que muestra la dirección y velocidad del viento. Esto proporciona una vista intuitiva de los patrones de circulación atmosférica.",
+      "howWeUseIt": "Cuando está habilitado, partículas animadas fluyen a través del mapa siguiendo vectores de viento. La velocidad de las partículas indica la fuerza del viento, y los patrones de flujo revelan características como corrientes en chorro, ciclones y vientos alisios.",
+      "processing": "Extraemos componentes de viento U y V a 10m de los datos GFS y creamos un campo vectorial. La animación usa WebGL para renderizar eficientemente miles de partículas que siguen el campo de viento.",
+      "limitations": "La animación muestra vientos de superficie (altura de 10m) que pueden diferir de los vientos a otras altitudes. La densidad de partículas está equilibrada entre claridad visual y rendimiento. Vientos muy ligeros pueden no mostrar movimiento obvio."
+    },
+    "rainfall": {
+      "title": "Observaciones de precipitación",
+      "shortDescription": "Datos de precipitación de estaciones meteorológicas para Portugal",
+      "description": "IPMA opera una red de más de 200 estaciones meteorológicas en Portugal que reportan precipitación acumulada. Estos datos proporcionan mediciones de precipitación de terreno para el país.",
+      "howWeUseIt": "Las estaciones meteorológicas se muestran como marcadores en el mapa, coloreados por cantidad de lluvia. Al hacer clic en una estación se muestra información detallada incluyendo totales de acumulación de 1 hora, 6 horas y 24 horas.",
+      "processing": "Obtenemos datos de estaciones cada 10 minutos de la API de IPMA. Los valores de lluvia están codificados por color desde verde (ligera) a través de amarillo y naranja hasta rojo (intensa).",
+      "limitations": "La cobertura está limitada a Portugal. Algunas áreas remotas tienen cobertura de estaciones escasa. Los datos de estaciones representan mediciones puntuales y pueden no capturar lluvias intensas localizadas entre estaciones."
+    },
+    "air-quality": {
+      "title": "Calidad del aire",
+      "shortDescription": "Monitoreo global de contaminación PM2.5",
+      "description": "El proyecto World Air Quality Index (WAQI) agrega datos de calidad del aire de estaciones de monitoreo en todo el mundo. Mostramos concentraciones de PM2.5 (partículas finas), que son el indicador más relevante para impactos en la salud.",
+      "howWeUseIt": "Las estaciones de calidad del aire se muestran como marcadores coloreados por nivel de AQI. Usamos ponderación por distancia inversa (IDW) para interpolar entre estaciones y crear un mapa continuo de contaminación.",
+      "processing": "Los datos se obtienen cada hora de la API de WAQI. Interpolamos valores de PM2.5 en una cuadrícula y renderizamos como una superposición semi-transparente. Las categorías de AQI siguen los estándares de la EPA (Bueno, Moderado, Insalubre para Grupos Sensibles, etc.).",
+      "limitations": "La densidad de estaciones varía mucho según la región - las áreas urbanas tienen mejor cobertura. La interpolación entre estaciones dispersas puede no reflejar las condiciones reales. La calidad del aire interior puede diferir significativamente de las lecturas exteriores."
+    },
+    "uv-index": {
+      "title": "Índice UV",
+      "shortDescription": "Niveles de radiación ultravioleta solar",
+      "description": "El índice UV de TEMIS (Servicio de Internet de Monitoreo de Emisiones Troposféricas) se deriva de observaciones satelitales de ozono y cobertura de nubes, combinadas con cálculos de geometría solar. Indica la fuerza de la radiación UV en la superficie de la Tierra.",
+      "howWeUseIt": "Los valores del índice UV se muestran como una superposición codificada por color desde verde (bajo) a través de amarillo y naranja hasta púrpura (extremo). Esto ayuda a los usuarios a entender las necesidades de protección solar.",
+      "processing": "Los mapas de índice UV diarios se obtienen de TEMIS. Los valores se interpolan a nuestra cuadrícula de visualización y se renderizan como una superposición semi-transparente.",
+      "limitations": "El índice UV es un promedio diario y no refleja variaciones de nubes en tiempo real. La exposición UV real depende de muchos factores incluyendo altitud, reflexión de superficie y hora del día."
+    },
+    "aurora": {
+      "title": "Pronóstico de aurora",
+      "shortDescription": "Visibilidad de auroras boreales y australes",
+      "description": "El Centro de Predicción del Clima Espacial de NOAA proporciona pronósticos de aurora basados en mediciones del viento solar y modelos geomagnéticos. El pronóstico muestra la probabilidad de aurora visible a diferentes latitudes.",
+      "howWeUseIt": "La probabilidad de aurora se muestra como una superposición de color para los hemisferios norte y sur. Probabilidades más altas (mostradas en colores más brillantes) indican mejores posibilidades de ver la aurora.",
+      "processing": "Obtenemos el pronóstico de aurora de 30 minutos de SWPC cada 30 minutos. Los datos del pronóstico se renderizan como una superposición que muestra la posición e intensidad del óvalo auroral.",
+      "limitations": "La visibilidad de la aurora depende en gran medida del clima local (se requieren cielos despejados), la contaminación lumínica y el momento exacto. El pronóstico muestra probabilidad estadística, no visualización garantizada."
+    },
+    "waves": {
+      "title": "Olas oceánicas",
+      "shortDescription": "Pronósticos de altura significativa de olas",
+      "description": "WAVEWATCH III de NOAA es un modelo de olas espectrales de tercera generación que proporciona pronósticos de altura, período y dirección de olas. El modelo cubre océanos globales y se actualiza cada 3 horas.",
+      "howWeUseIt": "La altura significativa de olas se muestra como una superposición oceánica codificada por color, desde calma (azul) hasta extremo (rojo). Esto ayuda a marineros y comunidades costeras a entender las condiciones del mar.",
+      "processing": "Los datos de olas se obtienen de los servidores de NOAA en formato GRIB2. Extraemos la altura significativa de olas y renderizamos como una superposición semi-transparente sobre áreas oceánicas.",
+      "limitations": "La resolución del modelo puede no capturar condiciones de olas en áreas costeras complejas. Las alturas de olas reales pueden variar significativamente en distancias cortas debido a la batimetría local y patrones de viento."
+    },
+    "ocean-currents": {
+      "title": "Corrientes oceánicas",
+      "shortDescription": "Visualización de flujo de corrientes superficiales",
+      "description": "OSCAR (Análisis de Corrientes Superficiales del Océano en Tiempo Real) de NOAA proporciona estimaciones de corrientes superficiales del océano derivadas de mediciones satelitales de altura del nivel del mar, viento y temperatura. Esto revela los principales patrones de circulación oceánica.",
+      "howWeUseIt": "Las corrientes oceánicas se visualizan como flujos de partículas animadas, similar a la animación del viento. Las partículas siguen vectores de corrientes, revelando características como la Corriente del Golfo, Kuroshio y corrientes ecuatoriales.",
+      "processing": "Los datos de corrientes se obtienen de los servidores NOAA ERDDAP. Interpolamos a nuestra cuadrícula de visualización y animamos partículas siguiendo los vectores de corrientes.",
+      "limitations": "OSCAR proporciona corrientes de superficie cercana que pueden diferir de flujos más profundos. La resolución es gruesa (~1/3°) por lo que las características costeras y de pequeña escala pueden no ser capturadas. Los datos se actualizan cada 5 días."
+    },
+    "sea-temperature": {
+      "title": "Temperatura superficial del mar",
+      "shortDescription": "Análisis de temperatura superficial del océano",
+      "description": "El OISST (Temperatura Superficial del Mar de Interpolación Óptima) de NOAA combina observaciones de barcos, boyas y satélites para producir un análisis diario global de SST a resolución de 0.25°.",
+      "howWeUseIt": "La SST se muestra como una superposición codificada por color desde frío (azul) a través de templado (verde/amarillo) hasta caliente (rojo). Las anomalías de temperatura y patrones como El Niño/La Niña son visibles.",
+      "processing": "Los datos diarios de SST se obtienen de NOAA y se renderizan como una superposición semi-transparente. La escala de color está optimizada para mostrar el rango completo de temperaturas oceánicas.",
+      "limitations": "La SST representa la temperatura de la piel que puede diferir de la temperatura del agua a mayor profundidad. Las áreas costeras y regiones con mucha cobertura de nubes pueden tener estimaciones menos precisas."
+    },
+    "aircraft": {
+      "title": "Seguimiento de aeronaves",
+      "shortDescription": "Posiciones de vuelo en tiempo real via ADS-B",
+      "description": "La Red OpenSky es una red de receptores basada en la comunidad que recopila datos ADS-B (Vigilancia Dependiente Automática-Difusión) de aeronaves. Esto proporciona posición, altitud, velocidad e identificación en tiempo real para la mayoría de aeronaves comerciales y muchas privadas.",
+      "howWeUseIt": "Las aeronaves se muestran como iconos en el mapa, rotados para mostrar el rumbo. Al hacer clic en una aeronave se muestran detalles del vuelo incluyendo indicativo, altitud, velocidad y origen/destino cuando está disponible.",
+      "processing": "Los datos de aeronaves se obtienen de OpenSky cuando el usuario desplaza o hace zoom en el mapa. Filtramos al área visible del mapa para reducir el volumen de datos y mejorar el rendimiento.",
+      "limitations": "La cobertura depende de la distribución de receptores de la comunidad - algunas regiones tienen brechas. No todas las aeronaves transmiten ADS-B. Aeronaves militares y algunas privadas pueden no aparecer. Los datos tienen un retraso de 5-10 segundos."
+    },
+    "lightning": {
+      "title": "Detección de rayos",
+      "shortDescription": "Ubicaciones de impactos de rayos en tiempo real",
+      "description": "Blitzortung.org opera una red comunitaria de detectores de rayos que usan métodos de tiempo de llegada para localizar impactos de rayos. La red cubre la mayor parte de Europa, América del Norte, Asia y Oceanía.",
+      "howWeUseIt": "Los impactos de rayos se muestran como marcadores que se desvanecen con el tiempo (se muestran los últimos 30 minutos). Los impactos recientes aparecen más brillantes. Esto ayuda a rastrear el movimiento e intensidad de tormentas.",
+      "processing": "Obtenemos datos de impactos recientes de Blitzortung cada pocos minutos. Los impactos se muestran con marcas de tiempo y se desvanecen según la antigüedad para mostrar la progresión de la tormenta.",
+      "limitations": "La precisión de detección varía según la región basada en la densidad de sensores. Algunos impactos pueden no ser detectados o pueden tener errores de posición de varios kilómetros. Los rayos nube-nube no se detectan de manera confiable."
+    },
+    "kiwisdr": {
+      "title": "Red KiwiSDR",
+      "shortDescription": "Radios definidas por software accesibles por web",
+      "description": "KiwiSDR es una radio definida por software que cubre 0-30 MHz y permite acceso remoto via navegador web. La red consiste en cientos de receptores en todo el mundo, permitiendo a cualquiera escuchar onda corta, radioaficionados y otras señales.",
+      "howWeUseIt": "Los receptores KiwiSDR se muestran como marcadores en el mapa. Al hacer clic en un receptor se abre su interfaz web donde puedes sintonizar diferentes frecuencias y escuchar en vivo.",
+      "processing": "Obtenemos el estado de la red KiwiSDR periódicamente para mostrar receptores activos. Cada marcador enlaza directamente a la interfaz web de ese receptor.",
+      "limitations": "La disponibilidad del receptor depende de operadores individuales. Algunos receptores pueden estar offline o tener límites de usuarios. La calidad de audio y cobertura de frecuencia varían según la configuración del receptor."
+    },
+    "aprs": {
+      "title": "Red APRS",
+      "shortDescription": "Reporte de posición de radioaficionados",
+      "description": "APRS (Sistema Automático de Reporte de Paquetes) es un sistema basado en radioaficionados para comunicaciones digitales en tiempo real. Es usado por operadores de radioaficionados para compartir posición, datos meteorológicos, mensajes y telemetría.",
+      "howWeUseIt": "Las estaciones APRS se muestran como marcadores en el mapa. Diferentes símbolos indican tipos de estación (estación base, móvil, estación meteorológica, digipeater). Al hacer clic se muestran detalles de la estación y actividad reciente.",
+      "processing": "Los datos se obtienen de servidores APRS-IS basados en el área visible del mapa. Filtramos y mostramos estaciones con actividad reciente.",
+      "limitations": "APRS requiere licencia de radioaficionado para transmitir. La cobertura depende de la infraestructura de digipeaters. La precisión de posición varía desde precisa por GPS hasta aproximada."
+    },
+    "ionosphere": {
+      "title": "Ionosfera y clima espacial",
+      "shortDescription": "Actividad solar y condiciones de propagación de radio",
+      "description": "El Centro de Predicción del Clima Espacial de NOAA monitorea la actividad solar y sus efectos en la ionosfera de la Tierra. Los índices clave incluyen el índice Kp (actividad geomagnética), flujo solar (emisión de radio solar) y flujo de rayos X (llamaradas solares).",
+      "howWeUseIt": "Los datos del clima espacial se muestran en un panel de información mostrando condiciones actuales. También mostramos mapas de Contenido Total de Electrones (TEC) que muestran la densidad ionosférica, que afecta la precisión del GPS y la propagación de radio HF.",
+      "processing": "Obtenemos índices de clima espacial de SWPC y mapas TEC de NASA. Los datos se muestran en tiempo real para ayudar a los usuarios a entender las condiciones actuales de propagación de radio y GPS.",
+      "limitations": "El clima espacial puede cambiar rápidamente durante eventos solares. Los mapas TEC tienen resolución limitada y se interpolan a partir de datos de receptores GPS. Las predicciones más allá de unos pocos días tienen alta incertidumbre."
+    }
+  }
+}

@@ -42,7 +42,7 @@ export function initRedis(config: Config): void {
     });
 
     logger.info("Redis client initialized (direct mode)", { url: redisUrl });
-  } else {
+  } else if (config.KV_REST_API_URL && config.KV_REST_API_TOKEN) {
     mode = "upstash";
     upstashClient = new UpstashRedis({
       url: config.KV_REST_API_URL,
@@ -50,6 +50,9 @@ export function initRedis(config: Config): void {
     });
 
     logger.info("Redis client initialized (Upstash HTTP mode)");
+  } else {
+    logger.error("No Redis configuration found. Set REDIS_MODE=direct with REDIS_URL, or provide KV_REST_API_URL and KV_REST_API_TOKEN");
+    process.exit(1);
   }
 }
 
