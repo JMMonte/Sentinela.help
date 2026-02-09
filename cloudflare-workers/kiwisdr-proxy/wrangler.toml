@@ -1,0 +1,7 @@
+name = "kiwisdr-proxy"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+account_id = "bdaf1f157809c9e3e2683b76b734cf66"
+
+[vars]
+UPSTREAM_URL = "http://kiwisdr.com/.public/"

@@ -10,8 +10,9 @@ import { BaseCollector } from "./base-collector.js";
 import { COLLECTOR_CONFIGS } from "../config.js";
 import { fetchWithRetry } from "../utils/fetch.js";
 
-// The new endpoint returns HTML with embedded station data in comments
-const KIWISDR_URL = "http://kiwisdr.com/.public/";
+// Use Cloudflare Worker proxy since kiwisdr.com only supports HTTP
+// and Railway/cloud providers often block outbound HTTP requests
+const KIWISDR_URL = "https://kiwisdr-proxy.darkmatter-bda.workers.dev/";
 
 // Full station type (used internally during parsing)
 type KiwiStationFull = {
