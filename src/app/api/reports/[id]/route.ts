@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db/prisma";
+import type { Contribution, ContributionImage } from "@prisma/client";
 
 export const runtime = "nodejs";
 
@@ -40,7 +41,7 @@ export async function GET(
         images: report.images,
         score: report.escalateCount - report.deescalateCount,
         weatherSnapshot: report.weatherSnapshot,
-        contributions: report.contributions.map((c) => ({
+        contributions: report.contributions.map((c: Contribution & { images: Pick<ContributionImage, "url">[] }) => ({
           id: c.id,
           createdAt: c.createdAt.toISOString(),
           type: c.type,
