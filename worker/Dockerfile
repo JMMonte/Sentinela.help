@@ -6,15 +6,15 @@ WORKDIR /app
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy package files
-COPY package.json pnpm-lock.yaml* ./
+# Copy package files from worker directory
+COPY worker/package.json worker/pnpm-lock.yaml* ./
 
 # Install dependencies
 RUN pnpm install
 
-# Copy source
-COPY tsconfig.json ./
-COPY src ./src
+# Copy source from worker directory
+COPY worker/tsconfig.json ./
+COPY worker/src ./src
 
 # Build TypeScript
 RUN pnpm run build
@@ -28,7 +28,7 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy package files
-COPY package.json pnpm-lock.yaml* ./
+COPY worker/package.json worker/pnpm-lock.yaml* ./
 
 # Install production dependencies only
 RUN pnpm install --prod
